@@ -95,7 +95,11 @@ before anyone spends anything.
 
 ## How it works
 
-![contextlift demo: the whole loop on a seven-row warehouse, offline, in under a second](docs/assets/demo.gif)
+![contextlift demo: the whole loop on a seven-row warehouse, offline](docs/assets/demo.gif)
+
+Measured on a fresh clone: the **first** run takes about 14 seconds, because
+`uv` builds the virtual environment and caches bytecode. Every run after that
+is about 0.17 seconds. The recording above is a warm run.
 
 That is `contextlift demo`: the whole loop on seven rows of data, with no key,
 no cloud and no network. The model answers in it are canned and it says so on

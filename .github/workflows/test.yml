@@ -6,6 +6,11 @@ on:
   pull_request:
   push:
     branches: [main]
+  # Manual re-run. Added because it was needed and missing: the scan step
+  # passes vacuously when the SECRET_PATTERNS secret is absent, printing
+  # "no pattern file ..., nothing scanned", and after setting the secret
+  # there was no way to re-run the workflow without inventing a commit.
+  workflow_dispatch:
 
 jobs:
   test:
