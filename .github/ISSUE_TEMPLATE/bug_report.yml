@@ -1,0 +1,69 @@
+name: Bug report
+description: Something did not do what it said it would
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **The command and its output are the whole report.** Every real defect
+        found in this project was found by running something, not by reading
+        it. A description without the command usually cannot be acted on.
+
+  - type: textarea
+    id: command
+    attributes:
+      label: The exact command you ran
+      description: >-
+        Copy it, do not retype it. Replace a project id or a table name if you
+        need to, but keep the flags.
+      render: shell
+      placeholder: uv run contextlift round --db sqlite:///shop.db --golds golds.csv --spec spec/
+    validations:
+      required: true
+
+  - type: textarea
+    id: output
+    attributes:
+      label: What it printed
+      description: >-
+        All of it, including the lines before the error. If it is very long,
+        the last 50 lines and the first 10.
+      render: shell
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected instead
+      placeholder: I expected the verdict line to say ... because ...
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      description: "`contextlift --version`, or the commit you are on"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: where
+    attributes:
+      label: Where does it run
+      options:
+        - Offline only (SQLite or DuckDB, no cloud)
+        - BigQuery
+        - Knowledge Catalog
+        - Somewhere else
+    validations:
+      required: true
+
+  - type: textarea
+    id: anything
+    attributes:
+      label: Anything else
+      description: >-
+        Optional. If a number looked wrong, say which number and what you
+        expected it to be computed from.

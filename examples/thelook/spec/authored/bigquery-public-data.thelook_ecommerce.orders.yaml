@@ -1,0 +1,4 @@
+description: One row per order. Counts of orders come from here; money comes from order_items.
+columns:
+  status:
+    description: "The state of the whole order, capitalised exactly. A completed order has status 'Complete'."

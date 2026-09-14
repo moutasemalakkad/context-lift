@@ -1,0 +1,5 @@
+columns:
+  event_type:
+    description: What happened in this session step. A session counts as a purchase when it contains a purchase event.
+  session_id:
+    description: Groups events into one visit. Conversion is sessions with a purchase over all sessions.

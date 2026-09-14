@@ -1,0 +1,68 @@
+What each class of authored context is worth on thelook, and what each costs
+2026-09-14, gemini-2.5-flash, 74 working questions, 5 arms, 370 answers.
+
+HOW TO REPRODUCE
+    make classes-thelook PROJECT=<project>
+and to replay this exact run without paying for the model calls again:
+    make classes-thelook PROJECT=<project> RESUME=/tmp/classes.ckpt
+
+WHAT AN ARM IS. One arm holds all four classes of authored context. Each of
+the other four removes exactly one class and changes nothing else: same
+questions, same schema, same model. So a NEGATIVE number means the arm scored
+BETTER without that class.
+
+THE ACCURACY RESULT, verbatim:
+
+what each class is worth, on 74 working question(s):
+  (positive means the class is doing work; removing it lost points)
+  the two rates are there because a difference of zero between 55% and 55% is not
+  the same finding as a difference of zero between 5% and 5%
+  examples                  -27.0 points [-37.8, -16.2]  66% without it against 39% with, 21 fixed 1 broke, 22 item(s)  the arm is better WITHOUT it
+  terms                      -2.7 points [-9.2, +3.8]  42% without it against 39% with, 4 fixed 2 broke, 5 item(s)  not shown either way
+  authored descriptions      -1.4 points [-5.9, +3.2]  41% without it against 39% with, 2 fixed 1 broke, 10 item(s)  not shown either way
+  rules                      +5.4 points [-5.1, +15.9]  34% without it against 39% with, 6 fixed 10 broke, 50 item(s)  not shown either way
+
+the arm is measurably better without: examples. Removing one and re-running is the cheapest test there is.
+
+THE COST RESULT, verbatim. This is the second axis: an agent that cannot find
+the right table explores more, so a class can pay for itself in query bill
+even when its accuracy verdict reads NOT PROVEN.
+
+  cost: $0.0361 of query bill across 370 answer(s)
+    0 full arm     $0.0107  $0.0001/answer  $0.0004/correct answer
+    minus authored descriptions $0.0053  $0.0001/answer  $0.0002/correct answer
+    minus examples $0.0113  $0.0002/answer  $0.0002/correct answer
+    minus rules    $0.0049  $0.0001/answer  $0.0002/correct answer
+    minus terms    $0.0039  $0.0001/answer  $0.0001/correct answer
+    cost per ANSWER is the clean comparison. Cost per CORRECT answer also carries the accuracy change, so it is not a cost result on its own
+    model calls are billed separately and are on the `spent:` line. Neither line is the whole bill
+
+READING THE TWO TOGETHER, which is the point of measuring both.
+
+Removing examples RAISED the query bill, from $0.0107 to $0.0113, and at the
+same time HALVED the cost per correct answer, from $0.0004 to $0.0002. The
+arm asked for more bytes and got far more right, so per useful answer it was
+twice as cheap. A cost-per-answer figure alone would have called that arm
+more expensive. A cost-per-correct figure alone would have hidden that it
+scanned more data. Neither number is the result on its own.
+
+WHAT THIS DOES NOT ESTABLISH.
+
+- 74 questions resolve a change above about 12 points
+  (`power.smallest_resolvable(74)`). Only the examples result clears that
+  floor. The other three read "not shown either way", which is not the same
+  as costing nothing.
+- The examples result is about THESE 22 worked examples on THIS schema. It
+  does not say worked examples are bad. The next step the tool names is the
+  cheapest one: remove a single example and re-run.
+- One model, one public dataset, seven tables. It does not generalise to an
+  estate.
+- The dollar figures are the warehouse query bill only. Model calls are
+  billed separately and appear on the run's own `spent:` line. Neither line
+  is the whole bill.
+
+A NOTE ON THIS FILE'S OWN NUMBERS. The first run of this experiment printed
+"n/a/correct answer" on every row: the per-answer record carries no
+`correct` field, so cost per correct was computed from zero correct answers.
+The figures above come from a re-run off that run's checkpoint, which replays
+the model answers from disk and pays only for the scoring queries.

@@ -1,0 +1,46 @@
+The perturbation suite's positive control, run 2026-09-13
+
+Command:
+  python scripts/perturb_suite.py --spec examples/thelook/spec \
+    --golds examples/thelook/golds.csv --run --db bq://<project> \
+    --project <project> --working examples/thelook/curate_ids.txt \
+    --only positive-control-remove-capitalisation --checkpoint <file>
+
+The 74 WORKING questions. The reserved half was never read: a
+perturbation arm is a diagnostic, and the held-out set is read once
+per round. Arms carry no worked examples, because every perturbation
+here breaks a RULE and a question the example bank answers verbatim
+cannot move whatever the rules say.
+
+  perturbation suite: 7 defect(s) against the clean arm c6782e448a4b
+  clean arm fe6c03fe120c: 49 of 74 correct (66.2%)
+  positive-control-remove-capitalisation: -4.1 points, broke 4 fixed 1, n=74
+
+  McNemar exact on broke 4 / fixed 1: p = 0.3750
+  74 questions resolve a change above about 14.0 points
+     (context_lift.power.smallest_resolvable(74))
+
+THE RESULT, AND IT IS ABOUT THE SUITE RATHER THAN ABOUT THE CONTEXT.
+Deleting a rule KNOWN to be load-bearing -- the one saying status
+values are capitalised exactly, without which a lowercase 'shipped'
+matches no row -- moved the score by 4.1 points. This gold set can
+only resolve a change above about 14. So the suite cannot resolve its
+own positive control, by a factor of about three.
+
+It DID register as a count: broke 4, fixed 1. That is the safety line's
+shape -- a fact about these 74 questions, not an estimate about others
+-- and it is the honest way to read this run. What it is not is a
+resolvable lift.
+
+WHAT FOLLOWS. Running the other six perturbations here would spend 444
+more model calls to produce six NOT PROVEN verdicts, because anything
+smaller than the positive control is further inside the noise. That is
+the same refusal the power gate already makes for a paid round, and it
+applies to this suite for the same reason.
+
+WHAT WOULD WORK. The BIRD set is 450 questions and resolves about 4
+points, which is where a 4.1-point effect starts to be visible, and it
+runs on a backend with published prices rather than the Conversational
+Analytics API, whose page bills 'data tokens' and does not define one.
+Growing the thelook set to 100+ would help less: 104 questions still
+only resolve about 11 points.

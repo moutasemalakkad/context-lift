@@ -1,0 +1,7 @@
+# What the estate already had for this table, and it had nothing.
+# Checked live on 2026-09-09: 0 of the columns in bigquery-public-data
+# .thelook_ecommerce carry a description, across all seven tables.
+# This file exists and is empty on purpose. An absent file means nobody
+# looked; an empty one means somebody looked and there was nothing.
+description: ""
+columns: {}

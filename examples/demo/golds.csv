@@ -1,0 +1,8 @@
+id,gold_sql
+ok1,"SELECT name FROM employee"
+ok2,"SELECT name FROM employee WHERE dept_id = 1"
+bad_nonselect,"DELETE FROM employee"
+bad_placeholder,"-- TODO: write the query for top earners"
+bad_execfail,"SELECT missing_column FROM employee"
+bad_zerorows,"SELECT name FROM employee WHERE salary > 1000000"
+bad_degenerate,"SELECT SUM(salary) FROM employee WHERE salary > 1000000"

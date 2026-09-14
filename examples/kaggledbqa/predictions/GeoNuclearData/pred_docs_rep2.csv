@@ -1,0 +1,46 @@
+id,question,gold_sql,pred_sql
+q000,What are the top 10 countries with most number of operational plants?,"SELECT Country FROM nuclear_power_plants WHERE Status = ""Operational"" GROUP BY Country ORDER BY count(Name) DESC LIMIT 10","SELECT Country, COUNT(Id) AS operational_plant_count FROM nuclear_power_plants WHERE Status = 'Operational' GROUP BY Country ORDER BY operational_plant_count DESC LIMIT 10"
+q001,What are the planed nuclear power plants and their located countries?,"SELECT Name, Country FROM nuclear_power_plants WHERE Status = ""Planned""","SELECT Name, Country FROM nuclear_power_plants WHERE Status = 'Planned'"
+q002,What’s the most used nuclear reactor model?,SELECT ReactorModel FROM nuclear_power_plants GROUP BY ReactorModel ORDER BY count(*) DESC LIMIT 1,SELECT ReactorModel FROM nuclear_power_plants GROUP BY ReactorModel ORDER BY COUNT(ReactorModel) DESC LIMIT 1
+q003,Which country is Kaiga-4 built in?,"SELECT Country FROM nuclear_power_plants WHERE Name = ""Kaiga-4""",SELECT Country FROM nuclear_power_plants WHERE Name = 'Kaiga-4'
+q004,How many PHWR are there today?,"SELECT count(*) FROM nuclear_power_plants WHERE ReactorType = ""PHWR""",SELECT COUNT(Id) FROM nuclear_power_plants WHERE ReactorType = 'PHWR' AND OperationalTo IS NULL
+q005,How many kinds of nuclear reactor model in the world?,SELECT count(DISTINCT ReactorModel) FROM nuclear_power_plants,SELECT COUNT(DISTINCT ReactorModel) FROM nuclear_power_plants
+q006,How many nuclear power plants were shut down now?,"SELECT count(*) FROM nuclear_power_plants WHERE Status = ""Shutdown""",SELECT COUNT(Id) FROM nuclear_power_plants WHERE OperationalTo IS NOT NULL
+q007,How many countries have at least 3 nuclear power plants?,SELECT Country FROM nuclear_power_plants Group BY Country HAVING count(Name) > 3,SELECT COUNT(Country) FROM (SELECT Country FROM nuclear_power_plants GROUP BY Country HAVING COUNT(Id) >= 3);
+q008,Which country has the most nuclear power plants?,SELECT Country FROM nuclear_power_plants GROUP BY Country ORDER BY count(name) DESC LIMIT 1,SELECT Country FROM nuclear_power_plants GROUP BY Country ORDER BY COUNT(Id) DESC LIMIT 1
+q009,Which country has only one nuclear power plants?,SELECT Country FROM nuclear_power_plants GROUP BY Country HAVING count(Name) = 1,SELECT Country FROM nuclear_power_plants GROUP BY Country HAVING COUNT(Id) = 1
+q010,Which country has the most capacities of nuclear power plants?,SELECT Country FROM nuclear_power_plants GROUP BY Country ORDER BY sum(Capacity) DESC LIMIT 1,SELECT Country FROM nuclear_power_plants GROUP BY Country ORDER BY SUM(Capacity) DESC LIMIT 1
+q011,Which country has the least capacities of nuclear power plants?,SELECT Country FROM nuclear_power_plants GROUP BY Country ORDER BY sum(Capacity) LIMIT 1,SELECT Country FROM nuclear_power_plants GROUP BY Country ORDER BY SUM(Capacity) ASC LIMIT 1
+q012,What are the top 3 countries which have the most nuclear power plants?,SELECT Country FROM nuclear_power_plants GROUP BY Country ORDER BY sum(Name) DESC LIMIT 3,"SELECT
+  Country,
+  COUNT(Id) AS PlantCount
+FROM nuclear_power_plants
+GROUP BY
+  Country
+ORDER BY
+  PlantCount DESC
+LIMIT 3;"
+q013,Which country has the most nuclear station?,SELECT Country FROM nuclear_power_plants GROUP BY Country ORDER BY count(Name) DESC LIMIT 1,SELECT Country FROM nuclear_power_plants GROUP BY Country ORDER BY COUNT(Id) DESC LIMIT 1
+q014,Which county has the most nuclear station shut down?,"SELECT Country FROM nuclear_power_plants WHERE Status = ""Shutdown"" GROUP BY Country ORDER BY count(Name) DESC LIMIT 1",SELECT Country FROM nuclear_power_plants WHERE Status = 'Shutdown' GROUP BY Country ORDER BY COUNT(Id) DESC LIMIT 1
+q015,What nuclear station has the largest nuclear power plant capacity?,SELECT Name FROM nuclear_power_plants ORDER BY Capacity DESC LIMIT 1,SELECT Name FROM nuclear_power_plants ORDER BY Capacity DESC LIMIT 1
+q016,How many operating nuclear station in France?,"SELECT count(*) FROM nuclear_power_plants WHERE Country = ""France"" and Status = ""Operational""",SELECT COUNT(Id) FROM nuclear_power_plants WHERE Country = 'France' AND Status = 'Operating'
+q017,How many nuclear station are under construction?,"SELECT count(Name) FROM nuclear_power_plants WHERE Status = ""Under Construction""",SELECT COUNT(Id) FROM nuclear_power_plants WHERE Status = 'Under construction'
+q018,What nuclear reactor model is the most popular?,SELECT ReactorModel FROM nuclear_power_plants GROUP BY ReactorModel ORDER BY count(*) DESC LIMIT 1,SELECT ReactorModel FROM nuclear_power_plants GROUP BY ReactorModel ORDER BY COUNT(ReactorModel) DESC LIMIT 1
+q019,Which country is Chinon-A3 in?,"SELECT Country FROM nuclear_power_plants WHERE Name = ""Chinon-A3""",SELECT Country FROM nuclear_power_plants WHERE Name = 'Chinon-A3'
+q020,What are operational nuclear power plants in Japan called?,"SELECT Name FROM nuclear_power_plants where Status = ""Operational"" and Country = ""Japan""",SELECT Name FROM nuclear_power_plants WHERE Country = 'Japan' AND Status = 'Operational'
+q021,Which country first started using nuclear power plant(s)?,SELECT Country FROM nuclear_power_plants ORDER BY OperationalFrom LIMIT 1,SELECT Country FROM nuclear_power_plants ORDER BY OperationalFrom ASC LIMIT 1
+q022,How many nuclear power plants are in preparation to be used in Japan?,"SELECT count(*) FROM nuclear_power_plants WHERE Country = ""Japan"" AND Status = ""Under Construction""",SELECT COUNT(Id) FROM nuclear_power_plants WHERE Country = 'Japan' AND Status = 'Pre-operational'
+q023,What is the current situation of the nuclear power plant in the United States with the maximum capacity?,"SELECT Status FROM nuclear_power_plants WHERE Country = ""United States"" ORDER BY Capacity DESC LIMIT 1",SELECT Status FROM nuclear_power_plants WHERE Country = 'United States' ORDER BY Capacity DESC LIMIT 1
+q024,What is the maximum capacity of existing pressurized water reactor?,"SELECT max(Capacity) FROM nuclear_power_plants WHERE ReactorType = ""PWR"" and Status = ""Operational""",SELECT MAX(Capacity) FROM nuclear_power_plants WHERE ReactorType = 'Pressurized Water Reactor' AND Status = 'Operational'
+q025,Which nation has the most nuclear plants under construction?,"SELECT Country FROM nuclear_power_plants WHERE Status = ""Under Construction"" GROUP BY Country ORDER BY count(*) DESC LIMIT 1",SELECT Country FROM nuclear_power_plants WHERE Status = 'Under construction' GROUP BY Country ORDER BY COUNT(Id) DESC LIMIT 1
+q026,Which country has the most under constriction power plants to date?,"SELECT Country FROM nuclear_power_plants WHERE Status = ""Under Construction"" GROUP BY Country ORDER BY count(*) DESC LIMIT 1","SELECT Country
+FROM nuclear_power_plants
+WHERE Status = 'Under Construction'
+GROUP BY Country
+ORDER BY COUNT(Id) DESC
+LIMIT 1"
+q027,Where is the first BWR type power plant built and located?,"SELECT Longitude, Latitude FROM nuclear_power_plants WHERE ReactorType = ""BWR"" ORDER BY ConstructionStartAt LIMIT 1","SELECT Country, Name FROM nuclear_power_plants WHERE ReactorType = 'BWR' ORDER BY ConstructionStartAt ASC LIMIT 1"
+q028,Which country lead the total capacity of the power plants it held?,SELECT Country FROM nuclear_power_plants GROUP BY Country ORDER BY sum(Capacity) DESC LIMIT 1,SELECT Country FROM nuclear_power_plants GROUP BY Country ORDER BY SUM(Capacity) DESC LIMIT 1
+q029,What is the main source of the information for this table?,SELECT Source FROM nuclear_power_plants GROUP BY Source ORDER BY count(*) DESC LIMIT 1,SELECT Source FROM nuclear_power_plants GROUP BY Source ORDER BY COUNT(Source) DESC LIMIT 1
+q030,Which reactor type has the largest average capacity?,SELECT ReactorType FROM nuclear_power_plants GROUP BY ReactorType ORDER BY avg(Capacity) DESC LIMIT 1,SELECT ReactorType FROM nuclear_power_plants GROUP BY ReactorType ORDER BY AVG(Capacity) DESC LIMIT 1
+q031,Which country is Kursk-1 in?,"SELECT Country FROM nuclear_power_plants WHERE Name = ""Kursk-1""",SELECT Country FROM nuclear_power_plants WHERE Name = 'Kursk-1'

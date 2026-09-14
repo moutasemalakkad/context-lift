@@ -1,0 +1,135 @@
+{
+  "_comment": [
+    "Every measured result this project is willing to put in the README.",
+    "One rule: a row may only exist here if a COMMITTED file carries its",
+    "numbers and a test pins that file. `source` names the file, `pinned_by`",
+    "names the test. scripts/make_results_chart.py renders this into the two",
+    "SVGs in this directory, and tests/test_results_chart.py fails if a row",
+    "and its source ever disagree, or if the committed SVGs go stale.",
+    "",
+    "`lift_points` is the per-QUESTION lift wherever the source records one.",
+    "Answering a question three times gives three answers, not three",
+    "independent facts, so the per-answer figure has a larger denominator and",
+    "a narrower interval. A line that mixes the two levels states a figure",
+    "that is comparable to neither, so every row here carries one `level`.",
+    "",
+    "`show_in_readme` decides what the chart draws. A row set false is still",
+    "verified by tests/test_results_chart.py and still lives here -- the",
+    "finding is kept and checked, it just is not on the front page. The",
+    "machine-read BI row is argued in full in docs/CASE_STUDY.md, which is",
+    "where a reader who asks 'can't you just read my BI tool?' should land.",
+    "",
+    "Two rows added 2026-09-13 are ARM-AGAINST-ARM, not context-against-none,",
+    "so read their direction from the label and not from the sign. Both are",
+    "hidden: a NOT PROVEN result belongs in the record, not on the front page."
+  ],
+  "results": [
+    {
+      "label": "BIRD evidence sentences, 3 databases",
+      "written_by": "people",
+      "questions": 39,
+      "without_percent": 30.8,
+      "with_percent": 61.5,
+      "lift_points": 30.8,
+      "lift_ci_points": [
+        11.8,
+        49.8
+      ],
+      "mcnemar_p": 0.0075,
+      "level": "question",
+      "verdict": "REAL GAIN",
+      "source": "examples/bird/run.py (recomputed live, nothing cached)",
+      "pinned_by": "tests/test_readme_numbers.py",
+      "show_in_readme": true
+    },
+    {
+      "label": "BIRD evidence sentences, 11 databases",
+      "written_by": "people",
+      "questions": 65,
+      "without_percent": null,
+      "with_percent": null,
+      "lift_points": 18.5,
+      "lift_ci_points": [
+        6.5,
+        30.4
+      ],
+      "mcnemar_p": 0.004425,
+      "level": "question",
+      "verdict": "REAL GAIN",
+      "source": "examples/bird/enterprise_result.json: question_lift_points",
+      "pinned_by": "tests/test_bird_enterprise.py",
+      "show_in_readme": true
+    },
+    {
+      "label": "rules written by hand, 97-table warehouse",
+      "written_by": "people",
+      "questions": 69,
+      "without_percent": 5.3,
+      "with_percent": 15.0,
+      "lift_points": 9.7,
+      "lift_ci_points": [
+        2.0,
+        18.3
+      ],
+      "mcnemar_p": 0.0391,
+      "level": "question",
+      "verdict": "REAL GAIN",
+      "source": "examples/beaver/result.json",
+      "pinned_by": "tests/test_beaver_quickstart.py",
+      "show_in_readme": true
+    },
+    {
+      "label": "a BI model with no written descriptions",
+      "written_by": "a machine",
+      "questions": 102,
+      "without_percent": null,
+      "with_percent": null,
+      "lift_points": 2.0,
+      "lift_ci_points": null,
+      "mcnemar_p": 0.6875,
+      "level": "question",
+      "verdict": "NOT PROVEN",
+      "source": "examples/thelook/lookml-arm/round-2026-09-12.txt",
+      "pinned_by": "tests/test_case_study_numbers.py",
+      "show_in_readme": false
+    },
+    {
+      "label": "oracle selection against sending every sentence",
+      "written_by": "people",
+      "questions": 450,
+      "without_percent": 42.9,
+      "with_percent": 41.3,
+      "lift_points": -1.6,
+      "lift_ci_points": [
+        -5.6,
+        1.1
+      ],
+      "mcnemar_p": 0.2451,
+      "level": "question",
+      "verdict": "NOT PROVEN",
+      "direction_note": "without = every sentence (the blob), with = this question's own sentence. A negative lift means the blob won.",
+      "source": "docs/evidence/blob-vs-selection.txt",
+      "pinned_by": "tests/test_case_study_numbers.py",
+      "show_in_readme": false
+    },
+    {
+      "label": "repairing quoted values against the real column values",
+      "written_by": "a machine",
+      "questions": 450,
+      "without_percent": 41.3,
+      "with_percent": 41.9,
+      "lift_points": 0.6,
+      "lift_ci_points": [
+        -0.8,
+        3.5
+      ],
+      "mcnemar_p": 0.3075,
+      "level": "question",
+      "verdict": "NOT PROVEN",
+      "direction_note": "without = the sentence as written, with = every quoted literal repaired. A positive lift means the repair helped.",
+      "source": "docs/evidence/repaired-literals.txt",
+      "pinned_by": "tests/test_case_study_numbers.py",
+      "show_in_readme": false
+    }
+  ]
+}

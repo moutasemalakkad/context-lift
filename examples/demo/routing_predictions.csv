@@ -1,0 +1,7 @@
+id,question,gold_table,pred_table
+r1,total order count by month?,sales.orders,sales.orders
+r2,which customers ordered most?,sales.customers,analytics-prod.sales.customers
+r3,unpaid invoices past 30 days?,finance.invoices,`finance.invoices`
+r4,average order value?,sales.orders,sales.customers
+r5,current stock per warehouse?,inventory.stock_levels,inventory.stock_level
+r6,headcount by department?,hr.employees,

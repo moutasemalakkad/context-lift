@@ -1,0 +1,2150 @@
+id,split,arm,arm_id,question,gold_sql,pred_sql,verdict,correct,citations,matched_example,job_id,thought_chars,retries
+tl000#rep0,curate,control,2404ed0d5166,"revenue by month, 2023","SELECT FORMAT_TIMESTAMP('%Y-%m', oi.created_at) AS month, ROUND(SUM(oi.sale_price), 2) AS revenue
+FROM `bigquery-public-data.thelook_ecommerce.order_items` oi
+WHERE oi.status NOT IN ('Cancelled', 'Returned') AND EXTRACT(YEAR FROM oi.created_at) = 2023
+GROUP BY month ORDER BY month","SELECT DATE_TRUNC(DATE(order_items.created_at), MONTH) AS MONTH,
+       ROUND(SUM(order_items.sale_price), 2) AS revenue
+FROM `bigquery-public-data.thelook_ecommerce.order_items` AS order_items
+WHERE order_items.created_at >= '2023-01-01 00:00:00 UTC'
+  AND order_items.created_at < '2024-01-01 00:00:00 UTC'
+  AND LOWER(order_items.status) NOT IN ('cancelled',
+                                        'returned')
+GROUP BY MONTH
+ORDER BY MONTH ASC;",,,,,job_D_Nv-YjUtKEt5OmVQ_Q6I3IWJEMA,0,1
+tl001#rep0,curate,control,2404ed0d5166,"top 10 product categories by revenue, all time","SELECT p.category, ROUND(SUM(oi.sale_price), 2) AS revenue
+FROM `bigquery-public-data.thelook_ecommerce.order_items` oi
+JOIN `bigquery-public-data.thelook_ecommerce.products` p ON p.id = oi.product_id
+WHERE oi.status NOT IN ('Cancelled', 'Returned')
+GROUP BY p.category ORDER BY revenue DESC LIMIT 10","SELECT p.category AS product_category,
+       ROUND(SUM(oi.sale_price), 2) AS revenue
+FROM `bigquery-public-data.thelook_ecommerce.order_items` AS oi
+INNER JOIN `bigquery-public-data.thelook_ecommerce.products` AS p ON oi.product_id = p.id
+GROUP BY product_category
+ORDER BY revenue DESC
+LIMIT 10",,,,,job_nmrVj3umKR8uRki01aIPClJ5I3Le,0,1
+tl003#rep0,curate,control,2404ed0d5166,gross margin by department,"SELECT p.department, ROUND(SUM(oi.sale_price - p.cost), 2) AS gross_margin
+FROM `bigquery-public-data.thelook_ecommerce.order_items` oi
+JOIN `bigquery-public-data.thelook_ecommerce.products` p ON p.id = oi.product_id
+WHERE oi.status NOT IN ('Cancelled', 'Returned')
+GROUP BY p.department ORDER BY gross_margin DESC","SELECT p.department AS department,
+       SUM(oi.sale_price) AS total_revenue,
+       SUM(p.cost) AS total_cost,
+       SUM(oi.sale_price) - SUM(p.cost) AS gross_margin_amount,
+       ROUND(SAFE_DIVIDE(SUM(oi.sale_price) - SUM(p.cost), SUM(oi.sale_price)) * 100, 2) AS gross_margin_percentage
+FROM `bigquery-public-data.thelook_ecommerce.order_items` AS oi
+INNER JOIN `bigquery-public-data.thelook_ecommerce.products` AS p ON oi.product_id = p.id
+GROUP BY department
+ORDER BY gross_margin_percentage DESC",,,,,job_LcWFrmF43-3PqU-tfuUJJrNFhSUE,0,0
+tl004#rep0,curate,control,2404ed0d5166,completed orders per month in 2023,"SELECT FORMAT_TIMESTAMP('%Y-%m', created_at) AS month, COUNT(*) AS completed_orders
+FROM `bigquery-public-data.thelook_ecommerce.orders`
+WHERE status = 'Complete' AND EXTRACT(YEAR FROM created_at) = 2023
+GROUP BY month ORDER BY month","SELECT FORMAT_TIMESTAMP('%Y-%m', created_at) AS MONTH,
+       COUNT(DISTINCT order_id) AS completed_orders
+FROM `bigquery-public-data.thelook_ecommerce.orders`
+WHERE LOWER(status) = 'complete'
+  AND EXTRACT(YEAR
+              FROM created_at) = 2023
+GROUP BY MONTH
+ORDER BY MONTH",,,,,job_9AqS5aEXH8jchKyO-fNAaLaYkSvC,0,1
+tl005#rep0,curate,control,2404ed0d5166,share of orders by status,"SELECT status, COUNT(*) AS orders, ROUND(COUNT(*) / SUM(COUNT(*)) OVER (), 4) AS share
+FROM `bigquery-public-data.thelook_ecommerce.orders`
+GROUP BY status ORDER BY orders DESC","SELECT status,
+       COUNT(DISTINCT order_id) AS total_orders,
+       ROUND(COUNT(DISTINCT order_id) / SUM(COUNT(DISTINCT order_id)) OVER() * 100, 2) AS percentage
+FROM `bigquery-public-data.thelook_ecommerce.orders`
+GROUP BY status
+ORDER BY percentage DESC",,,,,job_aQwhMCpQb04tqPkmbQShrEnlywVm,0,0
+tl009#rep0,curate,control,2404ed0d5166,new customers per month in 2024,"SELECT FORMAT_TIMESTAMP('%Y-%m', created_at) AS month, COUNT(*) AS new_customers
+FROM `bigquery-public-data.thelook_ecommerce.users`
+WHERE EXTRACT(YEAR FROM created_at) = 2024
+GROUP BY month ORDER BY month","SELECT DATE_TRUNC(DATE(created_at), MONTH) AS signup_month,
+       COUNT(DISTINCT id) AS new_customers
+FROM `bigquery-public-data.thelook_ecommerce.users`
+WHERE EXTRACT(YEAR
+              FROM created_at) = 2024
+GROUP BY 1
+ORDER BY 1 ASC;",,,,,job_QO9f59mMC1SiNM8ugHwtLSEpMUDe,0,1
+tl010#rep0,curate,control,2404ed0d5166,"revenue by customer traffic source, 2023","SELECT u.traffic_source, ROUND(SUM(oi.sale_price), 2) AS revenue
+FROM `bigquery-public-data.thelook_ecommerce.order_items` oi
+JOIN `bigquery-public-data.thelook_ecommerce.users` u ON u.id = oi.user_id
+WHERE oi.status NOT IN ('Cancelled', 'Returned') AND EXTRACT(YEAR FROM oi.created_at) = 2023
+GROUP BY u.traffic_source ORDER BY revenue DESC","SELECT users.traffic_source AS customer_traffic_source,
+       ROUND(SUM(order_items.sale_price), 2) AS total_revenue
+FROM `bigquery-public-data.thelook_ecommerce.order_items` AS order_items
+INNER JOIN `bigquery-public-data.thelook_ecommerce.users` AS users ON order_items.user_id = users.id
+WHERE order_items.created_at >= '2023-01-01 00:00:00 UTC'
+  AND order_items.created_at < '2024-01-01 00:00:00 UTC'
+GROUP BY customer_traffic_source
+ORDER BY total_revenue DESC",,,,,job_gvi6776yLNuG3zlQ_8ud5eYiOLLF,0,0
+tl011#rep0,curate,control,2404ed0d5166,average order value by customer age band,"SELECT CASE WHEN u.age < 25 THEN 'under 25' WHEN u.age < 40 THEN '25-39' WHEN u.age < 60 THEN '40-59' ELSE '60+' END AS age_band,
+       ROUND(SUM(oi.sale_price) / COUNT(DISTINCT oi.order_id), 2) AS avg_order_value
+FROM `bigquery-public-data.thelook_ecommerce.order_items` oi
+JOIN `bigquery-public-data.thelook_ecommerce.users` u ON u.id = oi.user_id
+WHERE oi.status = 'Complete'
+GROUP BY age_band ORDER BY age_band","SELECT CASE
+           WHEN u.age < 18 THEN 'Under 18'
+           WHEN u.age BETWEEN 18 AND 24 THEN '18-24'
+           WHEN u.age BETWEEN 25 AND 34 THEN '25-34'
+           WHEN u.age BETWEEN 35 AND 44 THEN '35-44'
+           WHEN u.age BETWEEN 45 AND 54 THEN '45-54'
+           WHEN u.age BETWEEN 55 AND 64 THEN '55-64'
+           ELSE '65 and Over'
+       END AS age_band,
+       ROUND(SUM(oi.sale_price) / COUNT(DISTINCT oi.order_id), 2) AS average_order_value,
+       COUNT(DISTINCT oi.order_id) AS total_orders,
+       ROUND(SUM(oi.sale_price), 2) AS total_sales
+FROM `bigquery-public-data.thelook_ecommerce.order_items` AS oi
+INNER JOIN `bigquery-public-data.thelook_ecommerce.users` AS u ON oi.user_id = u.id
+GROUP BY age_band
+ORDER BY CASE age_band
+             WHEN 'Under 18' THEN 1
+             WHEN '18-24' THEN 2
+             WHEN '25-34' THEN 3
+             WHEN '35-44' THEN 4
+             WHEN '45-54' THEN 5
+             WHEN '55-64' THEN 6
+             ELSE 7
+         END",,,,,job_K3Tc1sFbqAIN9wLuIXiILEAUaq0a,0,0
+tl012#rep0,curate,control,2404ed0d5166,top 10 customers by lifetime revenue,"SELECT u.id AS user_id, u.email, ROUND(SUM(oi.sale_price), 2) AS lifetime_revenue
+FROM `bigquery-public-data.thelook_ecommerce.order_items` oi
+JOIN `bigquery-public-data.thelook_ecommerce.users` u ON u.id = oi.user_id
+WHERE oi.status NOT IN ('Cancelled', 'Returned')
+GROUP BY u.id, u.email ORDER BY lifetime_revenue DESC LIMIT 10","SELECT users.id AS user_id,
+       users.first_name,
+       users.last_name,
+       ROUND(SUM(order_items.sale_price), 2) AS lifetime_revenue
+FROM `bigquery-public-data.thelook_ecommerce.order_items` AS order_items
+INNER JOIN `bigquery-public-data.thelook_ecommerce.users` AS users ON order_items.user_id = users.id
+GROUP BY users.id,
+         users.first_name,
+         users.last_name
+ORDER BY lifetime_revenue DESC
+LIMIT 10",,,,,job_VULXIiM_ZokJ2HmXyOYhj7-1yyAn,0,0
+tl014#rep0,curate,control,2404ed0d5166,products never sold (no order item at all),"SELECT p.category, COUNT(*) AS products_never_sold
+FROM `bigquery-public-data.thelook_ecommerce.products` p
+LEFT JOIN `bigquery-public-data.thelook_ecommerce.order_items` oi ON oi.product_id = p.id
+WHERE oi.id IS NULL
+GROUP BY p.category ORDER BY products_never_sold DESC LIMIT 10","SELECT p.id AS product_id,
+       p.name AS product_name,
+       p.brand AS product_brand,
+       p.category AS product_category,
+       p.retail_price,
+       COUNT(*) OVER() AS total_unsold_products
+FROM `bigquery-public-data.thelook_ecommerce.products` AS p
+LEFT JOIN `bigquery-public-data.thelook_ecommerce.order_items` AS oi ON p.id = oi.product_id
+WHERE oi.product_id IS NULL
+ORDER BY p.id
+LIMIT 10;",,,,,job_vKhSjyi2QQkRBEPiCuy2DvN0b9AQ,0,0
+tl015#rep0,curate,control,2404ed0d5166,inventory on hand by distribution center,"SELECT dc.name AS distribution_center, COUNT(*) AS items_on_hand
+FROM `bigquery-public-data.thelook_ecommerce.inventory_items` ii
+JOIN `bigquery-public-data.thelook_ecommerce.distribution_centers` dc ON dc.id = ii.product_distribution_center_id
+WHERE ii.sold_at IS NULL
+GROUP BY dc.name ORDER BY items_on_hand DESC","SELECT dc.id AS distribution_center_id,
+       dc.name AS distribution_center_name,
+       COUNT(ii.id) AS inventory_on_hand_count
+FROM `bigquery-public-data.thelook_ecommerce.distribution_centers` AS dc
+LEFT JOIN `bigquery-public-data.thelook_ecommerce.inventory_items` AS ii ON dc.id = ii.product_distribution_center_id
+AND ii.sold_at IS NULL
+GROUP BY 1,
+         2
+ORDER BY inventory_on_hand_count DESC",,,,,job__lcLEabi-qPKfuOEaeZ_kLKSuw8K,0,1
+tl016#rep0,curate,control,2404ed0d5166,purchase conversion by traffic source,"SELECT traffic_source,
+       ROUND(COUNT(DISTINCT IF(event_type = 'purchase', session_id, NULL)) / COUNT(DISTINCT session_id), 4) AS conversion_rate
+FROM `bigquery-public-data.thelook_ecommerce.events`
+GROUP BY traffic_source ORDER BY conversion_rate DESC","SELECT traffic_source,
+       COUNT(DISTINCT session_id) AS total_sessions,
+       COUNT(DISTINCT CASE
+                          WHEN event_type = 'purchase' THEN session_id
+                      END) AS purchase_sessions,
+       ROUND(SAFE_DIVIDE(COUNT(DISTINCT CASE
+                                            WHEN event_type = 'purchase' THEN session_id
+                                        END), COUNT(DISTINCT session_id)) * 100, 2) AS conversion_rate_percentage
+FROM `bigquery-public-data.thelook_ecommerce.events`
+GROUP BY traffic_source
+ORDER BY conversion_rate_percentage DESC",,,,,job_73XjMzp3-4ngzDHJ_yTNFnPmuyvu,0,0
+tl017#rep0,curate,control,2404ed0d5166,sessions by browser in 2024,"SELECT browser, COUNT(DISTINCT session_id) AS sessions
+FROM `bigquery-public-data.thelook_ecommerce.events`
+WHERE EXTRACT(YEAR FROM created_at) = 2024
+GROUP BY browser ORDER BY sessions DESC","SELECT browser,
+       COUNT(DISTINCT session_id) AS session_count
+FROM `bigquery-public-data.thelook_ecommerce.events`
+WHERE created_at >= '2024-01-01 00:00:00 UTC'
+  AND created_at < '2025-01-01 00:00:00 UTC'
+GROUP BY 1
+ORDER BY 2 DESC;",,,,,job_rfFgYu88wj0i2IAjdM1F-oJeP7MD,0,0
+tl018#rep0,curate,control,2404ed0d5166,"cart abandonment: sessions with a cart event and no purchase, by month in 2024","SELECT FORMAT_TIMESTAMP('%Y-%m', created_at) AS month, COUNTIF(has_cart AND NOT has_purchase) AS abandoned_sessions
+FROM (
+  SELECT session_id, MIN(created_at) AS created_at,
+         LOGICAL_OR(event_type = 'cart') AS has_cart,
+         LOGICAL_OR(event_type = 'purchase') AS has_purchase
+  FROM `bigquery-public-data.thelook_ecommerce.events`
+  WHERE EXTRACT(YEAR FROM created_at) = 2024
+  GROUP BY session_id
+)
+GROUP BY month ORDER BY month","WITH session_events AS
+  (SELECT session_id,
+          MIN(created_at) AS session_start,
+          LOGICAL_OR(LOWER(event_type) = 'cart') AS has_cart,
+          LOGICAL_OR(LOWER(event_type) = 'purchase') AS has_purchase
+   FROM `bigquery-public-data.thelook_ecommerce.events`
+   WHERE created_at >= '2024-01-01 00:00:00 UTC'
+     AND created_at < '2025-01-01 00:00:00 UTC'
+   GROUP BY session_id)
+SELECT DATE_TRUNC(DATE(session_start), MONTH) AS MONTH,
+       COUNT(DISTINCT CASE
+                          WHEN has_cart
+                               AND NOT has_purchase THEN session_id
+                      END) AS abandoned_sessions,
+       COUNT(DISTINCT CASE
+                          WHEN has_cart THEN session_id
+                      END) AS total_cart_sessions,
+       ROUND(SAFE_DIVIDE(COUNT(DISTINCT CASE
+                                            WHEN has_cart
+                                                 AND NOT has_purchase THEN session_id
+                                        END), COUNT(DISTINCT CASE
+                                                                 WHEN has_cart THEN session_id
+                                                             END)) * 100, 1) AS abandonment_rate_percentage
+FROM session_events
+GROUP BY 1
+ORDER BY 1;",,,,,job_7WTowxul5P4KELPRpCUYsIPyNdSn,0,1
+tl019#rep0,curate,control,2404ed0d5166,"monthly revenue with month-over-month change, 2023","WITH monthly AS (
+  SELECT FORMAT_TIMESTAMP('%Y-%m', created_at) AS month, SUM(sale_price) AS revenue
+  FROM `bigquery-public-data.thelook_ecommerce.order_items`
+  WHERE status NOT IN ('Cancelled', 'Returned') AND EXTRACT(YEAR FROM created_at) = 2023
+  GROUP BY month
+)
+SELECT month, ROUND(revenue, 2) AS revenue,
+       ROUND(revenue - LAG(revenue) OVER (ORDER BY month), 2) AS change_from_previous_month
+FROM monthly ORDER BY month","WITH monthly_sales AS
+  (SELECT DATE_TRUNC(DATE(created_at), MONTH) AS MONTH,
+          SUM(sale_price) AS revenue
+   FROM `bigquery-public-data.thelook_ecommerce.order_items`
+   WHERE EXTRACT(YEAR
+                 FROM created_at) = 2023
+   GROUP BY 1)
+SELECT MONTH,
+       ROUND(revenue, 2) AS revenue,
+       ROUND(revenue - LAG(revenue) OVER (
+                                          ORDER BY MONTH), 2) AS mom_revenue_change,
+       ROUND(SAFE_DIVIDE(revenue - LAG(revenue) OVER (
+                                                      ORDER BY MONTH), LAG(revenue) OVER (
+                                                                                          ORDER BY MONTH)) * 100, 2) AS mom_percentage_change
+FROM monthly_sales
+ORDER BY MONTH;",,,,,job_31oQ_5n1gduB58cYFUHVIgEWyIWp,0,0
+tl021#rep0,curate,control,2404ed0d5166,"orders with more than 3 items, by month in 2024","SELECT FORMAT_TIMESTAMP('%Y-%m', created_at) AS month, COUNT(*) AS large_orders
+FROM `bigquery-public-data.thelook_ecommerce.orders`
+WHERE num_of_item > 3 AND EXTRACT(YEAR FROM created_at) = 2024
+GROUP BY month ORDER BY month","SELECT FORMAT_TIMESTAMP('%Y-%m', created_at) AS MONTH,
+       COUNT(*) AS order_count
+FROM `bigquery-public-data.thelook_ecommerce.orders`
+WHERE num_of_item > 3
+  AND EXTRACT(YEAR
+              FROM created_at) = 2024
+GROUP BY 1
+ORDER BY 1;",,,,,job_s1ZTD_e0GcVHZF2ASYy9k1Eeq45r,0,1
+tl022#rep0,curate,control,2404ed0d5166,"average days from order to delivery by country, delivered orders only","SELECT u.country, ROUND(AVG(TIMESTAMP_DIFF(o.delivered_at, o.created_at, HOUR)) / 24, 2) AS avg_days_to_deliver
+FROM `bigquery-public-data.thelook_ecommerce.orders` o
+JOIN `bigquery-public-data.thelook_ecommerce.users` u ON u.id = o.user_id
+WHERE o.delivered_at IS NOT NULL
+GROUP BY u.country ORDER BY avg_days_to_deliver LIMIT 10","SELECT users.country,
+       ROUND(AVG(TIMESTAMP_DIFF(order_items.delivered_at, order_items.created_at, SECOND) / 86400.0), 2) AS avg_days_to_delivery,
+       COUNT(*) AS total_delivered_items
+FROM `bigquery-public-data.thelook_ecommerce.order_items` AS order_items
+INNER JOIN `bigquery-public-data.thelook_ecommerce.users` AS users ON order_items.user_id = users.id
+WHERE order_items.status = 'Complete'
+  AND order_items.delivered_at IS NOT NULL
+GROUP BY 1
+ORDER BY avg_days_to_delivery DESC",,,,,job_dc5zPOdQpexP9Wog4URJrQnPcdEQ,0,0
+tl023#rep0,curate,control,2404ed0d5166,"revenue by gender and department, 2023","SELECT o.gender, p.department, ROUND(SUM(oi.sale_price), 2) AS revenue
+FROM `bigquery-public-data.thelook_ecommerce.order_items` oi
+JOIN `bigquery-public-data.thelook_ecommerce.orders` o ON o.order_id = oi.order_id
+JOIN `bigquery-public-data.thelook_ecommerce.products` p ON p.id = oi.product_id
+WHERE oi.status NOT IN ('Cancelled', 'Returned') AND EXTRACT(YEAR FROM oi.created_at) = 2023
+GROUP BY o.gender, p.department ORDER BY o.gender, p.department","SELECT orders.gender,
+       products.department,
+       ROUND(SUM(order_items.sale_price), 2) AS total_revenue
+FROM `bigquery-public-data.thelook_ecommerce.order_items` AS order_items
+INNER JOIN `bigquery-public-data.thelook_ecommerce.products` AS products ON order_items.product_id = products.id
+INNER JOIN `bigquery-public-data.thelook_ecommerce.orders` AS orders ON order_items.order_id = orders.order_id
+WHERE EXTRACT(YEAR
+              FROM order_items.created_at) = 2023
+GROUP BY orders.gender,
+         products.department
+ORDER BY total_revenue DESC",,,,,job__51bq2wV2nT5tg7mvIrrM_Sxiptw,0,0
+tl024#rep0,curate,control,2404ed0d5166,"discount depth: products sold below retail price, share by category","SELECT p.category, ROUND(COUNTIF(oi.sale_price < p.retail_price) / COUNT(*), 4) AS share_sold_below_retail
+FROM `bigquery-public-data.thelook_ecommerce.order_items` oi
+JOIN `bigquery-public-data.thelook_ecommerce.products` p ON p.id = oi.product_id
+WHERE oi.status NOT IN ('Cancelled', 'Returned')
+GROUP BY p.category ORDER BY share_sold_below_retail DESC LIMIT 10","SELECT p.category AS product_category,
+       COUNT(*) AS total_units_sold,
+       COUNTIF(oi.sale_price < p.retail_price) AS discounted_units_sold,
+       ROUND(SAFE_DIVIDE(COUNTIF(oi.sale_price < p.retail_price), COUNT(*)) * 100, 1) AS discount_share_percentage,
+       ROUND(AVG(CASE
+                     WHEN oi.sale_price < p.retail_price THEN SAFE_DIVIDE(p.retail_price - oi.sale_price, p.retail_price) * 100
+                 END), 1) AS avg_discount_depth_percentage
+FROM `bigquery-public-data.thelook_ecommerce.order_items` AS oi
+INNER JOIN `bigquery-public-data.thelook_ecommerce.products` AS p ON oi.product_id = p.id
+GROUP BY product_category
+ORDER BY discount_share_percentage DESC",,,,,job_FMQmiSBJggRaVLvS84aZ3EGC8W1E,0,0
+tl025#rep0,curate,control,2404ed0d5166,cancelled order share by month in 2024,"SELECT FORMAT_TIMESTAMP('%Y-%m', created_at) AS month,
+       ROUND(COUNTIF(status = 'Cancelled') / COUNT(*), 4) AS cancelled_share
+FROM `bigquery-public-data.thelook_ecommerce.orders`
+WHERE EXTRACT(YEAR FROM created_at) = 2024
+GROUP BY month ORDER BY month","SELECT EXTRACT(MONTH
+               FROM created_at) AS month_num,
+       FORMAT_TIMESTAMP('%Y-%m', created_at) AS month_str,
+       COUNT(DISTINCT CASE
+                          WHEN LOWER(status) = 'cancelled' THEN order_id
+                      END) AS cancelled_orders,
+       COUNT(DISTINCT order_id) AS total_orders,
+       ROUND(SAFE_DIVIDE(COUNT(DISTINCT CASE
+                                            WHEN LOWER(status) = 'cancelled' THEN order_id
+                                        END), COUNT(DISTINCT order_id)) * 100, 2) AS cancelled_share_percentage
+FROM `bigquery-public-data.thelook_ecommerce.orders`
+WHERE EXTRACT(YEAR
+              FROM created_at) = 2024
+GROUP BY month_num,
+         month_str
+ORDER BY month_num;",,,,,job_zq69EtmBxm_w32Prb2DxlphmizHD,0,1
+tm000#rep0,curate,control,2404ed0d5166,"Which are the top 10 states by number of customers, and what is the customer_count for each?","SELECT state,
+       COUNT(DISTINCT id) AS customer_count
+FROM `bigquery-public-data.thelook_ecommerce.users`
+GROUP BY state
+ORDER BY customer_count DESC
+LIMIT 10","SELECT state,
+       COUNT(DISTINCT id) AS customer_count
+FROM `bigquery-public-data.thelook_ecommerce.users`
+GROUP BY 1
+ORDER BY customer_count DESC
+LIMIT 10;",MATCH,True,,,job_GLJ9PCewd7DtBVySJWuxGWHinruR,0,0
+tm002#rep0,curate,control,2404ed0d5166,"For each month in 2024, what is the month number, the month, the total number of orders, the number of cancelled orders, and the cancelled_share_percentage, ordered by month number?","SELECT
+  EXTRACT(MONTH FROM DATE(created_at)) AS month_num,
+  FORMAT_DATE('%Y-%m', DATE(created_at)) AS month,
+  COUNT(DISTINCT order_id) AS total_orders,
+  COUNT(DISTINCT CASE WHEN LOWER(status) = 'cancelled' THEN order_id END) AS cancelled_orders,
+  ROUND(SAFE_DIVIDE(COUNT(DISTINCT CASE WHEN LOWER(status) = 'cancelled' THEN order_id END), COUNT(DISTINCT order_id)) * 100, 2) AS cancelled_share_percentage
+FROM
+  `bigquery-public-data.thelook_ecommerce.orders`
+WHERE
+  EXTRACT(YEAR FROM DATE(created_at)) = 2024
+GROUP BY
+  month_num,
+  month
+ORDER BY
+  month_num;","SELECT EXTRACT(MONTH
+               FROM created_at) AS month_number,
+       FORMAT_TIMESTAMP('%B', created_at) AS MONTH,
+       COUNT(DISTINCT order_id) AS total_orders,
+       COUNT(DISTINCT CASE
+                          WHEN LOWER(status) = 'cancelled' THEN order_id
+                      END) AS cancelled_orders,
+       ROUND(SAFE_DIVIDE(COUNT(DISTINCT CASE
+                                            WHEN LOWER(status) = 'cancelled' THEN order_id
+                                        END), COUNT(DISTINCT order_id)) * 100, 2) AS cancelled_share_percentage
+FROM `bigquery-public-data.thelook_ecommerce.orders`
+WHERE created_at >= '2024-01-01 00:00:00 UTC'
+  AND created_at < '2025-01-01 00:00:00 UTC'
+GROUP BY month_number,
+         MONTH
+ORDER BY month_number;",,,,,job_fV9Y5TWBgDkKRMiCN5gico0b6trZ,0,1
+tm003#rep0,curate,control,2404ed0d5166,"What are the total sessions, purchase sessions, and conversion rate percentage by traffic source, ordered by conversion rate percentage from highest to lowest?","SELECT
+  traffic_source,
+  COUNT(DISTINCT session_id) AS total_sessions,
+  COUNT(DISTINCT CASE WHEN LOWER(event_type) = 'purchase' THEN session_id END) AS purchase_sessions,
+  ROUND(SAFE_DIVIDE(COUNT(DISTINCT CASE WHEN LOWER(event_type) = 'purchase' THEN session_id END), COUNT(DISTINCT session_id)) * 100, 2) AS conversion_rate_percentage
+FROM
+  `bigquery-public-data.thelook_ecommerce.events`
+GROUP BY
+  traffic_source
+ORDER BY
+  conversion_rate_percentage DESC","SELECT traffic_source,
+       COUNT(DISTINCT session_id) AS total_sessions,
+       COUNT(DISTINCT CASE
+                          WHEN LOWER(event_type) = 'purchase' THEN session_id
+                      END) AS purchase_sessions,
+       ROUND(SAFE_DIVIDE(COUNT(DISTINCT CASE
+                                            WHEN LOWER(event_type) = 'purchase' THEN session_id
+                                        END), COUNT(DISTINCT session_id)) * 100, 2) AS conversion_rate_percentage
+FROM `bigquery-public-data.thelook_ecommerce.events`
+GROUP BY 1
+ORDER BY conversion_rate_percentage DESC",,,,,job_q2HnzRI8N9mKBcG3qZe188UwuSpB,0,0
+ta000#rep0,curate,control,2404ed0d5166,"revenue by quarter, 2023","SELECT FORMAT_TIMESTAMP('%Y-Q', oi.created_at) AS q, CAST(CEIL(EXTRACT(MONTH FROM oi.created_at)/3) AS INT64) AS quarter, ROUND(SUM(oi.sale_price),2) AS revenue
+FROM `bigquery-public-data.thelook_ecommerce.order_items` oi
+WHERE oi.status NOT IN ('Cancelled','Returned') AND EXTRACT(YEAR FROM oi.created_at)=2023
+GROUP BY q, quarter ORDER BY q, quarter","SELECT EXTRACT(QUARTER
+               FROM created_at) AS QUARTER,
+       ROUND(SUM(sale_price), 2) AS revenue
+FROM `bigquery-public-data.thelook_ecommerce.order_items`
+WHERE created_at >= '2023-01-01 00:00:00 UTC'
+  AND created_at < '2024-01-01 00:00:00 UTC'
+  AND status NOT IN ('Cancelled',
+                     'Returned')
+GROUP BY QUARTER
+ORDER BY QUARTER;",MISMATCH,False,,,job_0lrE53ODGaAf-YgeJObKQpI_njvY,0,0
+ta001#rep0,curate,control,2404ed0d5166,revenue by department,"SELECT p.department, ROUND(SUM(oi.sale_price),2) AS revenue
+FROM `bigquery-public-data.thelook_ecommerce.order_items` oi JOIN `bigquery-public-data.thelook_ecommerce.products` p ON p.id=oi.product_id
+WHERE oi.status NOT IN ('Cancelled','Returned')
+GROUP BY p.department ORDER BY revenue DESC","SELECT p.department,
+       ROUND(SUM(oi.sale_price), 2) AS revenue
+FROM `bigquery-public-data.thelook_ecommerce.order_items` AS oi
+INNER JOIN `bigquery-public-data.thelook_ecommerce.products` AS p ON oi.product_id = p.id
+GROUP BY p.department
+ORDER BY revenue DESC",MISMATCH,False,,,job_O1IBtIgfdguhFOWWYUSliRUFI9_1,0,0
+ta002#rep0,curate,control,2404ed0d5166,revenue per customer country in 2024,"SELECT u.country, ROUND(SUM(oi.sale_price),2) AS revenue
+FROM `bigquery-public-data.thelook_ecommerce.order_items` oi JOIN `bigquery-public-data.thelook_ecommerce.users` u ON u.id=oi.user_id
+WHERE oi.status NOT IN ('Cancelled','Returned') AND EXTRACT(YEAR FROM oi.created_at)=2024
+GROUP BY u.country ORDER BY revenue DESC","SELECT u.country AS customer_country,
+       ROUND(SUM(oi.sale_price), 2) AS total_revenue
+FROM `bigquery-public-data.thelook_ecommerce.order_items` AS oi
+INNER JOIN `bigquery-public-data.thelook_ecommerce.users` AS u ON oi.user_id = u.id
+WHERE oi.created_at >= '2024-01-01 00:00:00 UTC'
+  AND oi.created_at < '2025-01-01 00:00:00 UTC'
+GROUP BY customer_country
+ORDER BY total_revenue DESC;",MISMATCH,False,,,job_FOYsQVS4DgfuvCgkrfC2oj1Z0SsR,0,1
+ta003#rep0,curate,control,2404ed0d5166,the five brands with the highest revenue overall,"SELECT p.brand, ROUND(SUM(oi.sale_price),2) AS revenue
+FROM `bigquery-public-data.thelook_ecommerce.order_items` oi JOIN `bigquery-public-data.thelook_ecommerce.products` p ON p.id=oi.product_id
+WHERE oi.status NOT IN ('Cancelled','Returned')
+GROUP BY p.brand ORDER BY revenue DESC LIMIT 5","SELECT p.brand,
+       SUM(oi.sale_price) AS total_revenue
+FROM `bigquery-public-data.thelook_ecommerce.order_items` AS oi
+INNER JOIN `bigquery-public-data.thelook_ecommerce.products` AS p ON oi.product_id = p.id
+WHERE oi.status NOT IN ('Cancelled',
+                        'Returned')
+GROUP BY p.brand
+ORDER BY total_revenue DESC
+LIMIT 5",MISMATCH,False,,,job_Ii0KelOADfIi1ArVfr8r5T1elrRU,0,0
+ta005#rep0,curate,control,2404ed0d5166,which categories earned more than 100000 in revenue,"SELECT p.category, ROUND(SUM(oi.sale_price),2) AS revenue
+FROM `bigquery-public-data.thelook_ecommerce.order_items` oi JOIN `bigquery-public-data.thelook_ecommerce.products` p ON p.id=oi.product_id
+WHERE oi.status NOT IN ('Cancelled','Returned')
+GROUP BY p.category HAVING SUM(oi.sale_price) > 100000 ORDER BY revenue DESC","SELECT p.category,
+       SUM(oi.sale_price) AS total_revenue
+FROM `bigquery-public-data.thelook_ecommerce.order_items` AS oi
+INNER JOIN `bigquery-public-data.thelook_ecommerce.products` AS p ON oi.product_id = p.id
+GROUP BY p.category
+HAVING SUM(oi.sale_price) > 100000
+ORDER BY total_revenue DESC",MISMATCH,False,,,job_gITlKS_hIvxWDpyZrM1pLnEbDSFq,0,0
+ta006#rep0,curate,control,2404ed0d5166,margin by category,"SELECT p.category, ROUND(SUM(oi.sale_price - p.cost),2) AS margin
+FROM `bigquery-public-data.thelook_ecommerce.order_items` oi JOIN `bigquery-public-data.thelook_ecommerce.products` p ON p.id=oi.product_id
+WHERE oi.status NOT IN ('Cancelled','Returned')
+GROUP BY p.category ORDER BY margin DESC","SELECT p.category AS product_category,
+       ROUND(SUM(oi.sale_price), 2) AS total_revenue,
+       ROUND(SUM(p.cost), 2) AS total_cost,
+       ROUND(SUM(oi.sale_price - p.cost), 2) AS total_profit,
+       ROUND(SAFE_DIVIDE(SUM(oi.sale_price - p.cost), SUM(oi.sale_price)) * 100, 1) AS margin_percentage
+FROM `bigquery-public-data.thelook_ecommerce.order_items` AS oi
+INNER JOIN `bigquery-public-data.thelook_ecommerce.products` AS p ON oi.product_id = p.id
+GROUP BY product_category
+ORDER BY total_profit DESC",MISMATCH,False,,,job_9wW4h7t08aK9JkV8ArzSkdLMxHLS,0,0
+ta009#rep0,curate,control,2404ed0d5166,margin percentage by department,"SELECT p.department, ROUND(SAFE_DIVIDE(SUM(oi.sale_price - p.cost), SUM(oi.sale_price))*100,2) AS margin_pct
+FROM `bigquery-public-data.thelook_ecommerce.order_items` oi JOIN `bigquery-public-data.thelook_ecommerce.products` p ON p.id=oi.product_id
+WHERE oi.status NOT IN ('Cancelled','Returned')
+GROUP BY p.department ORDER BY margin_pct DESC","SELECT department,
+       ROUND(SAFE_DIVIDE(SUM(retail_price - cost), SUM(retail_price)) * 100, 2) AS margin_percentage,
+       ROUND(SUM(retail_price - cost), 2) AS total_margin,
+       ROUND(SUM(retail_price), 2) AS total_retail_price
+FROM `bigquery-public-data.thelook_ecommerce.products`
+GROUP BY department
+ORDER BY margin_percentage DESC",MISMATCH,False,,,job_QbeFEN8GAQ2lnfziwE_px7E-b_T4,0,0
+ta010#rep0,curate,control,2404ed0d5166,how many completed orders were there in 2024,SELECT COUNT(*) AS n FROM `bigquery-public-data.thelook_ecommerce.orders` WHERE status='Complete' AND EXTRACT(YEAR FROM created_at)=2024,"SELECT COUNT(DISTINCT order_id) AS completed_orders_count
+FROM `bigquery-public-data.thelook_ecommerce.order_items`
+WHERE status = 'Complete'
+  AND created_at >= '2024-01-01 00:00:00 UTC'
+  AND created_at < '2025-01-01 00:00:00 UTC'",MISMATCH,False,,,job_kBmbhSPMJwjyj-VbLyzHW2aDsApi,0,0
+ta012#rep0,curate,control,2404ed0d5166,"completed orders per customer state, top 15","SELECT u.state, COUNT(*) AS n
+FROM `bigquery-public-data.thelook_ecommerce.orders` o JOIN `bigquery-public-data.thelook_ecommerce.users` u ON u.id=o.user_id
+WHERE o.status='Complete'
+GROUP BY u.state ORDER BY n DESC LIMIT 15","SELECT users.state AS customer_state,
+       COUNT(DISTINCT orders.order_id) AS completed_orders_count
+FROM `bigquery-public-data.thelook_ecommerce.orders` AS orders
+INNER JOIN `bigquery-public-data.thelook_ecommerce.users` AS users ON orders.user_id = users.id
+WHERE LOWER(orders.status) = 'complete'
+GROUP BY customer_state
+ORDER BY completed_orders_count DESC
+LIMIT 15;",MATCH,True,,,job_fmJ7jBp9-nKnBuA5ZstYwvTyKqY6,0,0
+ta013#rep0,curate,control,2404ed0d5166,"the share of orders that are completed, by month in 2023","SELECT FORMAT_TIMESTAMP('%Y-%m', created_at) AS month, ROUND(SAFE_DIVIDE(COUNTIF(status='Complete'), COUNT(*))*100,2) AS complete_pct
+FROM `bigquery-public-data.thelook_ecommerce.orders`
+WHERE EXTRACT(YEAR FROM created_at)=2023
+GROUP BY month ORDER BY month","SELECT EXTRACT(MONTH
+               FROM created_at) AS order_month,
+       COUNT(DISTINCT order_id) AS total_orders,
+       COUNT(DISTINCT CASE
+                          WHEN LOWER(status) = 'complete' THEN order_id
+                      END) AS completed_orders,
+       ROUND(SAFE_DIVIDE(COUNT(DISTINCT CASE
+                                            WHEN LOWER(status) = 'complete' THEN order_id
+                                        END), COUNT(DISTINCT order_id)) * 100, 2) AS completed_share_percentage
+FROM `bigquery-public-data.thelook_ecommerce.orders`
+WHERE created_at >= '2023-01-01 00:00:00 UTC'
+  AND created_at < '2024-01-01 00:00:00 UTC'
+GROUP BY order_month
+ORDER BY order_month",MISMATCH,False,,,job_qpJJwA-W2_KiQgpQ1ebxiiawS9oJ,0,1
+ta015#rep0,curate,control,2404ed0d5166,the slowest 10 states to deliver to,"SELECT u.state, ROUND(AVG(TIMESTAMP_DIFF(oi.delivered_at, oi.shipped_at, HOUR)),2) AS hours
+FROM `bigquery-public-data.thelook_ecommerce.order_items` oi JOIN `bigquery-public-data.thelook_ecommerce.users` u ON u.id=oi.user_id
+WHERE oi.delivered_at IS NOT NULL AND oi.shipped_at IS NOT NULL
+GROUP BY u.state ORDER BY hours DESC LIMIT 10","SELECT users.state AS state,
+       users.country AS country,
+       ROUND(AVG(TIMESTAMP_DIFF(order_items.delivered_at, order_items.created_at, SECOND)) / 86400.0, 2) AS avg_delivery_time_days,
+       COUNT(order_items.id) AS total_deliveries
+FROM `bigquery-public-data.thelook_ecommerce.order_items` AS order_items
+INNER JOIN `bigquery-public-data.thelook_ecommerce.users` AS users ON order_items.user_id = users.id
+WHERE order_items.delivered_at IS NOT NULL
+  AND order_items.created_at IS NOT NULL
+  AND order_items.delivered_at >= order_items.created_at
+GROUP BY state,
+         country
+ORDER BY avg_delivery_time_days DESC
+LIMIT 10",MISMATCH,False,,,job_uvFY4oJ8GbUuTLCONjJE8c8pfOdy,0,1
+ta017#rep0,curate,control,2404ed0d5166,return rate by department,"SELECT p.department, ROUND(SAFE_DIVIDE(COUNTIF(oi.status='Returned'), COUNTIF(oi.status<>'Cancelled'))*100,2) AS return_pct
+FROM `bigquery-public-data.thelook_ecommerce.order_items` oi JOIN `bigquery-public-data.thelook_ecommerce.products` p ON p.id=oi.product_id
+GROUP BY p.department ORDER BY return_pct DESC","SELECT products.department,
+       COUNT(order_items.id) AS total_order_items,
+       SUM(CASE
+               WHEN order_items.status = 'Returned' THEN 1
+               ELSE 0
+           END) AS returned_items,
+       ROUND(SAFE_DIVIDE(SUM(CASE
+                                 WHEN order_items.status = 'Returned' THEN 1
+                                 ELSE 0
+                             END), COUNT(order_items.id)) * 100, 2) AS return_rate_percentage
+FROM `bigquery-public-data.thelook_ecommerce.order_items` AS order_items
+INNER JOIN `bigquery-public-data.thelook_ecommerce.products` AS products ON order_items.product_id = products.id
+GROUP BY products.department
+ORDER BY return_rate_percentage DESC",MISMATCH,False,,,job_nvE3k-Q5AfNc_h2EnNmgl6jl7dgI,0,0
+ta018#rep0,curate,control,2404ed0d5166,return rate by month in 2024,"SELECT FORMAT_TIMESTAMP('%Y-%m', created_at) AS month, ROUND(SAFE_DIVIDE(COUNTIF(status='Returned'), COUNTIF(status<>'Cancelled'))*100,2) AS return_pct
+FROM `bigquery-public-data.thelook_ecommerce.order_items`
+WHERE EXTRACT(YEAR FROM created_at)=2024
+GROUP BY month ORDER BY month","SELECT EXTRACT(MONTH
+               FROM created_at) AS month_num,
+       FORMAT_TIMESTAMP('%B', created_at) AS month_name,
+       COUNT(*) AS total_items,
+       COUNTIF(status = 'Returned') AS returned_items,
+       ROUND(SAFE_DIVIDE(COUNTIF(status = 'Returned'), COUNT(*)) * 100, 2) AS return_rate_percentage
+FROM `bigquery-public-data.thelook_ecommerce.order_items`
+WHERE EXTRACT(YEAR
+              FROM created_at) = 2024
+GROUP BY month_num,
+         month_name
+ORDER BY month_num;",MISMATCH,False,,,job_PKene8_7I82WR90InkNn8HsAHP7O,0,1
+ta019#rep0,curate,control,2404ed0d5166,"the 10 brands with the worst return rate, among brands with over 500 items sold","SELECT p.brand, ROUND(SAFE_DIVIDE(COUNTIF(oi.status='Returned'), COUNTIF(oi.status<>'Cancelled'))*100,2) AS return_pct
+FROM `bigquery-public-data.thelook_ecommerce.order_items` oi JOIN `bigquery-public-data.thelook_ecommerce.products` p ON p.id=oi.product_id
+GROUP BY p.brand HAVING COUNTIF(oi.status<>'Cancelled') > 500 ORDER BY return_pct DESC LIMIT 10","SELECT p.brand,
+       COUNT(oi.id) AS items_sold,
+       COUNTIF(oi.status = 'Returned') AS items_returned,
+       ROUND(SAFE_DIVIDE(COUNTIF(oi.status = 'Returned'), COUNT(oi.id)) * 100, 2) AS return_rate_percentage
+FROM `bigquery-public-data.thelook_ecommerce.order_items` AS oi
+INNER JOIN `bigquery-public-data.thelook_ecommerce.products` AS p ON oi.product_id = p.id
+GROUP BY p.brand
+HAVING items_sold > 500
+ORDER BY return_rate_percentage DESC
+LIMIT 10",MISMATCH,False,,,job_G-jOm4YttuqReYSnDzrqtA8W1Xzw,0,0
+ta022#rep0,curate,control,2404ed0d5166,average order value by customer gender,"SELECT u.gender, ROUND(SAFE_DIVIDE(SUM(oi.sale_price), COUNT(DISTINCT oi.order_id)),2) AS aov
+FROM `bigquery-public-data.thelook_ecommerce.order_items` oi JOIN `bigquery-public-data.thelook_ecommerce.users` u ON u.id=oi.user_id
+WHERE oi.status NOT IN ('Cancelled','Returned')
+GROUP BY u.gender ORDER BY aov DESC","SELECT orders.gender AS customer_gender,
+       ROUND(SUM(order_items.sale_price) / COUNT(DISTINCT orders.order_id), 2) AS average_order_value,
+       ROUND(SUM(order_items.sale_price), 2) AS total_revenue,
+       COUNT(DISTINCT orders.order_id) AS total_orders
+FROM `bigquery-public-data.thelook_ecommerce.orders` AS orders
+INNER JOIN `bigquery-public-data.thelook_ecommerce.order_items` AS order_items ON orders.order_id = order_items.order_id
+GROUP BY customer_gender
+ORDER BY customer_gender",MISMATCH,False,,,job_Bg5fl3HMBC23HLMPXk2VxQzOdipO,0,0
+ta023#rep0,curate,control,2404ed0d5166,how many inventory items are on hand right now,SELECT COUNT(*) AS n FROM `bigquery-public-data.thelook_ecommerce.inventory_items` WHERE sold_at IS NULL,"SELECT COUNT(*) AS items_on_hand
+FROM `bigquery-public-data.thelook_ecommerce.inventory_items`
+WHERE sold_at IS NULL
+  AND created_at <= '2026-09-11 02:08:22 UTC'",MATCH,True,,,job_2b7n3Ap6cFrKzJSCfTjE3UCm8nT6,0,0
+ta024#rep0,curate,control,2404ed0d5166,inventory on hand by product category,"SELECT product_category, COUNT(*) AS on_hand FROM `bigquery-public-data.thelook_ecommerce.inventory_items` WHERE sold_at IS NULL GROUP BY product_category ORDER BY on_hand DESC","SELECT product_category,
+       COUNT(*) AS inventory_on_hand
+FROM `bigquery-public-data.thelook_ecommerce.inventory_items`
+WHERE sold_at IS NULL
+GROUP BY product_category
+ORDER BY inventory_on_hand DESC",MATCH,True,,,job_uvf9kyMEbJrh_1kkDOYxiYvtJpKX,0,0
+ta025#rep0,curate,control,2404ed0d5166,"the value of inventory on hand by department, at cost","SELECT product_department, ROUND(SUM(cost),2) AS cost_on_hand FROM `bigquery-public-data.thelook_ecommerce.inventory_items` WHERE sold_at IS NULL GROUP BY product_department ORDER BY cost_on_hand DESC","SELECT product_department AS department,
+       SUM(cost) AS total_cost
+FROM `bigquery-public-data.thelook_ecommerce.inventory_items`
+WHERE sold_at IS NULL
+GROUP BY department
+ORDER BY total_cost DESC;",MISMATCH,False,,,job_3mVdGn0j52_0qw-_S_E9KxkVwaPn,0,0
+ta026#rep0,curate,control,2404ed0d5166,average age in days of inventory still on hand,"SELECT ROUND(AVG(TIMESTAMP_DIFF(CURRENT_TIMESTAMP(), created_at, DAY)),2) AS avg_age_days FROM `bigquery-public-data.thelook_ecommerce.inventory_items` WHERE sold_at IS NULL","SELECT AVG(TIMESTAMP_DIFF(CURRENT_TIMESTAMP(), created_at, DAY)) AS avg_age_in_days
+FROM `bigquery-public-data.thelook_ecommerce.inventory_items`
+WHERE sold_at IS NULL;",MISMATCH,False,,,job_7Q8STEIfRok6qRb5Wb01Sf15jMwC,0,0
+ta027#rep0,curate,control,2404ed0d5166,"how many days on average does an item sit in inventory before it sells, by category","SELECT product_category, ROUND(AVG(TIMESTAMP_DIFF(sold_at, created_at, DAY)),2) AS days_to_sell
+FROM `bigquery-public-data.thelook_ecommerce.inventory_items`
+WHERE sold_at IS NOT NULL
+GROUP BY product_category ORDER BY days_to_sell DESC","SELECT product_category,
+       ROUND(AVG(DATE_DIFF(DATE(sold_at), DATE(created_at), DAY)), 2) AS avg_days_to_sell,
+       COUNT(*) AS items_sold
+FROM `bigquery-public-data.thelook_ecommerce.inventory_items`
+WHERE sold_at IS NOT NULL
+GROUP BY product_category
+ORDER BY avg_days_to_sell DESC",MISMATCH,False,,,job_LRZr_MWGpbcBFfnQTFDdOTw5xPGc,0,1
+ta029#rep0,curate,control,2404ed0d5166,sessions by traffic source in 2024,"SELECT traffic_source, COUNT(DISTINCT session_id) AS sessions FROM `bigquery-public-data.thelook_ecommerce.events` WHERE EXTRACT(YEAR FROM created_at)=2024 GROUP BY traffic_source ORDER BY sessions DESC","SELECT traffic_source,
+       COUNT(DISTINCT session_id) AS session_count
+FROM `bigquery-public-data.thelook_ecommerce.events`
+WHERE created_at >= '2024-01-01 00:00:00 UTC'
+  AND created_at < '2025-01-01 00:00:00 UTC'
+GROUP BY traffic_source
+ORDER BY session_count DESC",MATCH,True,,,job_ekwkUZV72oC4JkbM0Ishm-qzh-B6,0,0
+ta033#rep0,curate,control,2404ed0d5166,the average age of customers by gender,"SELECT gender, ROUND(AVG(age),2) AS avg_age FROM `bigquery-public-data.thelook_ecommerce.users` GROUP BY gender ORDER BY gender","SELECT gender,
+       ROUND(AVG(age), 1) AS average_age
+FROM `bigquery-public-data.thelook_ecommerce.users`
+GROUP BY gender;",MISMATCH,False,,,job_ojoj1f45rmMggBSVMiIXmb5mWCxG,0,0
+ta035#rep0,curate,control,2404ed0d5166,how many products are there in each category,"SELECT category, COUNT(*) AS n FROM `bigquery-public-data.thelook_ecommerce.products` GROUP BY category ORDER BY n DESC","SELECT category,
+       COUNT(DISTINCT id) AS product_count
+FROM `bigquery-public-data.thelook_ecommerce.products`
+GROUP BY category
+ORDER BY product_count DESC",MATCH,True,,,job_M81gLbQHX-Qhntk0x4BEWsYucq0k,0,1
+ta036#rep0,curate,control,2404ed0d5166,the 10 most expensive products by retail price,"SELECT name, category, brand, retail_price FROM `bigquery-public-data.thelook_ecommerce.products` ORDER BY retail_price DESC LIMIT 10","SELECT id AS product_id,
+       name AS product_name,
+       retail_price
+FROM `bigquery-public-data.thelook_ecommerce.products`
+ORDER BY retail_price DESC
+LIMIT 10",MISMATCH,False,,,job_aAHkNaMDDT3H3TgyqZJwNstoJE02,0,0
+ta037#rep0,curate,control,2404ed0d5166,average retail price by department,"SELECT department, ROUND(AVG(retail_price),2) AS avg_price FROM `bigquery-public-data.thelook_ecommerce.products` GROUP BY department ORDER BY avg_price DESC","SELECT department,
+       ROUND(AVG(retail_price), 2) AS avg_retail_price
+FROM `bigquery-public-data.thelook_ecommerce.products`
+GROUP BY department
+ORDER BY avg_retail_price DESC",MATCH,True,,,job_IrlkP8wxyiGz5WR1cAAQMs8EuNtf,0,0
+ta038#rep0,curate,control,2404ed0d5166,how many distribution centers are there,SELECT COUNT(*) AS n FROM `bigquery-public-data.thelook_ecommerce.distribution_centers`,"SELECT COUNT(DISTINCT id) AS total_distribution_centers
+FROM `bigquery-public-data.thelook_ecommerce.distribution_centers`",MATCH,True,,,job_trkh-ir2TlGRgOi-xAsdoRBRYwFH,0,0
+ta039#rep0,curate,control,2404ed0d5166,how many products does each distribution center supply,"SELECT d.name, COUNT(*) AS n
+FROM `bigquery-public-data.thelook_ecommerce.products` p JOIN `bigquery-public-data.thelook_ecommerce.distribution_centers` d ON d.id=p.distribution_center_id
+GROUP BY d.name ORDER BY n DESC","SELECT dc.id AS distribution_center_id,
+       dc.name AS distribution_center_name,
+       COUNT(DISTINCT p.id) AS product_count
+FROM `bigquery-public-data.thelook_ecommerce.distribution_centers` AS dc
+INNER JOIN `bigquery-public-data.thelook_ecommerce.products` AS p ON dc.id = p.distribution_center_id
+GROUP BY dc.id,
+         dc.name
+ORDER BY product_count DESC",MISMATCH,False,,,job_RPjspUAURGC-aUTFakaYGyvbqmHp,0,0
+ta041#rep0,curate,control,2404ed0d5166,revenue split between men's and women's departments in 2023,"SELECT p.department, ROUND(SUM(oi.sale_price),2) AS revenue
+FROM `bigquery-public-data.thelook_ecommerce.order_items` oi JOIN `bigquery-public-data.thelook_ecommerce.products` p ON p.id=oi.product_id
+WHERE oi.status NOT IN ('Cancelled','Returned') AND EXTRACT(YEAR FROM oi.created_at)=2023
+GROUP BY p.department ORDER BY p.department","WITH dept_revenue AS
+  (SELECT p.department,
+          SUM(oi.sale_price) AS revenue
+   FROM `bigquery-public-data.thelook_ecommerce.order_items` AS oi
+   INNER JOIN `bigquery-public-data.thelook_ecommerce.products` AS p ON oi.product_id = p.id
+   WHERE oi.created_at >= '2023-01-01 00:00:00 UTC'
+     AND oi.created_at < '2024-01-01 00:00:00 UTC'
+   GROUP BY p.department),
+     total_rev AS
+  (SELECT SUM(revenue) AS total
+   FROM dept_revenue)
+SELECT dr.department,
+       ROUND(dr.revenue, 2) AS revenue,
+       ROUND(SAFE_DIVIDE(dr.revenue, tr.total) * 100, 1) AS revenue_percentage
+FROM dept_revenue AS dr
+CROSS JOIN total_rev AS tr
+ORDER BY dr.department;",MISMATCH,False,,,job_-utd8Sk2tEBileI2hhqXgjtUT7P9,0,0
+ta042#rep0,curate,control,2404ed0d5166,cumulative revenue by month through 2023,"WITH m AS (SELECT FORMAT_TIMESTAMP('%Y-%m', oi.created_at) AS month, SUM(oi.sale_price) AS revenue
+  FROM `bigquery-public-data.thelook_ecommerce.order_items` oi WHERE oi.status NOT IN ('Cancelled','Returned') AND EXTRACT(YEAR FROM oi.created_at)=2023 GROUP BY month)
+SELECT month, ROUND(SUM(revenue) OVER (ORDER BY month),2) AS cumulative_revenue FROM m ORDER BY month","WITH monthly_revenue AS
+  (SELECT DATE_TRUNC(DATE(created_at), MONTH) AS MONTH,
+          SUM(sale_price) AS revenue
+   FROM `bigquery-public-data.thelook_ecommerce.order_items`
+   WHERE created_at < '2024-01-01 00:00:00'
+   GROUP BY 1)
+SELECT MONTH,
+       ROUND(revenue, 2) AS monthly_revenue,
+       ROUND(SUM(revenue) OVER (
+                                ORDER BY MONTH), 2) AS cumulative_revenue
+FROM monthly_revenue
+ORDER BY MONTH ASC;",MISMATCH,False,,,job_Zy_dIr9CwWCtUUMRuVMQM0miyvjf,0,1
+ta044#rep0,curate,control,2404ed0d5166,how much revenue came from customers who joined in 2022,"SELECT ROUND(SUM(oi.sale_price),2) AS revenue
+FROM `bigquery-public-data.thelook_ecommerce.order_items` oi JOIN `bigquery-public-data.thelook_ecommerce.users` u ON u.id=oi.user_id
+WHERE oi.status NOT IN ('Cancelled','Returned') AND EXTRACT(YEAR FROM u.created_at)=2022","SELECT SUM(oi.sale_price) AS total_revenue
+FROM `bigquery-public-data.thelook_ecommerce.order_items` AS oi
+INNER JOIN `bigquery-public-data.thelook_ecommerce.users` AS u ON oi.user_id = u.id
+WHERE EXTRACT(YEAR
+              FROM u.created_at) = 2022;",MISMATCH,False,,,job_1WQs-1elVmRcn4NuwTDWehd8TPHk,0,0
+ta045#rep0,curate,control,2404ed0d5166,revenue by customer age band,"SELECT CASE WHEN u.age < 25 THEN 'under 25' WHEN u.age < 40 THEN '25 to 39' WHEN u.age < 60 THEN '40 to 59' ELSE '60 and over' END AS age_band, ROUND(SUM(oi.sale_price),2) AS revenue
+FROM `bigquery-public-data.thelook_ecommerce.order_items` oi JOIN `bigquery-public-data.thelook_ecommerce.users` u ON u.id=oi.user_id
+WHERE oi.status NOT IN ('Cancelled','Returned')
+GROUP BY age_band ORDER BY revenue DESC","SELECT CASE
+           WHEN u.age < 20 THEN 'Under 20'
+           WHEN u.age BETWEEN 20 AND 29 THEN '20-29'
+           WHEN u.age BETWEEN 30 AND 39 THEN '30-39'
+           WHEN u.age BETWEEN 40 AND 49 THEN '40-49'
+           WHEN u.age BETWEEN 50 AND 59 THEN '50-59'
+           WHEN u.age BETWEEN 60 AND 69 THEN '60-69'
+           ELSE '70 and Over'
+       END AS age_band,
+       ROUND(SUM(oi.sale_price), 2) AS total_revenue,
+       COUNT(DISTINCT oi.order_id) AS total_orders
+FROM `bigquery-public-data.thelook_ecommerce.order_items` AS oi
+INNER JOIN `bigquery-public-data.thelook_ecommerce.users` AS u ON oi.user_id = u.id
+GROUP BY age_band
+ORDER BY MIN(u.age)",MISMATCH,False,,,job_jb6-c2h7MpFBj02B6F4P1n96008L,0,1
+ta046#rep0,curate,control,2404ed0d5166,the 10 products that earned the most revenue,"SELECT p.name, ROUND(SUM(oi.sale_price),2) AS revenue
+FROM `bigquery-public-data.thelook_ecommerce.order_items` oi JOIN `bigquery-public-data.thelook_ecommerce.products` p ON p.id=oi.product_id
+WHERE oi.status NOT IN ('Cancelled','Returned')
+GROUP BY p.name ORDER BY revenue DESC LIMIT 10","SELECT p.id AS product_id,
+       p.name AS product_name,
+       ROUND(SUM(oi.sale_price), 2) AS total_revenue
+FROM `bigquery-public-data.thelook_ecommerce.order_items` AS oi
+INNER JOIN `bigquery-public-data.thelook_ecommerce.products` AS p ON oi.product_id = p.id
+GROUP BY product_id,
+         product_name
+ORDER BY total_revenue DESC
+LIMIT 10;",MISMATCH,False,,,job_gruciB99bwHZ-jBG_XVx_YDVmdEZ,0,0
+ta047#rep0,curate,control,2404ed0d5166,units sold by category in 2024,"SELECT p.category, COUNT(*) AS units
+FROM `bigquery-public-data.thelook_ecommerce.order_items` oi JOIN `bigquery-public-data.thelook_ecommerce.products` p ON p.id=oi.product_id
+WHERE oi.status NOT IN ('Cancelled','Returned') AND EXTRACT(YEAR FROM oi.created_at)=2024
+GROUP BY p.category ORDER BY units DESC","SELECT p.category AS product_category,
+       COUNT(oi.id) AS units_sold
+FROM `bigquery-public-data.thelook_ecommerce.order_items` AS oi
+INNER JOIN `bigquery-public-data.thelook_ecommerce.products` AS p ON oi.product_id = p.id
+WHERE oi.created_at >= '2024-01-01 00:00:00 UTC'
+  AND oi.created_at < '2025-01-01 00:00:00 UTC'
+GROUP BY product_category
+ORDER BY units_sold DESC;",MISMATCH,False,,,job_eT-YEsGXI4qlCAYUU6fKAQmPbc7j,0,0
+ta048#rep0,curate,control,2404ed0d5166,margin per unit sold by category,"SELECT p.category, ROUND(AVG(oi.sale_price - p.cost),2) AS margin_per_unit
+FROM `bigquery-public-data.thelook_ecommerce.order_items` oi JOIN `bigquery-public-data.thelook_ecommerce.products` p ON p.id=oi.product_id
+WHERE oi.status NOT IN ('Cancelled','Returned')
+GROUP BY p.category ORDER BY margin_per_unit DESC","SELECT p.category AS product_category,
+       ROUND(AVG(oi.sale_price - p.cost), 2) AS margin_per_unit,
+       COUNT(oi.id) AS units_sold,
+       ROUND(SUM(oi.sale_price - p.cost), 2) AS total_profit
+FROM `bigquery-public-data.thelook_ecommerce.order_items` AS oi
+INNER JOIN `bigquery-public-data.thelook_ecommerce.products` AS p ON oi.product_id = p.id
+GROUP BY product_category
+ORDER BY margin_per_unit DESC;",MISMATCH,False,,,job_ibtQtLAygSv8Dwi2cXfjbUy32jZe,0,1
+ta051#rep0,curate,control,2404ed0d5166,"how many orders did each customer place, for the top 10 customers","SELECT o.user_id, COUNT(*) AS orders FROM `bigquery-public-data.thelook_ecommerce.orders` o WHERE o.status='Complete' GROUP BY o.user_id ORDER BY orders DESC, o.user_id LIMIT 10","SELECT users.id AS user_id,
+       CONCAT(users.first_name, ' ', users.last_name) AS customer_name,
+       COUNT(DISTINCT orders.order_id) AS order_count
+FROM `bigquery-public-data.thelook_ecommerce.orders` AS orders
+INNER JOIN `bigquery-public-data.thelook_ecommerce.users` AS users ON orders.user_id = users.id
+GROUP BY user_id,
+         customer_name
+ORDER BY order_count DESC,
+         user_id ASC
+LIMIT 10;",MISMATCH,False,,,job_4mzcodJa2Rfa-5dkJG1F4A3iChuf,0,0
+ta053#rep0,curate,control,2404ed0d5166,completed orders by number of items in the order,"SELECT num_of_item, COUNT(*) AS orders FROM `bigquery-public-data.thelook_ecommerce.orders` WHERE status='Complete' GROUP BY num_of_item ORDER BY num_of_item","SELECT o.num_of_item AS number_of_items,
+       COUNT(DISTINCT o.order_id) AS completed_orders_count
+FROM `bigquery-public-data.thelook_ecommerce.orders` AS o
+INNER JOIN `bigquery-public-data.thelook_ecommerce.order_items` AS oi ON o.order_id = oi.order_id
+WHERE LOWER(oi.status) = 'complete'
+GROUP BY 1
+ORDER BY 1;",MATCH,True,,,job_E_NeZf2gurGZwSrWRlu4vBSe8Aig,0,0
+ta054#rep0,curate,control,2404ed0d5166,the share of completed orders by traffic source,"SELECT u.traffic_source, ROUND(SAFE_DIVIDE(COUNT(*), SUM(COUNT(*)) OVER ())*100,2) AS share_pct
+FROM `bigquery-public-data.thelook_ecommerce.orders` o JOIN `bigquery-public-data.thelook_ecommerce.users` u ON u.id=o.user_id
+WHERE o.status='Complete'
+GROUP BY u.traffic_source ORDER BY share_pct DESC","SELECT u.traffic_source,
+       COUNT(DISTINCT o.order_id) AS total_orders,
+       COUNT(DISTINCT CASE
+                          WHEN LOWER(o.status) = 'complete' THEN o.order_id
+                      END) AS completed_orders,
+       ROUND(SAFE_DIVIDE(COUNT(DISTINCT CASE
+                                            WHEN LOWER(o.status) = 'complete' THEN o.order_id
+                                        END), SUM(COUNT(DISTINCT CASE
+                                                                     WHEN LOWER(o.status) = 'complete' THEN o.order_id
+                                                                 END)) OVER()) * 100, 2) AS share_of_completed_orders_percentage,
+       ROUND(SAFE_DIVIDE(COUNT(DISTINCT CASE
+                                            WHEN LOWER(o.status) = 'complete' THEN o.order_id
+                                        END), COUNT(DISTINCT o.order_id)) * 100, 2) AS completion_rate_percentage
+FROM `bigquery-public-data.thelook_ecommerce.orders` AS o
+INNER JOIN `bigquery-public-data.thelook_ecommerce.users` AS u ON o.user_id = u.id
+GROUP BY u.traffic_source
+ORDER BY share_of_completed_orders_percentage DESC",MISMATCH,False,,,job_abwYfU_3Kl7VSPaJtroSoOUn-AD0,0,1
+ta057#rep0,curate,control,2404ed0d5166,"median-ish delivery time: the 90th percentile in hours, by distribution center","SELECT d.name, ROUND(APPROX_QUANTILES(TIMESTAMP_DIFF(oi.delivered_at, oi.shipped_at, HOUR), 100)[OFFSET(90)],2) AS p90_hours
+FROM `bigquery-public-data.thelook_ecommerce.order_items` oi JOIN `bigquery-public-data.thelook_ecommerce.products` p ON p.id=oi.product_id JOIN `bigquery-public-data.thelook_ecommerce.distribution_centers` d ON d.id=p.distribution_center_id
+WHERE oi.delivered_at IS NOT NULL AND oi.shipped_at IS NOT NULL
+GROUP BY d.name ORDER BY p90_hours DESC","SELECT dc.id AS distribution_center_id,
+       dc.name AS distribution_center_name,
+       APPROX_QUANTILES(TIMESTAMP_DIFF(oi.delivered_at, oi.shipped_at, HOUR), 100)[OFFSET(90)] AS delivery_time_90th_percentile_hours
+FROM `bigquery-public-data.thelook_ecommerce.order_items` AS oi
+INNER JOIN `bigquery-public-data.thelook_ecommerce.inventory_items` AS ii ON oi.inventory_item_id = ii.id
+INNER JOIN `bigquery-public-data.thelook_ecommerce.distribution_centers` AS dc ON ii.product_distribution_center_id = dc.id
+WHERE oi.shipped_at IS NOT NULL
+  AND oi.delivered_at IS NOT NULL
+  AND oi.delivered_at >= oi.shipped_at
+GROUP BY distribution_center_id,
+         distribution_center_name
+ORDER BY delivery_time_90th_percentile_hours DESC",MISMATCH,False,,,job_Poss9wUcmgEvT4tdfRPumHaecvLI,0,0
+ta058#rep0,curate,control,2404ed0d5166,how many items were returned in 2024,SELECT COUNT(*) AS n FROM `bigquery-public-data.thelook_ecommerce.order_items` WHERE status='Returned' AND EXTRACT(YEAR FROM created_at)=2024,"SELECT COUNT(*) AS returned_items_count
+FROM `bigquery-public-data.thelook_ecommerce.order_items` AS order_items
+WHERE order_items.status = 'Returned'
+  AND order_items.returned_at >= '2024-01-01 00:00:00 UTC'
+  AND order_items.returned_at < '2025-01-01 00:00:00 UTC'",MISMATCH,False,,,job_Yu2A2JFtara3JF8T6NeF51NVT7t5,0,0
+ta060#rep0,curate,control,2404ed0d5166,how much revenue was lost to returns in 2024,"SELECT ROUND(SUM(sale_price),2) AS returned_value FROM `bigquery-public-data.thelook_ecommerce.order_items` WHERE status='Returned' AND EXTRACT(YEAR FROM created_at)=2024","SELECT SUM(CASE
+               WHEN EXTRACT(YEAR
+                            FROM returned_at) = 2024 THEN sale_price
+           END) AS revenue_lost_by_returned_date,
+       SUM(CASE
+               WHEN EXTRACT(YEAR
+                            FROM created_at) = 2024
+                    AND status = 'Returned' THEN sale_price
+           END) AS revenue_lost_by_order_created_date
+FROM `bigquery-public-data.thelook_ecommerce.order_items`",MISMATCH,False,,,job_EcZeeXDtcG0PZfIUZ4zSLapTHgfR,0,0
+ta061#rep0,curate,control,2404ed0d5166,average order value overall,"SELECT ROUND(SAFE_DIVIDE(SUM(oi.sale_price), COUNT(DISTINCT oi.order_id)),2) AS aov FROM `bigquery-public-data.thelook_ecommerce.order_items` oi WHERE oi.status NOT IN ('Cancelled','Returned')","SELECT AVG(order_revenue) AS average_order_value
+FROM
+  (SELECT order_id,
+          SUM(sale_price) AS order_revenue
+   FROM `bigquery-public-data.thelook_ecommerce.order_items`
+   GROUP BY order_id)",MISMATCH,False,,,job_f5iCG8GJv3f_X0Fyr6zGLFdwF_bz,0,0
+ta062#rep0,curate,control,2404ed0d5166,"average order value by customer country, top 10","SELECT u.country, ROUND(SAFE_DIVIDE(SUM(oi.sale_price), COUNT(DISTINCT oi.order_id)),2) AS aov
+FROM `bigquery-public-data.thelook_ecommerce.order_items` oi JOIN `bigquery-public-data.thelook_ecommerce.users` u ON u.id=oi.user_id
+WHERE oi.status NOT IN ('Cancelled','Returned')
+GROUP BY u.country ORDER BY aov DESC LIMIT 10",,PRED_ERROR,False,,,,0,0
+ta063#rep0,curate,control,2404ed0d5166,"inventory on hand by distribution center, by cost","SELECT d.name, ROUND(SUM(i.cost),2) AS cost_on_hand
+FROM `bigquery-public-data.thelook_ecommerce.inventory_items` i JOIN `bigquery-public-data.thelook_ecommerce.distribution_centers` d ON d.id=i.product_distribution_center_id
+WHERE i.sold_at IS NULL
+GROUP BY d.name ORDER BY cost_on_hand DESC","SELECT dc.id AS distribution_center_id,
+       dc.name AS distribution_center_name,
+       ROUND(SUM(ii.cost), 2) AS total_inventory_cost,
+       COUNT(ii.id) AS inventory_item_count
+FROM `bigquery-public-data.thelook_ecommerce.inventory_items` AS ii
+INNER JOIN `bigquery-public-data.thelook_ecommerce.distribution_centers` AS dc ON ii.product_distribution_center_id = dc.id
+WHERE ii.sold_at IS NULL
+GROUP BY dc.id,
+         dc.name
+ORDER BY total_inventory_cost DESC;",MISMATCH,False,,,job_XHfx_j3dokMcDCsZmVbpUcXQoI9m,0,0
+ta065#rep0,curate,control,2404ed0d5166,how many inventory items were created in 2024 and are still unsold,SELECT COUNT(*) AS n FROM `bigquery-public-data.thelook_ecommerce.inventory_items` WHERE sold_at IS NULL AND EXTRACT(YEAR FROM created_at)=2024,"SELECT COUNT(*) AS unsold_count
+FROM `bigquery-public-data.thelook_ecommerce.inventory_items`
+WHERE EXTRACT(YEAR
+              FROM created_at) = 2024
+  AND sold_at IS NULL;",MATCH,True,,,job_f1avrjCTvJwEtG6dl5oShSjtC7Ku,0,0
+ta066#rep0,curate,control,2404ed0d5166,"the share of inventory that has sold, by department","SELECT product_department, ROUND(SAFE_DIVIDE(COUNTIF(sold_at IS NOT NULL), COUNT(*))*100,2) AS sold_pct
+FROM `bigquery-public-data.thelook_ecommerce.inventory_items` GROUP BY product_department ORDER BY sold_pct DESC","SELECT product_department AS department,
+       COUNT(sold_at) AS sold_count,
+       COUNT(*) AS total_count,
+       ROUND(SAFE_DIVIDE(COUNT(sold_at), COUNT(*)) * 100, 1) AS sold_share_percentage
+FROM `bigquery-public-data.thelook_ecommerce.inventory_items`
+GROUP BY 1
+ORDER BY sold_share_percentage DESC;",MISMATCH,False,,,job_qJbSysLMHIn-SH_rG9u5pEkS4R7G,0,0
+ta069#rep0,curate,control,2404ed0d5166,average number of events per session,"WITH s AS (SELECT session_id, COUNT(*) AS n FROM `bigquery-public-data.thelook_ecommerce.events` GROUP BY session_id)
+SELECT ROUND(AVG(n),2) AS avg_events FROM s","SELECT AVG(event_count) AS avg_events_per_session
+FROM
+  (SELECT session_id,
+          COUNT(*) AS event_count
+   FROM `bigquery-public-data.thelook_ecommerce.events`
+   GROUP BY session_id)",MISMATCH,False,,,job_jU2DpzWKiBXrhHpmyWIX--KjRaWv,0,0
+ta070#rep0,curate,control,2404ed0d5166,sessions per month in 2024,"SELECT FORMAT_TIMESTAMP('%Y-%m', created_at) AS month, COUNT(DISTINCT session_id) AS sessions FROM `bigquery-public-data.thelook_ecommerce.events` WHERE EXTRACT(YEAR FROM created_at)=2024 GROUP BY month ORDER BY month","SELECT FORMAT_TIMESTAMP('%Y-%m', created_at) AS MONTH,
+       COUNT(DISTINCT session_id) AS session_count
+FROM `bigquery-public-data.thelook_ecommerce.events`
+WHERE created_at >= '2024-01-01 00:00:00 UTC'
+  AND created_at < '2025-01-01 00:00:00 UTC'
+GROUP BY 1
+ORDER BY 1",MATCH,True,,,job_HUzcA1I63BUAVSTyFToEQmrPi0WS,0,1
+ta071#rep0,curate,control,2404ed0d5166,how many customers have never placed an order,SELECT COUNT(*) AS n FROM `bigquery-public-data.thelook_ecommerce.users` u WHERE NOT EXISTS (SELECT 1 FROM `bigquery-public-data.thelook_ecommerce.orders` o WHERE o.user_id=u.id),"SELECT COUNT(DISTINCT u.id) AS customers_without_orders
+FROM `bigquery-public-data.thelook_ecommerce.users` AS u
+WHERE u.id NOT IN
+    (SELECT DISTINCT user_id
+     FROM `bigquery-public-data.thelook_ecommerce.orders`
+     WHERE user_id IS NOT NULL )",MATCH,True,,,job_Q3t9dS_oXQoJmwviZkhJz14XinHk,0,0
+ta072#rep0,curate,control,2404ed0d5166,the 10 cities with the most customers,"SELECT city, COUNT(*) AS n FROM `bigquery-public-data.thelook_ecommerce.users` GROUP BY city ORDER BY n DESC, city LIMIT 10","SELECT city,
+       country,
+       COUNT(DISTINCT id) AS customer_count
+FROM `bigquery-public-data.thelook_ecommerce.users`
+WHERE city IS NOT NULL
+GROUP BY city,
+         country
+ORDER BY customer_count DESC
+LIMIT 10;",MISMATCH,False,,,job_lToDI7ulmbU3UUOB0TtGlE1446UZ,0,1
+ta073#rep0,curate,control,2404ed0d5166,how many products cost more than their category average,"WITH a AS (SELECT category, AVG(retail_price) AS avg_price FROM `bigquery-public-data.thelook_ecommerce.products` GROUP BY category)
+SELECT COUNT(*) AS n FROM `bigquery-public-data.thelook_ecommerce.products` p JOIN a ON a.category=p.category WHERE p.retail_price > a.avg_price","WITH category_avg AS
+  (SELECT id,
+          cost,
+          category,
+          AVG(cost) OVER(PARTITION BY category) AS avg_cost
+   FROM `bigquery-public-data.thelook_ecommerce.products`)
+SELECT COUNT(DISTINCT id) AS product_count
+FROM category_avg
+WHERE cost > avg_cost;",MISMATCH,False,,,job_4KXiVn5xMLNiFHG1szVu8i2bUTlv,0,0
+ta074#rep0,curate,control,2404ed0d5166,the markup percentage by category,"SELECT category, ROUND(SAFE_DIVIDE(AVG(retail_price - cost), AVG(cost))*100,2) AS markup_pct FROM `bigquery-public-data.thelook_ecommerce.products` GROUP BY category ORDER BY markup_pct DESC","SELECT category,
+       ROUND(SAFE_DIVIDE(SUM(retail_price - cost), SUM(cost)) * 100, 2) AS markup_percentage
+FROM `bigquery-public-data.thelook_ecommerce.products`
+GROUP BY category
+ORDER BY markup_percentage DESC",MATCH,True,,,job_oGgCEOWZgea3sgazOnx2D26_RYwT,0,1
+tl000#rep0,curate,treatment,c6782e448a4b,"revenue by month, 2023","SELECT FORMAT_TIMESTAMP('%Y-%m', oi.created_at) AS month, ROUND(SUM(oi.sale_price), 2) AS revenue
+FROM `bigquery-public-data.thelook_ecommerce.order_items` oi
+WHERE oi.status NOT IN ('Cancelled', 'Returned') AND EXTRACT(YEAR FROM oi.created_at) = 2023
+GROUP BY month ORDER BY month",,,,"example:revenue by month, 2023","revenue by month, 2023",job_5nKmMOpuXHtObuU3tl3PIAenGURQ,0,0
+tl001#rep0,curate,treatment,c6782e448a4b,"top 10 product categories by revenue, all time","SELECT p.category, ROUND(SUM(oi.sale_price), 2) AS revenue
+FROM `bigquery-public-data.thelook_ecommerce.order_items` oi
+JOIN `bigquery-public-data.thelook_ecommerce.products` p ON p.id = oi.product_id
+WHERE oi.status NOT IN ('Cancelled', 'Returned')
+GROUP BY p.category ORDER BY revenue DESC LIMIT 10",,,,"example:top 10 product categories by revenue, all time;term:revenue","top 10 product categories by revenue, all time",job_iUycnH8Fp-87lLhSwW0Kq3IpF868,0,0
+tl003#rep0,curate,treatment,c6782e448a4b,gross margin by department,"SELECT p.department, ROUND(SUM(oi.sale_price - p.cost), 2) AS gross_margin
+FROM `bigquery-public-data.thelook_ecommerce.order_items` oi
+JOIN `bigquery-public-data.thelook_ecommerce.products` p ON p.id = oi.product_id
+WHERE oi.status NOT IN ('Cancelled', 'Returned')
+GROUP BY p.department ORDER BY gross_margin DESC",,,,example:gross margin by department,gross margin by department,job_pgMWPlLy18xYn8zXOEZDNbT8PAMv,0,0
+tl004#rep0,curate,treatment,c6782e448a4b,completed orders per month in 2023,"SELECT FORMAT_TIMESTAMP('%Y-%m', created_at) AS month, COUNT(*) AS completed_orders
+FROM `bigquery-public-data.thelook_ecommerce.orders`
+WHERE status = 'Complete' AND EXTRACT(YEAR FROM created_at) = 2023
+GROUP BY month ORDER BY month",,,,example:completed orders per month in 2023,completed orders per month in 2023,job_l8QygHjJxWOxFtizQlVVs--e9rHn,0,0
+tl005#rep0,curate,treatment,c6782e448a4b,share of orders by status,"SELECT status, COUNT(*) AS orders, ROUND(COUNT(*) / SUM(COUNT(*)) OVER (), 4) AS share
+FROM `bigquery-public-data.thelook_ecommerce.orders`
+GROUP BY status ORDER BY orders DESC",,,,example:share of orders by status,share of orders by status,job_lzN09ceNuQNBAEWhfUlrp-FJFYN5,0,0
+tl009#rep0,curate,treatment,c6782e448a4b,new customers per month in 2024,"SELECT FORMAT_TIMESTAMP('%Y-%m', created_at) AS month, COUNT(*) AS new_customers
+FROM `bigquery-public-data.thelook_ecommerce.users`
+WHERE EXTRACT(YEAR FROM created_at) = 2024
+GROUP BY month ORDER BY month",,,,example:new customers per month in 2024,new customers per month in 2024,job_IJAYlcc8TDZxx6DqJsCVo9B5gfAa,0,0
+tl010#rep0,curate,treatment,c6782e448a4b,"revenue by customer traffic source, 2023","SELECT u.traffic_source, ROUND(SUM(oi.sale_price), 2) AS revenue
+FROM `bigquery-public-data.thelook_ecommerce.order_items` oi
+JOIN `bigquery-public-data.thelook_ecommerce.users` u ON u.id = oi.user_id
+WHERE oi.status NOT IN ('Cancelled', 'Returned') AND EXTRACT(YEAR FROM oi.created_at) = 2023
+GROUP BY u.traffic_source ORDER BY revenue DESC",,,,"example:revenue by customer traffic source, 2023","revenue by customer traffic source, 2023",job_B5Vq7zWMELVZNuq_2w3qMeUKFEWh,0,0
+tl011#rep0,curate,treatment,c6782e448a4b,average order value by customer age band,"SELECT CASE WHEN u.age < 25 THEN 'under 25' WHEN u.age < 40 THEN '25-39' WHEN u.age < 60 THEN '40-59' ELSE '60+' END AS age_band,
+       ROUND(SUM(oi.sale_price) / COUNT(DISTINCT oi.order_id), 2) AS avg_order_value
+FROM `bigquery-public-data.thelook_ecommerce.order_items` oi
+JOIN `bigquery-public-data.thelook_ecommerce.users` u ON u.id = oi.user_id
+WHERE oi.status = 'Complete'
+GROUP BY age_band ORDER BY age_band",,,,example:average order value by customer age band,average order value by customer age band,job_Kk9Rp8knNA1XMbec2oAFRDjsTpVg,0,0
+tl012#rep0,curate,treatment,c6782e448a4b,top 10 customers by lifetime revenue,"SELECT u.id AS user_id, u.email, ROUND(SUM(oi.sale_price), 2) AS lifetime_revenue
+FROM `bigquery-public-data.thelook_ecommerce.order_items` oi
+JOIN `bigquery-public-data.thelook_ecommerce.users` u ON u.id = oi.user_id
+WHERE oi.status NOT IN ('Cancelled', 'Returned')
+GROUP BY u.id, u.email ORDER BY lifetime_revenue DESC LIMIT 10",,,,,top 10 customers by lifetime revenue,job_4P8APsa4xDQpIBfiElgwA2vUcRyB,0,0
+tl014#rep0,curate,treatment,c6782e448a4b,products never sold (no order item at all),"SELECT p.category, COUNT(*) AS products_never_sold
+FROM `bigquery-public-data.thelook_ecommerce.products` p
+LEFT JOIN `bigquery-public-data.thelook_ecommerce.order_items` oi ON oi.product_id = p.id
+WHERE oi.id IS NULL
+GROUP BY p.category ORDER BY products_never_sold DESC LIMIT 10",,,,example:products never sold (no order item at all),products never sold (no order item at all),job_i2ZwczGiBzKxQJ1vfxU9j785ru5K,0,0
+tl015#rep0,curate,treatment,c6782e448a4b,inventory on hand by distribution center,"SELECT dc.name AS distribution_center, COUNT(*) AS items_on_hand
+FROM `bigquery-public-data.thelook_ecommerce.inventory_items` ii
+JOIN `bigquery-public-data.thelook_ecommerce.distribution_centers` dc ON dc.id = ii.product_distribution_center_id
+WHERE ii.sold_at IS NULL
+GROUP BY dc.name ORDER BY items_on_hand DESC",,,,example:inventory on hand by distribution center,inventory on hand by distribution center,job_s2ohMLHFJcF4OCXXUiuKhuVU09XI,0,0
+tl016#rep0,curate,treatment,c6782e448a4b,purchase conversion by traffic source,"SELECT traffic_source,
+       ROUND(COUNT(DISTINCT IF(event_type = 'purchase', session_id, NULL)) / COUNT(DISTINCT session_id), 4) AS conversion_rate
+FROM `bigquery-public-data.thelook_ecommerce.events`
+GROUP BY traffic_source ORDER BY conversion_rate DESC",,,,,purchase conversion by traffic source,job_txJGeElbcnunu4grfguM70X5ydp_,0,0
+tl017#rep0,curate,treatment,c6782e448a4b,sessions by browser in 2024,"SELECT browser, COUNT(DISTINCT session_id) AS sessions
+FROM `bigquery-public-data.thelook_ecommerce.events`
+WHERE EXTRACT(YEAR FROM created_at) = 2024
+GROUP BY browser ORDER BY sessions DESC",,,,example:sessions by browser in 2024,sessions by browser in 2024,job_d3exwXyy8tmyKKvRApSm65F0SeSn,0,0
+tl018#rep0,curate,treatment,c6782e448a4b,"cart abandonment: sessions with a cart event and no purchase, by month in 2024","SELECT FORMAT_TIMESTAMP('%Y-%m', created_at) AS month, COUNTIF(has_cart AND NOT has_purchase) AS abandoned_sessions
+FROM (
+  SELECT session_id, MIN(created_at) AS created_at,
+         LOGICAL_OR(event_type = 'cart') AS has_cart,
+         LOGICAL_OR(event_type = 'purchase') AS has_purchase
+  FROM `bigquery-public-data.thelook_ecommerce.events`
+  WHERE EXTRACT(YEAR FROM created_at) = 2024
+  GROUP BY session_id
+)
+GROUP BY month ORDER BY month",,,,"example:cart abandonment: sessions with a cart event and no purchase, by month in 2024","cart abandonment: sessions with a cart event and no purchase, by month in 2024",job_LQI_MLSfGlJdVhmrN8_dzijI0weH,0,0
+tl019#rep0,curate,treatment,c6782e448a4b,"monthly revenue with month-over-month change, 2023","WITH monthly AS (
+  SELECT FORMAT_TIMESTAMP('%Y-%m', created_at) AS month, SUM(sale_price) AS revenue
+  FROM `bigquery-public-data.thelook_ecommerce.order_items`
+  WHERE status NOT IN ('Cancelled', 'Returned') AND EXTRACT(YEAR FROM created_at) = 2023
+  GROUP BY month
+)
+SELECT month, ROUND(revenue, 2) AS revenue,
+       ROUND(revenue - LAG(revenue) OVER (ORDER BY month), 2) AS change_from_previous_month
+FROM monthly ORDER BY month",,,,"example:monthly revenue with month-over-month change, 2023","monthly revenue with month-over-month change, 2023",job_CJ9rsKKhluo5IQX5YEbfkPdEbhpI,0,0
+tl021#rep0,curate,treatment,c6782e448a4b,"orders with more than 3 items, by month in 2024","SELECT FORMAT_TIMESTAMP('%Y-%m', created_at) AS month, COUNT(*) AS large_orders
+FROM `bigquery-public-data.thelook_ecommerce.orders`
+WHERE num_of_item > 3 AND EXTRACT(YEAR FROM created_at) = 2024
+GROUP BY month ORDER BY month",,,,"example:orders with more than 3 items, by month in 2024","orders with more than 3 items, by month in 2024",job_mHJ0H8rhg7OEKfdSjWCQBy7uNulo,0,0
+tl022#rep0,curate,treatment,c6782e448a4b,"average days from order to delivery by country, delivered orders only","SELECT u.country, ROUND(AVG(TIMESTAMP_DIFF(o.delivered_at, o.created_at, HOUR)) / 24, 2) AS avg_days_to_deliver
+FROM `bigquery-public-data.thelook_ecommerce.orders` o
+JOIN `bigquery-public-data.thelook_ecommerce.users` u ON u.id = o.user_id
+WHERE o.delivered_at IS NOT NULL
+GROUP BY u.country ORDER BY avg_days_to_deliver LIMIT 10",,,,"example:average days from order to delivery by country, delivered orders only","average days from order to delivery by country, delivered orders only",job_G0sPQey8JoeuXMtXMtOIb6qTbs4e,0,0
+tl023#rep0,curate,treatment,c6782e448a4b,"revenue by gender and department, 2023","SELECT o.gender, p.department, ROUND(SUM(oi.sale_price), 2) AS revenue
+FROM `bigquery-public-data.thelook_ecommerce.order_items` oi
+JOIN `bigquery-public-data.thelook_ecommerce.orders` o ON o.order_id = oi.order_id
+JOIN `bigquery-public-data.thelook_ecommerce.products` p ON p.id = oi.product_id
+WHERE oi.status NOT IN ('Cancelled', 'Returned') AND EXTRACT(YEAR FROM oi.created_at) = 2023
+GROUP BY o.gender, p.department ORDER BY o.gender, p.department",,,,"example:revenue by gender and department, 2023","revenue by gender and department, 2023",job_CFzQio1hhzwUTQ9aUO4fM2Z0P5mg,0,0
+tl024#rep0,curate,treatment,c6782e448a4b,"discount depth: products sold below retail price, share by category","SELECT p.category, ROUND(COUNTIF(oi.sale_price < p.retail_price) / COUNT(*), 4) AS share_sold_below_retail
+FROM `bigquery-public-data.thelook_ecommerce.order_items` oi
+JOIN `bigquery-public-data.thelook_ecommerce.products` p ON p.id = oi.product_id
+WHERE oi.status NOT IN ('Cancelled', 'Returned')
+GROUP BY p.category ORDER BY share_sold_below_retail DESC LIMIT 10",,,,"example:discount depth: products sold below retail price, share by category","discount depth: products sold below retail price, share by category",job_K_JVp-uv2kihfAaGLc6-AdauLN27,0,0
+tl025#rep0,curate,treatment,c6782e448a4b,cancelled order share by month in 2024,"SELECT FORMAT_TIMESTAMP('%Y-%m', created_at) AS month,
+       ROUND(COUNTIF(status = 'Cancelled') / COUNT(*), 4) AS cancelled_share
+FROM `bigquery-public-data.thelook_ecommerce.orders`
+WHERE EXTRACT(YEAR FROM created_at) = 2024
+GROUP BY month ORDER BY month",,,,example:cancelled order share by month in 2024,cancelled order share by month in 2024,job_BI5TPrTRCJoaGoeuputVy49mTOu2,0,0
+tm000#rep0,curate,treatment,c6782e448a4b,"Which are the top 10 states by number of customers, and what is the customer_count for each?","SELECT state,
+       COUNT(DISTINCT id) AS customer_count
+FROM `bigquery-public-data.thelook_ecommerce.users`
+GROUP BY state
+ORDER BY customer_count DESC
+LIMIT 10","SELECT state,
+       COUNT(id) AS customer_count
+FROM `bigquery-public-data.thelook_ecommerce.users`
+WHERE state IS NOT NULL
+GROUP BY state
+ORDER BY customer_count DESC
+LIMIT 10;",MATCH,True,,,job_QgJzGQ35I72kLbBzke-4XNv4_oDy,0,1
+tm002#rep0,curate,treatment,c6782e448a4b,"For each month in 2024, what is the month number, the month, the total number of orders, the number of cancelled orders, and the cancelled_share_percentage, ordered by month number?","SELECT
+  EXTRACT(MONTH FROM DATE(created_at)) AS month_num,
+  FORMAT_DATE('%Y-%m', DATE(created_at)) AS month,
+  COUNT(DISTINCT order_id) AS total_orders,
+  COUNT(DISTINCT CASE WHEN LOWER(status) = 'cancelled' THEN order_id END) AS cancelled_orders,
+  ROUND(SAFE_DIVIDE(COUNT(DISTINCT CASE WHEN LOWER(status) = 'cancelled' THEN order_id END), COUNT(DISTINCT order_id)) * 100, 2) AS cancelled_share_percentage
+FROM
+  `bigquery-public-data.thelook_ecommerce.orders`
+WHERE
+  EXTRACT(YEAR FROM DATE(created_at)) = 2024
+GROUP BY
+  month_num,
+  month
+ORDER BY
+  month_num;",,,,"example:For each month in 2024, what is the month number, the month, the total number of orders, the number of cancelled orders, and the cancelled_share_percentage, ordered by month number?","For each month in 2024, what is the month number, the month, the total number of orders, the number of cancelled orders, and the cancelled_share_percentage, ordered by month number?",job_Ta1gZz5Fw0d-p7BnwgOqnvfQX3y5,0,0
+tm003#rep0,curate,treatment,c6782e448a4b,"What are the total sessions, purchase sessions, and conversion rate percentage by traffic source, ordered by conversion rate percentage from highest to lowest?","SELECT
+  traffic_source,
+  COUNT(DISTINCT session_id) AS total_sessions,
+  COUNT(DISTINCT CASE WHEN LOWER(event_type) = 'purchase' THEN session_id END) AS purchase_sessions,
+  ROUND(SAFE_DIVIDE(COUNT(DISTINCT CASE WHEN LOWER(event_type) = 'purchase' THEN session_id END), COUNT(DISTINCT session_id)) * 100, 2) AS conversion_rate_percentage
+FROM
+  `bigquery-public-data.thelook_ecommerce.events`
+GROUP BY
+  traffic_source
+ORDER BY
+  conversion_rate_percentage DESC",,,,"example:What are the total sessions, purchase sessions, and conversion rate percentage by traffic source, ordered by conversion rate percentage from highest to lowest?","What are the total sessions, purchase sessions, and conversion rate percentage by traffic source, ordered by conversion rate percentage from highest to lowest?",job_9ib7Y2KYkRmOQg5XDtG4D2z8gAtT,0,0
+ta000#rep0,curate,treatment,c6782e448a4b,"revenue by quarter, 2023","SELECT FORMAT_TIMESTAMP('%Y-Q', oi.created_at) AS q, CAST(CEIL(EXTRACT(MONTH FROM oi.created_at)/3) AS INT64) AS quarter, ROUND(SUM(oi.sale_price),2) AS revenue
+FROM `bigquery-public-data.thelook_ecommerce.order_items` oi
+WHERE oi.status NOT IN ('Cancelled','Returned') AND EXTRACT(YEAR FROM oi.created_at)=2023
+GROUP BY q, quarter ORDER BY q, quarter","SELECT CONCAT('Q', EXTRACT(QUARTER
+                           FROM oi.created_at)) AS QUARTER,
+       ROUND(SUM(oi.sale_price), 2) AS revenue
+FROM `bigquery-public-data.thelook_ecommerce.order_items` oi
+WHERE oi.status NOT IN ('Cancelled',
+                        'Returned')
+  AND EXTRACT(YEAR
+              FROM oi.created_at) = 2023
+GROUP BY QUARTER
+ORDER BY QUARTER",MISMATCH,False,"example:revenue by month, 2023",,job_4lnE20vI69glPg5DFAxv_zu08qWt,0,0
+ta001#rep0,curate,treatment,c6782e448a4b,revenue by department,"SELECT p.department, ROUND(SUM(oi.sale_price),2) AS revenue
+FROM `bigquery-public-data.thelook_ecommerce.order_items` oi JOIN `bigquery-public-data.thelook_ecommerce.products` p ON p.id=oi.product_id
+WHERE oi.status NOT IN ('Cancelled','Returned')
+GROUP BY p.department ORDER BY revenue DESC","SELECT p.department,
+       ROUND(SUM(oi.sale_price), 2) AS revenue
+FROM `bigquery-public-data.thelook_ecommerce.order_items` oi
+JOIN `bigquery-public-data.thelook_ecommerce.products` p ON p.id = oi.product_id
+WHERE oi.status NOT IN ('Cancelled',
+                        'Returned')
+GROUP BY p.department
+ORDER BY revenue DESC",MATCH,True,term:revenue,,job_aXtr6PR8O6w7qD7Q-9j1aLMAJH5j,0,0
+ta002#rep0,curate,treatment,c6782e448a4b,revenue per customer country in 2024,"SELECT u.country, ROUND(SUM(oi.sale_price),2) AS revenue
+FROM `bigquery-public-data.thelook_ecommerce.order_items` oi JOIN `bigquery-public-data.thelook_ecommerce.users` u ON u.id=oi.user_id
+WHERE oi.status NOT IN ('Cancelled','Returned') AND EXTRACT(YEAR FROM oi.created_at)=2024
+GROUP BY u.country ORDER BY revenue DESC","SELECT u.country,
+       ROUND(SUM(oi.sale_price), 2) AS revenue
+FROM `bigquery-public-data.thelook_ecommerce.order_items` AS oi
+INNER JOIN `bigquery-public-data.thelook_ecommerce.users` AS u ON u.id = oi.user_id
+WHERE oi.status NOT IN ('Cancelled',
+                        'Returned')
+  AND EXTRACT(YEAR
+              FROM oi.created_at) = 2024
+GROUP BY u.country
+ORDER BY revenue DESC",MATCH,True,term:revenue,,job_M70aMRowaPQBz5bTvTMcjdhTyj-Z,0,0
+ta003#rep0,curate,treatment,c6782e448a4b,the five brands with the highest revenue overall,"SELECT p.brand, ROUND(SUM(oi.sale_price),2) AS revenue
+FROM `bigquery-public-data.thelook_ecommerce.order_items` oi JOIN `bigquery-public-data.thelook_ecommerce.products` p ON p.id=oi.product_id
+WHERE oi.status NOT IN ('Cancelled','Returned')
+GROUP BY p.brand ORDER BY revenue DESC LIMIT 5","SELECT p.brand,
+       ROUND(SUM(oi.sale_price), 2) AS revenue
+FROM `bigquery-public-data.thelook_ecommerce.order_items` oi
+JOIN `bigquery-public-data.thelook_ecommerce.products` p ON p.id = oi.product_id
+WHERE oi.status NOT IN ('Cancelled',
+                        'Returned')
+GROUP BY p.brand
+ORDER BY revenue DESC
+LIMIT 5",MATCH,True,,,job_Om5X1XEI2A3WuW8JzW0bnlhNTYfN,0,0
+ta005#rep0,curate,treatment,c6782e448a4b,which categories earned more than 100000 in revenue,"SELECT p.category, ROUND(SUM(oi.sale_price),2) AS revenue
+FROM `bigquery-public-data.thelook_ecommerce.order_items` oi JOIN `bigquery-public-data.thelook_ecommerce.products` p ON p.id=oi.product_id
+WHERE oi.status NOT IN ('Cancelled','Returned')
+GROUP BY p.category HAVING SUM(oi.sale_price) > 100000 ORDER BY revenue DESC","SELECT p.category,
+       ROUND(SUM(oi.sale_price), 2) AS revenue
+FROM `bigquery-public-data.thelook_ecommerce.order_items` oi
+JOIN `bigquery-public-data.thelook_ecommerce.products` p ON p.id = oi.product_id
+WHERE oi.status NOT IN ('Cancelled',
+                        'Returned')
+GROUP BY p.category
+HAVING SUM(oi.sale_price) > 100000
+ORDER BY revenue DESC",MATCH,True,"example:top 10 product categories by revenue, all time",,job_8UQYEUwkjCIW-NR9z137UCmIw-7j,0,0
+ta006#rep0,curate,treatment,c6782e448a4b,margin by category,"SELECT p.category, ROUND(SUM(oi.sale_price - p.cost),2) AS margin
+FROM `bigquery-public-data.thelook_ecommerce.order_items` oi JOIN `bigquery-public-data.thelook_ecommerce.products` p ON p.id=oi.product_id
+WHERE oi.status NOT IN ('Cancelled','Returned')
+GROUP BY p.category ORDER BY margin DESC","SELECT p.category,
+       ROUND(SUM(oi.sale_price - p.cost), 2) AS margin
+FROM `bigquery-public-data.thelook_ecommerce.order_items` AS oi
+JOIN `bigquery-public-data.thelook_ecommerce.products` AS p ON p.id = oi.product_id
+WHERE oi.status NOT IN ('Cancelled',
+                        'Returned')
+GROUP BY p.category
+ORDER BY margin DESC;",MATCH,True,term:margin,,job_Dlb2YEmzELULlgh9QGQ4M6pu5st0,0,0
+ta009#rep0,curate,treatment,c6782e448a4b,margin percentage by department,"SELECT p.department, ROUND(SAFE_DIVIDE(SUM(oi.sale_price - p.cost), SUM(oi.sale_price))*100,2) AS margin_pct
+FROM `bigquery-public-data.thelook_ecommerce.order_items` oi JOIN `bigquery-public-data.thelook_ecommerce.products` p ON p.id=oi.product_id
+WHERE oi.status NOT IN ('Cancelled','Returned')
+GROUP BY p.department ORDER BY margin_pct DESC","SELECT p.department,
+       ROUND(SAFE_DIVIDE(SUM(oi.sale_price - p.cost), SUM(oi.sale_price)) * 100, 2) AS margin_percentage
+FROM `bigquery-public-data.thelook_ecommerce.order_items` AS oi
+JOIN `bigquery-public-data.thelook_ecommerce.products` AS p ON p.id = oi.product_id
+WHERE oi.status NOT IN ('Cancelled',
+                        'Returned')
+GROUP BY p.department
+ORDER BY margin_percentage DESC",MATCH,True,,,job_ivFbO4WYT_EbBoxZ1hSmKEykQYef,0,0
+ta010#rep0,curate,treatment,c6782e448a4b,how many completed orders were there in 2024,SELECT COUNT(*) AS n FROM `bigquery-public-data.thelook_ecommerce.orders` WHERE status='Complete' AND EXTRACT(YEAR FROM created_at)=2024,"SELECT COUNT(*) AS completed_orders
+FROM `bigquery-public-data.thelook_ecommerce.orders`
+WHERE status = 'Complete'
+  AND EXTRACT(YEAR
+              FROM created_at) = 2024",MATCH,True,,,job_cJUSDyGyS9MSFegBPmD12JeRNNlC,0,0
+ta012#rep0,curate,treatment,c6782e448a4b,"completed orders per customer state, top 15","SELECT u.state, COUNT(*) AS n
+FROM `bigquery-public-data.thelook_ecommerce.orders` o JOIN `bigquery-public-data.thelook_ecommerce.users` u ON u.id=o.user_id
+WHERE o.status='Complete'
+GROUP BY u.state ORDER BY n DESC LIMIT 15","SELECT u.state,
+       COUNT(DISTINCT o.order_id) AS completed_orders
+FROM `bigquery-public-data.thelook_ecommerce.orders` o
+JOIN `bigquery-public-data.thelook_ecommerce.users` u ON u.id = o.user_id
+WHERE o.status = 'Complete'
+GROUP BY u.state
+ORDER BY completed_orders DESC
+LIMIT 15",MATCH,True,,,job_3XoHOWgiBcbubgsVTQd6cFF8QicL,0,0
+ta013#rep0,curate,treatment,c6782e448a4b,"the share of orders that are completed, by month in 2023","SELECT FORMAT_TIMESTAMP('%Y-%m', created_at) AS month, ROUND(SAFE_DIVIDE(COUNTIF(status='Complete'), COUNT(*))*100,2) AS complete_pct
+FROM `bigquery-public-data.thelook_ecommerce.orders`
+WHERE EXTRACT(YEAR FROM created_at)=2023
+GROUP BY month ORDER BY month","SELECT FORMAT_TIMESTAMP('%Y-%m', created_at) AS MONTH,
+       ROUND(COUNTIF(status = 'Complete') / COUNT(*), 4) AS completed_share
+FROM `bigquery-public-data.thelook_ecommerce.orders`
+WHERE EXTRACT(YEAR
+              FROM created_at) = 2023
+GROUP BY MONTH
+ORDER BY MONTH",MISMATCH,False,term:completed order,,job_s4vB1lBalUGj4vwLnS7weyahJjVH,0,0
+ta015#rep0,curate,treatment,c6782e448a4b,the slowest 10 states to deliver to,"SELECT u.state, ROUND(AVG(TIMESTAMP_DIFF(oi.delivered_at, oi.shipped_at, HOUR)),2) AS hours
+FROM `bigquery-public-data.thelook_ecommerce.order_items` oi JOIN `bigquery-public-data.thelook_ecommerce.users` u ON u.id=oi.user_id
+WHERE oi.delivered_at IS NOT NULL AND oi.shipped_at IS NOT NULL
+GROUP BY u.state ORDER BY hours DESC LIMIT 10","SELECT u.state,
+       ROUND(AVG(TIMESTAMP_DIFF(o.delivered_at, o.shipped_at, HOUR)) / 24, 2) AS avg_delivery_days
+FROM `bigquery-public-data.thelook_ecommerce.orders` AS o
+JOIN `bigquery-public-data.thelook_ecommerce.users` AS u ON o.user_id = u.id
+WHERE o.delivered_at IS NOT NULL
+  AND o.shipped_at IS NOT NULL
+GROUP BY u.state
+ORDER BY avg_delivery_days DESC
+LIMIT 10",MISMATCH,False,,,job_E37KSqZ7dIGsa54uNPjPIrOk7tUv,0,0
+ta017#rep0,curate,treatment,c6782e448a4b,return rate by department,"SELECT p.department, ROUND(SAFE_DIVIDE(COUNTIF(oi.status='Returned'), COUNTIF(oi.status<>'Cancelled'))*100,2) AS return_pct
+FROM `bigquery-public-data.thelook_ecommerce.order_items` oi JOIN `bigquery-public-data.thelook_ecommerce.products` p ON p.id=oi.product_id
+GROUP BY p.department ORDER BY return_pct DESC","SELECT p.department,
+       ROUND(SAFE_DIVIDE(COUNTIF(oi.status = 'Returned'), COUNTIF(oi.status != 'Cancelled')), 4) AS return_rate
+FROM `bigquery-public-data.thelook_ecommerce.order_items` AS oi
+JOIN `bigquery-public-data.thelook_ecommerce.products` AS p ON oi.product_id = p.id
+GROUP BY p.department
+ORDER BY return_rate DESC",MISMATCH,False,,,job_8QyTQ8WcdGMEjhqN5IAJolmNd6-S,0,0
+ta018#rep0,curate,treatment,c6782e448a4b,return rate by month in 2024,"SELECT FORMAT_TIMESTAMP('%Y-%m', created_at) AS month, ROUND(SAFE_DIVIDE(COUNTIF(status='Returned'), COUNTIF(status<>'Cancelled'))*100,2) AS return_pct
+FROM `bigquery-public-data.thelook_ecommerce.order_items`
+WHERE EXTRACT(YEAR FROM created_at)=2024
+GROUP BY month ORDER BY month","SELECT FORMAT_TIMESTAMP('%Y-%m', created_at) AS MONTH,
+       ROUND(COUNTIF(status = 'Returned') / COUNTIF(status != 'Cancelled'), 4) AS return_rate
+FROM `bigquery-public-data.thelook_ecommerce.order_items`
+WHERE EXTRACT(YEAR
+              FROM created_at) = 2024
+GROUP BY MONTH
+ORDER BY MONTH",MISMATCH,False,,,job_4XhbqaDl4b8YSnI2qoZSKnu7kWw4,0,0
+ta019#rep0,curate,treatment,c6782e448a4b,"the 10 brands with the worst return rate, among brands with over 500 items sold","SELECT p.brand, ROUND(SAFE_DIVIDE(COUNTIF(oi.status='Returned'), COUNTIF(oi.status<>'Cancelled'))*100,2) AS return_pct
+FROM `bigquery-public-data.thelook_ecommerce.order_items` oi JOIN `bigquery-public-data.thelook_ecommerce.products` p ON p.id=oi.product_id
+GROUP BY p.brand HAVING COUNTIF(oi.status<>'Cancelled') > 500 ORDER BY return_pct DESC LIMIT 10","SELECT p.brand,
+       ROUND(SAFE_DIVIDE(COUNTIF(oi.status = 'Returned'), COUNTIF(oi.status != 'Cancelled')) * 100, 2) AS return_rate_percentage
+FROM `bigquery-public-data.thelook_ecommerce.order_items` oi
+JOIN `bigquery-public-data.thelook_ecommerce.products` p ON oi.product_id = p.id
+GROUP BY p.brand
+HAVING COUNT(oi.id) > 500
+ORDER BY return_rate_percentage DESC
+LIMIT 10",MISMATCH,False,,,job_Jsm1vlY-6bFZ4PHzkye801ZXJSKS,0,0
+ta022#rep0,curate,treatment,c6782e448a4b,average order value by customer gender,"SELECT u.gender, ROUND(SAFE_DIVIDE(SUM(oi.sale_price), COUNT(DISTINCT oi.order_id)),2) AS aov
+FROM `bigquery-public-data.thelook_ecommerce.order_items` oi JOIN `bigquery-public-data.thelook_ecommerce.users` u ON u.id=oi.user_id
+WHERE oi.status NOT IN ('Cancelled','Returned')
+GROUP BY u.gender ORDER BY aov DESC","SELECT u.gender,
+       ROUND(SUM(CASE
+                     WHEN oi.status NOT IN ('Cancelled', 'Returned') THEN oi.sale_price
+                     ELSE 0
+                 END) / COUNT(DISTINCT CASE
+                                           WHEN o.status = 'Complete' THEN o.order_id
+                                       END), 2) AS avg_order_value
+FROM `bigquery-public-data.thelook_ecommerce.order_items` oi
+JOIN `bigquery-public-data.thelook_ecommerce.users` u ON u.id = oi.user_id
+JOIN `bigquery-public-data.thelook_ecommerce.orders` o ON o.order_id = oi.order_id
+WHERE o.status = 'Complete'
+GROUP BY u.gender
+ORDER BY avg_order_value DESC",MISMATCH,False,,,job_48Tvu57IjV2nejoSiGAbc3b0CMga,0,0
+ta023#rep0,curate,treatment,c6782e448a4b,how many inventory items are on hand right now,SELECT COUNT(*) AS n FROM `bigquery-public-data.thelook_ecommerce.inventory_items` WHERE sold_at IS NULL,"SELECT COUNT(*) AS total_items_on_hand
+FROM `bigquery-public-data.thelook_ecommerce.inventory_items`
+WHERE sold_at IS NULL",MATCH,True,term:on hand,,job_CgpxUZxPyygZFuV1TbUfkG3PxXxI,0,0
+ta024#rep0,curate,treatment,c6782e448a4b,inventory on hand by product category,"SELECT product_category, COUNT(*) AS on_hand FROM `bigquery-public-data.thelook_ecommerce.inventory_items` WHERE sold_at IS NULL GROUP BY product_category ORDER BY on_hand DESC","SELECT product_category,
+       COUNT(*) AS items_on_hand
+FROM `bigquery-public-data.thelook_ecommerce.inventory_items`
+WHERE sold_at IS NULL
+GROUP BY product_category
+ORDER BY items_on_hand DESC",MATCH,True,example:inventory on hand by distribution center,,job_lhZcUWrzO4rZrxAtv1BiY5QxDcLD,0,1
+ta025#rep0,curate,treatment,c6782e448a4b,"the value of inventory on hand by department, at cost","SELECT product_department, ROUND(SUM(cost),2) AS cost_on_hand FROM `bigquery-public-data.thelook_ecommerce.inventory_items` WHERE sold_at IS NULL GROUP BY product_department ORDER BY cost_on_hand DESC","SELECT product_department AS department,
+       ROUND(SUM(cost), 2) AS total_cost
+FROM `bigquery-public-data.thelook_ecommerce.inventory_items`
+WHERE sold_at IS NULL
+GROUP BY department
+ORDER BY total_cost DESC",MATCH,True,,,job_fvU5W9NJ_scoze8jFCuBYIo0yxFz,0,0
+ta026#rep0,curate,treatment,c6782e448a4b,average age in days of inventory still on hand,"SELECT ROUND(AVG(TIMESTAMP_DIFF(CURRENT_TIMESTAMP(), created_at, DAY)),2) AS avg_age_days FROM `bigquery-public-data.thelook_ecommerce.inventory_items` WHERE sold_at IS NULL","SELECT ROUND(AVG(TIMESTAMP_DIFF(CURRENT_TIMESTAMP(), created_at, HOUR)) / 24, 2) AS avg_age_days
+FROM `bigquery-public-data.thelook_ecommerce.inventory_items`
+WHERE sold_at IS NULL",MISMATCH,False,term:on hand,,job_2UP9g0qbe4PnT81DJWWqq7uWhZLB,0,0
+ta027#rep0,curate,treatment,c6782e448a4b,"how many days on average does an item sit in inventory before it sells, by category","SELECT product_category, ROUND(AVG(TIMESTAMP_DIFF(sold_at, created_at, DAY)),2) AS days_to_sell
+FROM `bigquery-public-data.thelook_ecommerce.inventory_items`
+WHERE sold_at IS NOT NULL
+GROUP BY product_category ORDER BY days_to_sell DESC","SELECT product_category,
+       ROUND(AVG(TIMESTAMP_DIFF(sold_at, created_at, HOUR)) / 24, 2) AS avg_days_in_inventory
+FROM `bigquery-public-data.thelook_ecommerce.inventory_items`
+WHERE sold_at IS NOT NULL
+GROUP BY product_category
+ORDER BY avg_days_in_inventory DESC",MISMATCH,False,,,job_ZDK0gy9A_wwZ473CAMgsf-8Ie0Jk,0,0
+ta029#rep0,curate,treatment,c6782e448a4b,sessions by traffic source in 2024,"SELECT traffic_source, COUNT(DISTINCT session_id) AS sessions FROM `bigquery-public-data.thelook_ecommerce.events` WHERE EXTRACT(YEAR FROM created_at)=2024 GROUP BY traffic_source ORDER BY sessions DESC","SELECT traffic_source,
+       COUNT(DISTINCT session_id) AS sessions
+FROM `bigquery-public-data.thelook_ecommerce.events`
+WHERE EXTRACT(YEAR
+              FROM created_at) = 2024
+GROUP BY traffic_source
+ORDER BY sessions DESC",MATCH,True,example:sessions by browser in 2024,,job_N0GSRJy5gqtAV091NmtfmqKucKMT,0,0
+ta033#rep0,curate,treatment,c6782e448a4b,the average age of customers by gender,"SELECT gender, ROUND(AVG(age),2) AS avg_age FROM `bigquery-public-data.thelook_ecommerce.users` GROUP BY gender ORDER BY gender","SELECT gender,
+       ROUND(AVG(age), 2) AS average_age
+FROM `bigquery-public-data.thelook_ecommerce.users`
+GROUP BY gender
+ORDER BY gender",MATCH,True,,,job_dHwUiReABLgRe-PYsqpS1a2iv3rc,0,0
+ta035#rep0,curate,treatment,c6782e448a4b,how many products are there in each category,"SELECT category, COUNT(*) AS n FROM `bigquery-public-data.thelook_ecommerce.products` GROUP BY category ORDER BY n DESC","SELECT category,
+       COUNT(*) AS product_count
+FROM `bigquery-public-data.thelook_ecommerce.products`
+GROUP BY category
+ORDER BY product_count DESC",MATCH,True,,,job_cLC1Xtu0kE164_Gg8hoVhwzofUPo,0,0
+ta036#rep0,curate,treatment,c6782e448a4b,the 10 most expensive products by retail price,"SELECT name, category, brand, retail_price FROM `bigquery-public-data.thelook_ecommerce.products` ORDER BY retail_price DESC LIMIT 10","SELECT DISTINCT name,
+                retail_price
+FROM `bigquery-public-data.thelook_ecommerce.products`
+ORDER BY retail_price DESC
+LIMIT 10",MISMATCH,False,,,job_99-v4aZIFZyAAsrsMkLTeq7L-z_r,0,0
+ta037#rep0,curate,treatment,c6782e448a4b,average retail price by department,"SELECT department, ROUND(AVG(retail_price),2) AS avg_price FROM `bigquery-public-data.thelook_ecommerce.products` GROUP BY department ORDER BY avg_price DESC","SELECT department,
+       ROUND(AVG(retail_price), 2) AS avg_retail_price
+FROM `bigquery-public-data.thelook_ecommerce.products`
+GROUP BY department
+ORDER BY avg_retail_price DESC",MATCH,True,,,job_xHEkt4q1bNKTSW2A_Q317L6TLIJ8,0,0
+ta038#rep0,curate,treatment,c6782e448a4b,how many distribution centers are there,SELECT COUNT(*) AS n FROM `bigquery-public-data.thelook_ecommerce.distribution_centers`,"SELECT COUNT(*) AS total_distribution_centers
+FROM `bigquery-public-data.thelook_ecommerce.distribution_centers`",MATCH,True,,,job_8Le7sr8AaDdAj-v5sLBm2q5kkFRk,0,0
+ta039#rep0,curate,treatment,c6782e448a4b,how many products does each distribution center supply,"SELECT d.name, COUNT(*) AS n
+FROM `bigquery-public-data.thelook_ecommerce.products` p JOIN `bigquery-public-data.thelook_ecommerce.distribution_centers` d ON d.id=p.distribution_center_id
+GROUP BY d.name ORDER BY n DESC","SELECT dc.name AS distribution_center,
+       COUNT(DISTINCT p.id) AS products_supplied
+FROM `bigquery-public-data.thelook_ecommerce.products` AS p
+INNER JOIN `bigquery-public-data.thelook_ecommerce.distribution_centers` AS dc ON p.distribution_center_id = dc.id
+GROUP BY distribution_center
+ORDER BY products_supplied DESC",MATCH,True,,,job_WyhOWci16jTeqNudXSEWNPbN9BdP,0,1
+ta041#rep0,curate,treatment,c6782e448a4b,revenue split between men's and women's departments in 2023,"SELECT p.department, ROUND(SUM(oi.sale_price),2) AS revenue
+FROM `bigquery-public-data.thelook_ecommerce.order_items` oi JOIN `bigquery-public-data.thelook_ecommerce.products` p ON p.id=oi.product_id
+WHERE oi.status NOT IN ('Cancelled','Returned') AND EXTRACT(YEAR FROM oi.created_at)=2023
+GROUP BY p.department ORDER BY p.department","SELECT p.department AS product_department,
+       ROUND(SUM(oi.sale_price), 2) AS revenue,
+       ROUND(SAFE_DIVIDE(SUM(oi.sale_price), SUM(SUM(oi.sale_price)) OVER ()) * 100, 2) AS revenue_percentage
+FROM `bigquery-public-data.thelook_ecommerce.order_items` oi
+JOIN `bigquery-public-data.thelook_ecommerce.products` p ON p.id = oi.product_id
+WHERE oi.status NOT IN ('Cancelled',
+                        'Returned')
+  AND EXTRACT(YEAR
+              FROM oi.created_at) = 2023
+GROUP BY product_department
+ORDER BY revenue DESC",MISMATCH,False,"term:revenue;example:revenue by gender and department, 2023",,job_lmkzupcKiYE_1UYVOzUqoNV7KZUP,0,0
+ta042#rep0,curate,treatment,c6782e448a4b,cumulative revenue by month through 2023,"WITH m AS (SELECT FORMAT_TIMESTAMP('%Y-%m', oi.created_at) AS month, SUM(oi.sale_price) AS revenue
+  FROM `bigquery-public-data.thelook_ecommerce.order_items` oi WHERE oi.status NOT IN ('Cancelled','Returned') AND EXTRACT(YEAR FROM oi.created_at)=2023 GROUP BY month)
+SELECT month, ROUND(SUM(revenue) OVER (ORDER BY month),2) AS cumulative_revenue FROM m ORDER BY month","WITH monthly_revenue AS
+  (SELECT FORMAT_TIMESTAMP('%Y-%m', oi.created_at) AS MONTH,
+          SUM(oi.sale_price) AS monthly_rev
+   FROM `bigquery-public-data.thelook_ecommerce.order_items` oi
+   WHERE oi.status NOT IN ('Cancelled',
+                           'Returned')
+     AND oi.created_at < '2024-01-01 00:00:00 UTC'
+   GROUP BY MONTH)
+SELECT MONTH,
+       ROUND(monthly_rev, 2) AS monthly_revenue,
+       ROUND(SUM(monthly_rev) OVER (
+                                    ORDER BY MONTH), 2) AS cumulative_revenue
+FROM monthly_revenue
+ORDER BY MONTH;",MISMATCH,False,term:revenue,,job_HpacQz1sfjwLJLP0yX1koiP-YV5L,0,1
+ta044#rep0,curate,treatment,c6782e448a4b,how much revenue came from customers who joined in 2022,"SELECT ROUND(SUM(oi.sale_price),2) AS revenue
+FROM `bigquery-public-data.thelook_ecommerce.order_items` oi JOIN `bigquery-public-data.thelook_ecommerce.users` u ON u.id=oi.user_id
+WHERE oi.status NOT IN ('Cancelled','Returned') AND EXTRACT(YEAR FROM u.created_at)=2022","SELECT ROUND(SUM(oi.sale_price), 2) AS revenue
+FROM `bigquery-public-data.thelook_ecommerce.order_items` oi
+JOIN `bigquery-public-data.thelook_ecommerce.users` u ON u.id = oi.user_id
+WHERE oi.status NOT IN ('Cancelled',
+                        'Returned')
+  AND EXTRACT(YEAR
+              FROM u.created_at) = 2022",MATCH,True,term:revenue,,job_yihcDm1e9DiH4nnWplumKu-PN8UM,0,0
+ta045#rep0,curate,treatment,c6782e448a4b,revenue by customer age band,"SELECT CASE WHEN u.age < 25 THEN 'under 25' WHEN u.age < 40 THEN '25 to 39' WHEN u.age < 60 THEN '40 to 59' ELSE '60 and over' END AS age_band, ROUND(SUM(oi.sale_price),2) AS revenue
+FROM `bigquery-public-data.thelook_ecommerce.order_items` oi JOIN `bigquery-public-data.thelook_ecommerce.users` u ON u.id=oi.user_id
+WHERE oi.status NOT IN ('Cancelled','Returned')
+GROUP BY age_band ORDER BY revenue DESC","SELECT CASE
+           WHEN u.age < 25 THEN 'under 25'
+           WHEN u.age BETWEEN 25 AND 39 THEN '25 to 39'
+           WHEN u.age BETWEEN 40 AND 59 THEN '40 to 59'
+           ELSE '60 and over'
+       END AS age_band,
+       ROUND(SUM(oi.sale_price), 2) AS revenue
+FROM `bigquery-public-data.thelook_ecommerce.order_items` AS oi
+JOIN `bigquery-public-data.thelook_ecommerce.users` AS u ON oi.user_id = u.id
+WHERE oi.status NOT IN ('Cancelled',
+                        'Returned')
+GROUP BY age_band
+ORDER BY age_band",MISMATCH,False,term:revenue,,job_9ipOLDZ6RIkMORjF7N9CQrfX0a1h,0,1
+ta046#rep0,curate,treatment,c6782e448a4b,the 10 products that earned the most revenue,"SELECT p.name, ROUND(SUM(oi.sale_price),2) AS revenue
+FROM `bigquery-public-data.thelook_ecommerce.order_items` oi JOIN `bigquery-public-data.thelook_ecommerce.products` p ON p.id=oi.product_id
+WHERE oi.status NOT IN ('Cancelled','Returned')
+GROUP BY p.name ORDER BY revenue DESC LIMIT 10","SELECT p.name AS product_name,
+       ROUND(SUM(oi.sale_price), 2) AS revenue
+FROM `bigquery-public-data.thelook_ecommerce.order_items` oi
+JOIN `bigquery-public-data.thelook_ecommerce.products` p ON p.id = oi.product_id
+WHERE oi.status NOT IN ('Cancelled',
+                        'Returned')
+GROUP BY product_name
+ORDER BY revenue DESC
+LIMIT 10",MATCH,True,,,job_swjxiiBeMLxnNZtrTZ0hu-9kUaBO,0,0
+ta047#rep0,curate,treatment,c6782e448a4b,units sold by category in 2024,"SELECT p.category, COUNT(*) AS units
+FROM `bigquery-public-data.thelook_ecommerce.order_items` oi JOIN `bigquery-public-data.thelook_ecommerce.products` p ON p.id=oi.product_id
+WHERE oi.status NOT IN ('Cancelled','Returned') AND EXTRACT(YEAR FROM oi.created_at)=2024
+GROUP BY p.category ORDER BY units DESC","SELECT p.category,
+       COUNT(oi.id) AS units_sold
+FROM `bigquery-public-data.thelook_ecommerce.order_items` oi
+JOIN `bigquery-public-data.thelook_ecommerce.products` p ON oi.product_id = p.id
+WHERE EXTRACT(YEAR
+              FROM oi.created_at) = 2024
+GROUP BY p.category
+ORDER BY units_sold DESC",MISMATCH,False,,,job_jFMvFKRABHAFQ36GtoQPYM9ltcnE,0,0
+ta048#rep0,curate,treatment,c6782e448a4b,margin per unit sold by category,"SELECT p.category, ROUND(AVG(oi.sale_price - p.cost),2) AS margin_per_unit
+FROM `bigquery-public-data.thelook_ecommerce.order_items` oi JOIN `bigquery-public-data.thelook_ecommerce.products` p ON p.id=oi.product_id
+WHERE oi.status NOT IN ('Cancelled','Returned')
+GROUP BY p.category ORDER BY margin_per_unit DESC","SELECT p.category,
+       ROUND(SAFE_DIVIDE(SUM(oi.sale_price - p.cost), COUNT(*)), 2) AS margin_per_unit
+FROM `bigquery-public-data.thelook_ecommerce.order_items` oi
+JOIN `bigquery-public-data.thelook_ecommerce.products` p ON p.id = oi.product_id
+WHERE oi.status NOT IN ('Cancelled',
+                        'Returned')
+GROUP BY p.category
+ORDER BY margin_per_unit DESC",MATCH,True,,,job_5Aok--cUYdH_gPA0XZ6QlYUYpqwy,0,0
+ta051#rep0,curate,treatment,c6782e448a4b,"how many orders did each customer place, for the top 10 customers","SELECT o.user_id, COUNT(*) AS orders FROM `bigquery-public-data.thelook_ecommerce.orders` o WHERE o.status='Complete' GROUP BY o.user_id ORDER BY orders DESC, o.user_id LIMIT 10",,PRED_ERROR,False,,,,0,0
+ta053#rep0,curate,treatment,c6782e448a4b,completed orders by number of items in the order,"SELECT num_of_item, COUNT(*) AS orders FROM `bigquery-public-data.thelook_ecommerce.orders` WHERE status='Complete' GROUP BY num_of_item ORDER BY num_of_item","SELECT num_of_item,
+       COUNT(order_id) AS completed_orders
+FROM `bigquery-public-data.thelook_ecommerce.orders`
+WHERE status = 'Complete'
+GROUP BY num_of_item
+ORDER BY num_of_item;",MATCH,True,,,job_4EvFwZyGVFYN1c-eooV9iNspoBpX,0,1
+ta054#rep0,curate,treatment,c6782e448a4b,the share of completed orders by traffic source,"SELECT u.traffic_source, ROUND(SAFE_DIVIDE(COUNT(*), SUM(COUNT(*)) OVER ())*100,2) AS share_pct
+FROM `bigquery-public-data.thelook_ecommerce.orders` o JOIN `bigquery-public-data.thelook_ecommerce.users` u ON u.id=o.user_id
+WHERE o.status='Complete'
+GROUP BY u.traffic_source ORDER BY share_pct DESC","SELECT u.traffic_source,
+       ROUND(COUNT(DISTINCT o.order_id) / SUM(COUNT(DISTINCT o.order_id)) OVER (), 4) AS SHARE
+FROM `bigquery-public-data.thelook_ecommerce.orders` o
+JOIN `bigquery-public-data.thelook_ecommerce.users` u ON o.user_id = u.id
+WHERE o.status = 'Complete'
+GROUP BY u.traffic_source
+ORDER BY SHARE DESC",MISMATCH,False,,,job_cfWWX-ULdLxUEkiFbzt1Y2khYsRF,0,0
+ta057#rep0,curate,treatment,c6782e448a4b,"median-ish delivery time: the 90th percentile in hours, by distribution center","SELECT d.name, ROUND(APPROX_QUANTILES(TIMESTAMP_DIFF(oi.delivered_at, oi.shipped_at, HOUR), 100)[OFFSET(90)],2) AS p90_hours
+FROM `bigquery-public-data.thelook_ecommerce.order_items` oi JOIN `bigquery-public-data.thelook_ecommerce.products` p ON p.id=oi.product_id JOIN `bigquery-public-data.thelook_ecommerce.distribution_centers` d ON d.id=p.distribution_center_id
+WHERE oi.delivered_at IS NOT NULL AND oi.shipped_at IS NOT NULL
+GROUP BY d.name ORDER BY p90_hours DESC","SELECT dc.name AS distribution_center,
+       APPROX_QUANTILES(TIMESTAMP_DIFF(oi.delivered_at, oi.shipped_at, HOUR), 100)[OFFSET(90)] AS p90_delivery_time_hours
+FROM `bigquery-public-data.thelook_ecommerce.order_items` AS oi
+JOIN `bigquery-public-data.thelook_ecommerce.inventory_items` AS ii ON oi.inventory_item_id = ii.id
+JOIN `bigquery-public-data.thelook_ecommerce.distribution_centers` AS dc ON ii.product_distribution_center_id = dc.id
+WHERE oi.shipped_at IS NOT NULL
+  AND oi.delivered_at IS NOT NULL
+GROUP BY dc.name
+ORDER BY p90_delivery_time_hours DESC",MISMATCH,False,,,job_w92WxGR5bT6hBYrv1sItm-c7AwIZ,0,0
+ta058#rep0,curate,treatment,c6782e448a4b,how many items were returned in 2024,SELECT COUNT(*) AS n FROM `bigquery-public-data.thelook_ecommerce.order_items` WHERE status='Returned' AND EXTRACT(YEAR FROM created_at)=2024,"SELECT COUNTIF(EXTRACT(YEAR
+                       FROM returned_at) = 2024) AS returned_in_2024_by_return_date,
+       COUNTIF(EXTRACT(YEAR
+                       FROM created_at) = 2024
+               AND status = 'Returned') AS returned_in_2024_by_creation_date
+FROM `bigquery-public-data.thelook_ecommerce.order_items`",MISMATCH,False,,,job_1P68JyXqOv3kZad4zAJOOK_c2eLU,0,0
+ta060#rep0,curate,treatment,c6782e448a4b,how much revenue was lost to returns in 2024,"SELECT ROUND(SUM(sale_price),2) AS returned_value FROM `bigquery-public-data.thelook_ecommerce.order_items` WHERE status='Returned' AND EXTRACT(YEAR FROM created_at)=2024","SELECT ROUND(SUM(oi.sale_price), 2) AS revenue_lost_to_returns
+FROM `bigquery-public-data.thelook_ecommerce.order_items` AS oi
+WHERE oi.status = 'Returned'
+  AND EXTRACT(YEAR
+              FROM oi.created_at) = 2024",MATCH,True,,,job_C5UBPC7YagTkErBJrxWYi0GG25Gy,0,0
+ta061#rep0,curate,treatment,c6782e448a4b,average order value overall,"SELECT ROUND(SAFE_DIVIDE(SUM(oi.sale_price), COUNT(DISTINCT oi.order_id)),2) AS aov FROM `bigquery-public-data.thelook_ecommerce.order_items` oi WHERE oi.status NOT IN ('Cancelled','Returned')","SELECT ROUND(SUM(sale_price) / COUNT(DISTINCT order_id), 2) AS average_order_value
+FROM `bigquery-public-data.thelook_ecommerce.order_items`
+WHERE status = 'Complete'",MISMATCH,False,example:average order value by customer age band,,job_h-dDowXOC2dkatMnp0c4xcvg0ZvW,0,0
+ta062#rep0,curate,treatment,c6782e448a4b,"average order value by customer country, top 10","SELECT u.country, ROUND(SAFE_DIVIDE(SUM(oi.sale_price), COUNT(DISTINCT oi.order_id)),2) AS aov
+FROM `bigquery-public-data.thelook_ecommerce.order_items` oi JOIN `bigquery-public-data.thelook_ecommerce.users` u ON u.id=oi.user_id
+WHERE oi.status NOT IN ('Cancelled','Returned')
+GROUP BY u.country ORDER BY aov DESC LIMIT 10","SELECT u.country,
+       ROUND(SUM(oi.sale_price) / COUNT(DISTINCT oi.order_id), 2) AS avg_order_value
+FROM `bigquery-public-data.thelook_ecommerce.order_items` AS oi
+JOIN `bigquery-public-data.thelook_ecommerce.users` AS u ON u.id = oi.user_id
+WHERE oi.status = 'Complete'
+GROUP BY u.country
+ORDER BY avg_order_value DESC
+LIMIT 10",MISMATCH,False,example:average order value by customer age band,,job_tJ2WIhG7T3JbxvNZhfMbbpw4fSNN,0,0
+ta063#rep0,curate,treatment,c6782e448a4b,"inventory on hand by distribution center, by cost","SELECT d.name, ROUND(SUM(i.cost),2) AS cost_on_hand
+FROM `bigquery-public-data.thelook_ecommerce.inventory_items` i JOIN `bigquery-public-data.thelook_ecommerce.distribution_centers` d ON d.id=i.product_distribution_center_id
+WHERE i.sold_at IS NULL
+GROUP BY d.name ORDER BY cost_on_hand DESC","SELECT dc.name AS distribution_center,
+       ROUND(SUM(ii.cost), 2) AS total_cost
+FROM `bigquery-public-data.thelook_ecommerce.inventory_items` ii
+JOIN `bigquery-public-data.thelook_ecommerce.distribution_centers` dc ON dc.id = ii.product_distribution_center_id
+WHERE ii.sold_at IS NULL
+GROUP BY dc.name
+ORDER BY total_cost DESC",MATCH,True,term:on hand;example:inventory on hand by distribution center,,job_8pPB_ctFOPYnGH0CHP5I-U_VVnc_,0,0
+ta065#rep0,curate,treatment,c6782e448a4b,how many inventory items were created in 2024 and are still unsold,SELECT COUNT(*) AS n FROM `bigquery-public-data.thelook_ecommerce.inventory_items` WHERE sold_at IS NULL AND EXTRACT(YEAR FROM created_at)=2024,"SELECT COUNT(*) AS unsold_items_count
+FROM `bigquery-public-data.thelook_ecommerce.inventory_items`
+WHERE EXTRACT(YEAR
+              FROM created_at) = 2024
+  AND sold_at IS NULL",MATCH,True,,,job_BL22LaLCIIEiYS2YztJHIb9D_D8T,0,0
+ta066#rep0,curate,treatment,c6782e448a4b,"the share of inventory that has sold, by department","SELECT product_department, ROUND(SAFE_DIVIDE(COUNTIF(sold_at IS NOT NULL), COUNT(*))*100,2) AS sold_pct
+FROM `bigquery-public-data.thelook_ecommerce.inventory_items` GROUP BY product_department ORDER BY sold_pct DESC","SELECT product_department AS department,
+       ROUND(SAFE_DIVIDE(COUNTIF(sold_at IS NOT NULL), COUNT(*)), 4) AS sold_share
+FROM `bigquery-public-data.thelook_ecommerce.inventory_items`
+GROUP BY department
+ORDER BY sold_share DESC",MISMATCH,False,,,job_uN61iajtDlJvYH7xfvXWIOaZ8HJF,0,0
+ta069#rep0,curate,treatment,c6782e448a4b,average number of events per session,"WITH s AS (SELECT session_id, COUNT(*) AS n FROM `bigquery-public-data.thelook_ecommerce.events` GROUP BY session_id)
+SELECT ROUND(AVG(n),2) AS avg_events FROM s","SELECT ROUND(COUNT(*) / COUNT(DISTINCT session_id), 2) AS avg_events_per_session
+FROM `bigquery-public-data.thelook_ecommerce.events`",MATCH,True,,,job_aeysXN9rm2HADS120nT6sCA9tO-Q,0,0
+ta070#rep0,curate,treatment,c6782e448a4b,sessions per month in 2024,"SELECT FORMAT_TIMESTAMP('%Y-%m', created_at) AS month, COUNT(DISTINCT session_id) AS sessions FROM `bigquery-public-data.thelook_ecommerce.events` WHERE EXTRACT(YEAR FROM created_at)=2024 GROUP BY month ORDER BY month","SELECT FORMAT_TIMESTAMP('%Y-%m', created_at) AS MONTH,
+       COUNT(DISTINCT session_id) AS sessions
+FROM `bigquery-public-data.thelook_ecommerce.events`
+WHERE EXTRACT(YEAR
+              FROM created_at) = 2024
+GROUP BY MONTH
+ORDER BY MONTH",MATCH,True,,,job_R79qCBmW-pAgq3LZqU-JfQMo1syr,0,0
+ta071#rep0,curate,treatment,c6782e448a4b,how many customers have never placed an order,SELECT COUNT(*) AS n FROM `bigquery-public-data.thelook_ecommerce.users` u WHERE NOT EXISTS (SELECT 1 FROM `bigquery-public-data.thelook_ecommerce.orders` o WHERE o.user_id=u.id),"SELECT COUNT(u.id) AS customers_never_placed_order
+FROM `bigquery-public-data.thelook_ecommerce.users` AS u
+LEFT JOIN `bigquery-public-data.thelook_ecommerce.orders` AS o ON u.id = o.user_id
+WHERE o.order_id IS NULL",MATCH,True,,,job_ffaxTEM_Qz8Cp1EM6w5GmAZTyRMY,0,0
+ta072#rep0,curate,treatment,c6782e448a4b,the 10 cities with the most customers,"SELECT city, COUNT(*) AS n FROM `bigquery-public-data.thelook_ecommerce.users` GROUP BY city ORDER BY n DESC, city LIMIT 10","SELECT city,
+       country,
+       COUNT(id) AS customer_count
+FROM `bigquery-public-data.thelook_ecommerce.users`
+WHERE city IS NOT NULL
+GROUP BY city,
+         country
+ORDER BY customer_count DESC
+LIMIT 10",MISMATCH,False,,,job_Ji1ahdNIeIL5AdBkYY9_abHAHv4k,0,0
+ta073#rep0,curate,treatment,c6782e448a4b,how many products cost more than their category average,"WITH a AS (SELECT category, AVG(retail_price) AS avg_price FROM `bigquery-public-data.thelook_ecommerce.products` GROUP BY category)
+SELECT COUNT(*) AS n FROM `bigquery-public-data.thelook_ecommerce.products` p JOIN a ON a.category=p.category WHERE p.retail_price > a.avg_price","WITH category_avg AS
+  (SELECT category,
+          AVG(cost) AS avg_cost
+   FROM `bigquery-public-data.thelook_ecommerce.products`
+   GROUP BY category)
+SELECT COUNT(*) AS product_count
+FROM `bigquery-public-data.thelook_ecommerce.products` AS p
+INNER JOIN category_avg AS ca ON p.category = ca.category
+WHERE p.cost > ca.avg_cost",MISMATCH,False,,,job_kPD3Lmu01BD_2TnnZthbvV4KK6b_,0,0
+ta074#rep0,curate,treatment,c6782e448a4b,the markup percentage by category,"SELECT category, ROUND(SAFE_DIVIDE(AVG(retail_price - cost), AVG(cost))*100,2) AS markup_pct FROM `bigquery-public-data.thelook_ecommerce.products` GROUP BY category ORDER BY markup_pct DESC","SELECT category,
+       ROUND((AVG(retail_price) - AVG(cost)) / AVG(cost) * 100, 2) AS markup_percentage
+FROM `bigquery-public-data.thelook_ecommerce.products`
+GROUP BY category
+ORDER BY markup_percentage DESC",MATCH,True,,,job_f7xGTFCUzmQcnRo9Mr3-281Qk2rt,0,0
+tl002#rep0,holdout,control,2404ed0d5166,top 5 brands by revenue inside one category,"SELECT p.brand, ROUND(SUM(oi.sale_price), 2) AS revenue
+FROM `bigquery-public-data.thelook_ecommerce.order_items` oi
+JOIN `bigquery-public-data.thelook_ecommerce.products` p ON p.id = oi.product_id
+WHERE oi.status NOT IN ('Cancelled', 'Returned') AND p.category = 'Jeans'
+GROUP BY p.brand ORDER BY revenue DESC LIMIT 5","WITH brand_revenue AS
+  (SELECT p.category,
+          p.brand,
+          SUM(oi.sale_price) AS revenue
+   FROM `bigquery-public-data.thelook_ecommerce.order_items` AS oi
+   INNER JOIN `bigquery-public-data.thelook_ecommerce.products` AS p ON oi.product_id = p.id
+   WHERE oi.status NOT IN ('Cancelled',
+                           'Returned')
+   GROUP BY p.category,
+            p.brand),
+     category_revenue AS
+  (SELECT category,
+          SUM(revenue) AS total_category_revenue
+   FROM brand_revenue
+   GROUP BY category
+   ORDER BY total_category_revenue DESC
+   LIMIT 1)
+SELECT br.category,
+       br.brand,
+       ROUND(br.revenue, 2) AS revenue
+FROM brand_revenue AS br
+INNER JOIN category_revenue AS cr ON br.category = cr.category
+ORDER BY br.revenue DESC
+LIMIT 5;",MISMATCH,False,,,job_21qNbMkCmk7-nUmzbBuOPM6Cs5k3,0,0
+tl006#rep0,holdout,control,2404ed0d5166,average delivery time in hours by distribution center,"SELECT dc.name AS distribution_center,
+       ROUND(AVG(TIMESTAMP_DIFF(oi.delivered_at, oi.shipped_at, HOUR)), 1) AS avg_delivery_hours
+FROM `bigquery-public-data.thelook_ecommerce.order_items` oi
+JOIN `bigquery-public-data.thelook_ecommerce.products` p ON p.id = oi.product_id
+JOIN `bigquery-public-data.thelook_ecommerce.distribution_centers` dc ON dc.id = p.distribution_center_id
+WHERE oi.delivered_at IS NOT NULL AND oi.shipped_at IS NOT NULL
+GROUP BY dc.name ORDER BY avg_delivery_hours","SELECT dc.id AS distribution_center_id,
+       dc.name AS distribution_center_name,
+       ROUND(AVG(TIMESTAMP_DIFF(oi.delivered_at, oi.shipped_at, HOUR)), 2) AS avg_delivery_time_hours
+FROM `bigquery-public-data.thelook_ecommerce.order_items` AS oi
+INNER JOIN `bigquery-public-data.thelook_ecommerce.inventory_items` AS ii ON oi.inventory_item_id = ii.id
+INNER JOIN `bigquery-public-data.thelook_ecommerce.distribution_centers` AS dc ON ii.product_distribution_center_id = dc.id
+WHERE oi.delivered_at IS NOT NULL
+  AND oi.shipped_at IS NOT NULL
+GROUP BY 1,
+         2
+ORDER BY avg_delivery_time_hours DESC;",MISMATCH,False,,,job_4dGZQS4y_unGT1wCPHLF3d25LiFs,0,1
+tl007#rep0,holdout,control,2404ed0d5166,return rate by category,"SELECT p.category,
+       ROUND(COUNTIF(oi.status = 'Returned') / COUNTIF(oi.status <> 'Cancelled'), 4) AS return_rate
+FROM `bigquery-public-data.thelook_ecommerce.order_items` oi
+JOIN `bigquery-public-data.thelook_ecommerce.products` p ON p.id = oi.product_id
+GROUP BY p.category HAVING COUNTIF(oi.status <> 'Cancelled') >= 500
+ORDER BY return_rate DESC LIMIT 10","SELECT p.category AS product_category,
+       COUNT(oi.id) AS total_order_items,
+       COUNTIF(LOWER(oi.status) = 'returned') AS returned_items_count,
+       ROUND(SAFE_DIVIDE(COUNTIF(LOWER(oi.status) = 'returned'), COUNT(oi.id)) * 100, 2) AS return_rate_percentage
+FROM `bigquery-public-data.thelook_ecommerce.order_items` AS oi
+INNER JOIN `bigquery-public-data.thelook_ecommerce.products` AS p ON oi.product_id = p.id
+GROUP BY product_category
+ORDER BY return_rate_percentage DESC",MISMATCH,False,,,job_DHAmCtQlm9griEq15D63DYIpXb1i,0,0
+tl008#rep0,holdout,control,2404ed0d5166,top 10 states by number of customers,"SELECT state, COUNT(*) AS customers
+FROM `bigquery-public-data.thelook_ecommerce.users`
+GROUP BY state ORDER BY customers DESC LIMIT 10","SELECT state,
+       COUNT(DISTINCT id) AS customer_count
+FROM `bigquery-public-data.thelook_ecommerce.users`
+GROUP BY state
+ORDER BY customer_count DESC
+LIMIT 10;",MATCH,True,,,job_A4Ci6vhWYgnle9aQmWO7gys8fTqN,0,0
+tl013#rep0,holdout,control,2404ed0d5166,"repeat customers: customers with more than one completed order, by country","SELECT u.country, COUNT(*) AS repeat_customers
+FROM (
+  SELECT user_id, COUNT(*) AS completed
+  FROM `bigquery-public-data.thelook_ecommerce.orders`
+  WHERE status = 'Complete' GROUP BY user_id HAVING completed > 1
+) r
+JOIN `bigquery-public-data.thelook_ecommerce.users` u ON u.id = r.user_id
+GROUP BY u.country ORDER BY repeat_customers DESC LIMIT 10","WITH user_completed_orders AS
+  (SELECT user_id,
+          COUNT(DISTINCT order_id) AS completed_orders_count
+   FROM `bigquery-public-data.thelook_ecommerce.orders`
+   WHERE LOWER(status) = 'complete'
+   GROUP BY user_id
+   HAVING COUNT(DISTINCT order_id) > 1)
+SELECT users.country,
+       COUNT(DISTINCT r.user_id) AS repeat_customers_count
+FROM user_completed_orders r
+INNER JOIN `bigquery-public-data.thelook_ecommerce.users` AS users ON r.user_id = users.id
+GROUP BY users.country
+ORDER BY repeat_customers_count DESC;",MISMATCH,False,,,job_5p1oUCmIDaNzj2A-jTZF0vNkUrgP,0,0
+tl020#rep0,holdout,control,2404ed0d5166,best-selling product per category in 2024 by units,"SELECT category, name AS product, units
+FROM (
+  SELECT p.category, p.name, COUNT(*) AS units,
+         ROW_NUMBER() OVER (PARTITION BY p.category ORDER BY COUNT(*) DESC, p.name) AS rn
+  FROM `bigquery-public-data.thelook_ecommerce.order_items` oi
+  JOIN `bigquery-public-data.thelook_ecommerce.products` p ON p.id = oi.product_id
+  WHERE oi.status NOT IN ('Cancelled', 'Returned') AND EXTRACT(YEAR FROM oi.created_at) = 2024
+  GROUP BY p.category, p.name
+)
+WHERE rn = 1 ORDER BY units DESC LIMIT 10","WITH product_sales AS
+  (SELECT p.category AS product_category,
+          p.id AS product_id,
+          p.name AS product_name,
+          COUNT(oi.id) AS units_sold
+   FROM `bigquery-public-data.thelook_ecommerce.order_items` AS oi
+   INNER JOIN `bigquery-public-data.thelook_ecommerce.products` AS p ON oi.product_id = p.id
+   WHERE oi.created_at >= '2024-01-01 00:00:00 UTC'
+     AND oi.created_at < '2025-01-01 00:00:00 UTC'
+   GROUP BY product_category,
+            product_id,
+            product_name),
+     ranked_products AS
+  (SELECT product_category,
+          product_id,
+          product_name,
+          units_sold,
+          ROW_NUMBER() OVER (PARTITION BY product_category
+                             ORDER BY units_sold DESC, product_name ASC) AS rank
+   FROM product_sales)
+SELECT product_category,
+       product_id,
+       product_name,
+       units_sold
+FROM ranked_products
+WHERE rank = 1
+ORDER BY units_sold DESC,
+         product_category ASC;",MISMATCH,False,,,job_YVyaH0VvV7a7h8-gZzaRGRyJnvm1,0,0
+tm001#rep0,holdout,control,2404ed0d5166,"Which distribution centers have the most inventory on hand, and how many items do they have, returning distribution center ID, distribution center name, and inventory on hand count?","SELECT
+  dc.id AS distribution_center_id,
+  dc.name AS distribution_center_name,
+  COUNT(ii.id) AS inventory_on_hand_count
+FROM
+  `bigquery-public-data.thelook_ecommerce.distribution_centers` AS dc
+LEFT JOIN
+  `bigquery-public-data.thelook_ecommerce.inventory_items` AS ii
+  ON dc.id = ii.product_distribution_center_id
+  AND ii.sold_at IS NULL
+GROUP BY
+  dc.id,
+  dc.name
+ORDER BY
+  inventory_on_hand_count DESC;","SELECT dc.id AS distribution_center_id,
+       dc.name AS distribution_center_name,
+       COUNT(ii.id) AS inventory_on_hand_count
+FROM `bigquery-public-data.thelook_ecommerce.distribution_centers` AS dc
+INNER JOIN `bigquery-public-data.thelook_ecommerce.inventory_items` AS ii ON dc.id = ii.product_distribution_center_id
+WHERE ii.sold_at IS NULL
+GROUP BY distribution_center_id,
+         distribution_center_name
+ORDER BY inventory_on_hand_count DESC",MATCH,True,,,job_VC3EMR0l8TTce_sTE3JBeV4xhrWO,0,0
+tm004#rep0,holdout,control,2404ed0d5166,"What are the product ID, name, category, brand, and retail price of products that have never been ordered, ordered by product ID?","SELECT
+  p.id AS product_id,
+  p.name AS product_name,
+  p.category AS product_category,
+  p.brand AS product_brand,
+  p.retail_price AS product_retail_price
+FROM
+  `bigquery-public-data.thelook_ecommerce.products` AS p
+LEFT JOIN
+  `bigquery-public-data.thelook_ecommerce.order_items` AS oi
+  ON p.id = oi.product_id
+WHERE
+  oi.id IS NULL
+ORDER BY
+  p.id ASC","SELECT p.id AS product_id,
+       p.name AS product_name,
+       p.category,
+       p.brand,
+       p.retail_price
+FROM `bigquery-public-data.thelook_ecommerce.products` AS p
+LEFT JOIN `bigquery-public-data.thelook_ecommerce.order_items` AS oi ON p.id = oi.product_id
+WHERE oi.product_id IS NULL
+ORDER BY product_id;",MATCH,True,,,job_AcUvHAX5b3nxzBKT8oc1-TUDSJ8Z,0,0
+ta004#rep0,holdout,control,2404ed0d5166,revenue by day of week,"SELECT FORMAT_TIMESTAMP('%A', oi.created_at) AS day_name, ROUND(SUM(oi.sale_price),2) AS revenue
+FROM `bigquery-public-data.thelook_ecommerce.order_items` oi
+WHERE oi.status NOT IN ('Cancelled','Returned')
+GROUP BY day_name ORDER BY revenue DESC","SELECT FORMAT_TIMESTAMP('%A', created_at) AS day_of_week,
+       ROUND(SUM(sale_price), 2) AS revenue
+FROM `bigquery-public-data.thelook_ecommerce.order_items`
+GROUP BY day_of_week,
+         EXTRACT(DAYOFWEEK
+                 FROM created_at)
+ORDER BY EXTRACT(DAYOFWEEK
+                 FROM created_at)",MISMATCH,False,,,job_nY2OMD2OVHpWMCj5cYBABd6iROhh,0,0
+ta007#rep0,holdout,control,2404ed0d5166,margin by brand for the top 10 brands,"SELECT p.brand, ROUND(SUM(oi.sale_price - p.cost),2) AS margin
+FROM `bigquery-public-data.thelook_ecommerce.order_items` oi JOIN `bigquery-public-data.thelook_ecommerce.products` p ON p.id=oi.product_id
+WHERE oi.status NOT IN ('Cancelled','Returned')
+GROUP BY p.brand ORDER BY margin DESC LIMIT 10","SELECT products.brand,
+       SUM(order_items.sale_price) AS total_revenue,
+       SUM(products.cost) AS total_cost,
+       SUM(order_items.sale_price - products.cost) AS total_margin,
+       ROUND(SAFE_DIVIDE(SUM(order_items.sale_price - products.cost), SUM(order_items.sale_price)) * 100, 2) AS margin_percentage
+FROM `bigquery-public-data.thelook_ecommerce.order_items` AS order_items
+INNER JOIN `bigquery-public-data.thelook_ecommerce.products` AS products ON order_items.product_id = products.id
+GROUP BY products.brand
+ORDER BY total_margin DESC
+LIMIT 10;",MISMATCH,False,,,job_94dTMgiY0TDC6y2V0s_sR-bDvQKu,0,1
+ta008#rep0,holdout,control,2404ed0d5166,margin per month in 2024,"SELECT FORMAT_TIMESTAMP('%Y-%m', oi.created_at) AS month, ROUND(SUM(oi.sale_price - p.cost),2) AS margin
+FROM `bigquery-public-data.thelook_ecommerce.order_items` oi JOIN `bigquery-public-data.thelook_ecommerce.products` p ON p.id=oi.product_id
+WHERE oi.status NOT IN ('Cancelled','Returned') AND EXTRACT(YEAR FROM oi.created_at)=2024
+GROUP BY month ORDER BY month","SELECT FORMAT_TIMESTAMP('%Y-%m', oi.created_at) AS MONTH,
+       ROUND(SUM(oi.sale_price), 2) AS total_revenue,
+       ROUND(SUM(ii.cost), 2) AS total_cost,
+       ROUND(SUM(oi.sale_price - ii.cost), 2) AS total_margin,
+       ROUND(SAFE_DIVIDE(SUM(oi.sale_price - ii.cost), SUM(oi.sale_price)) * 100, 2) AS margin_percentage
+FROM `bigquery-public-data.thelook_ecommerce.order_items` AS oi
+INNER JOIN `bigquery-public-data.thelook_ecommerce.inventory_items` AS ii ON oi.inventory_item_id = ii.id
+WHERE oi.created_at >= '2024-01-01 00:00:00 UTC'
+  AND oi.created_at < '2025-01-01 00:00:00 UTC'
+GROUP BY MONTH
+ORDER BY MONTH;",MISMATCH,False,,,job_ApNIxqO33aw2Kdmw3FLVLT0nM3U-,0,0
+ta011#rep0,holdout,control,2404ed0d5166,completed orders by gender,"SELECT gender, COUNT(*) AS n FROM `bigquery-public-data.thelook_ecommerce.orders` WHERE status='Complete' GROUP BY gender ORDER BY n DESC","SELECT gender,
+       COUNT(DISTINCT order_id) AS completed_orders_count
+FROM `bigquery-public-data.thelook_ecommerce.orders`
+WHERE LOWER(status) = 'complete'
+GROUP BY gender
+ORDER BY completed_orders_count DESC",MATCH,True,,,job_MFINFxtqbSCGo1ad9KORTBlQ-rem,0,0
+ta014#rep0,holdout,control,2404ed0d5166,average delivery time in days by month in 2024,"SELECT FORMAT_TIMESTAMP('%Y-%m', shipped_at) AS month, ROUND(AVG(TIMESTAMP_DIFF(delivered_at, shipped_at, HOUR))/24,2) AS days
+FROM `bigquery-public-data.thelook_ecommerce.order_items`
+WHERE delivered_at IS NOT NULL AND shipped_at IS NOT NULL AND EXTRACT(YEAR FROM shipped_at)=2024
+GROUP BY month ORDER BY month","SELECT FORMAT_TIMESTAMP('%Y-%m', order_items.created_at) AS order_month,
+       ROUND(AVG(TIMESTAMP_DIFF(order_items.delivered_at, order_items.created_at, SECOND) / 86400.0), 2) AS avg_delivery_time_days
+FROM `bigquery-public-data.thelook_ecommerce.order_items` AS order_items
+WHERE order_items.created_at >= '2024-01-01 00:00:00 UTC'
+  AND order_items.created_at < '2025-01-01 00:00:00 UTC'
+  AND order_items.delivered_at IS NOT NULL
+GROUP BY order_month
+ORDER BY order_month ASC;",MISMATCH,False,,,job_exXeH-do05IdU-QMDs-0G7MWWXLa,0,1
+ta016#rep0,holdout,control,2404ed0d5166,average delivery time in hours by product department,"SELECT p.department, ROUND(AVG(TIMESTAMP_DIFF(oi.delivered_at, oi.shipped_at, HOUR)),2) AS hours
+FROM `bigquery-public-data.thelook_ecommerce.order_items` oi JOIN `bigquery-public-data.thelook_ecommerce.products` p ON p.id=oi.product_id
+WHERE oi.delivered_at IS NOT NULL AND oi.shipped_at IS NOT NULL
+GROUP BY p.department ORDER BY hours DESC","SELECT p.department AS product_department,
+       ROUND(AVG(TIMESTAMP_DIFF(oi.delivered_at, oi.created_at, HOUR)), 2) AS avg_delivery_time_hours
+FROM `bigquery-public-data.thelook_ecommerce.order_items` AS oi
+INNER JOIN `bigquery-public-data.thelook_ecommerce.products` AS p ON oi.product_id = p.id
+WHERE oi.delivered_at IS NOT NULL
+  AND oi.created_at IS NOT NULL
+GROUP BY 1
+ORDER BY 1",MISMATCH,False,,,job_V1w-fegPg4dxyzzoBe5Y9HBU__LA,0,0
+ta020#rep0,holdout,control,2404ed0d5166,average order value by month in 2023,"SELECT FORMAT_TIMESTAMP('%Y-%m', oi.created_at) AS month, ROUND(SAFE_DIVIDE(SUM(oi.sale_price), COUNT(DISTINCT oi.order_id)),2) AS aov
+FROM `bigquery-public-data.thelook_ecommerce.order_items` oi
+WHERE oi.status NOT IN ('Cancelled','Returned') AND EXTRACT(YEAR FROM oi.created_at)=2023
+GROUP BY month ORDER BY month","SELECT FORMAT_TIMESTAMP('%Y-%m', order_items.created_at) AS MONTH,
+       ROUND(SUM(order_items.sale_price) / COUNT(DISTINCT order_items.order_id), 2) AS average_order_value,
+       ROUND(SUM(order_items.sale_price), 2) AS total_sales,
+       COUNT(DISTINCT order_items.order_id) AS total_orders
+FROM `bigquery-public-data.thelook_ecommerce.order_items` AS order_items
+WHERE order_items.created_at >= '2023-01-01 00:00:00 UTC'
+  AND order_items.created_at < '2024-01-01 00:00:00 UTC'
+GROUP BY 1
+ORDER BY 1;",MISMATCH,False,,,job_XvThf_XEE7l5mmOPjytxoB9LW718,0,1
+ta021#rep0,holdout,control,2404ed0d5166,average order value by traffic source,"SELECT u.traffic_source, ROUND(SAFE_DIVIDE(SUM(oi.sale_price), COUNT(DISTINCT oi.order_id)),2) AS aov
+FROM `bigquery-public-data.thelook_ecommerce.order_items` oi JOIN `bigquery-public-data.thelook_ecommerce.users` u ON u.id=oi.user_id
+WHERE oi.status NOT IN ('Cancelled','Returned')
+GROUP BY u.traffic_source ORDER BY aov DESC","SELECT u.traffic_source,
+       ROUND(SAFE_DIVIDE(SUM(oi.sale_price), COUNT(DISTINCT oi.order_id)), 2) AS average_order_value,
+       COUNT(DISTINCT oi.order_id) AS total_orders,
+       ROUND(SUM(oi.sale_price), 2) AS total_revenue
+FROM `bigquery-public-data.thelook_ecommerce.order_items` AS oi
+INNER JOIN `bigquery-public-data.thelook_ecommerce.users` AS u ON oi.user_id = u.id
+GROUP BY u.traffic_source
+ORDER BY average_order_value DESC",MISMATCH,False,,,job_iZ77l1AZNLvmX5xZG_JjwlIs2jUJ,0,0
+ta028#rep0,holdout,control,2404ed0d5166,how many events were there by event type,"SELECT event_type, COUNT(*) AS n FROM `bigquery-public-data.thelook_ecommerce.events` GROUP BY event_type ORDER BY n DESC","SELECT event_type,
+       COUNT(id) AS event_count
+FROM `bigquery-public-data.thelook_ecommerce.events`
+GROUP BY event_type
+ORDER BY event_count DESC",MATCH,True,,,job_AUu9g-nEM4Ih8JFXlSuXagNxWvi9,0,0
+ta030#rep0,holdout,control,2404ed0d5166,events by hour of day,"SELECT EXTRACT(HOUR FROM created_at) AS hour, COUNT(*) AS n FROM `bigquery-public-data.thelook_ecommerce.events` GROUP BY hour ORDER BY hour","SELECT EXTRACT(HOUR
+               FROM created_at) AS hour_of_day,
+       COUNT(1) AS event_count
+FROM `bigquery-public-data.thelook_ecommerce.events`
+GROUP BY hour_of_day
+ORDER BY hour_of_day;",MATCH,True,,,job_H7k_2wv9Ps__5E6ZL7ulwSG6vOUB,0,1
+ta031#rep0,holdout,control,2404ed0d5166,the 10 states with the most sessions,"SELECT state, COUNT(DISTINCT session_id) AS sessions FROM `bigquery-public-data.thelook_ecommerce.events` GROUP BY state ORDER BY sessions DESC LIMIT 10","SELECT state,
+       COUNT(DISTINCT session_id) AS total_sessions
+FROM `bigquery-public-data.thelook_ecommerce.events`
+WHERE state IS NOT NULL
+GROUP BY state
+ORDER BY total_sessions DESC
+LIMIT 10",MATCH,True,,,job_Q-5p4WWl52WrVzGZRFT7ZGqrjHPk,0,0
+ta032#rep0,holdout,control,2404ed0d5166,how many customers are there by country,"SELECT country, COUNT(*) AS n FROM `bigquery-public-data.thelook_ecommerce.users` GROUP BY country ORDER BY n DESC","SELECT country,
+       COUNT(DISTINCT id) AS customer_count
+FROM `bigquery-public-data.thelook_ecommerce.users`
+GROUP BY 1
+ORDER BY customer_count DESC;",MATCH,True,,,job_pYYjjg9ZXYv7W1jx6ZwhQ7Yi9U9J,0,0
+ta034#rep0,holdout,control,2404ed0d5166,customers acquired by traffic source in 2023,"SELECT traffic_source, COUNT(*) AS n FROM `bigquery-public-data.thelook_ecommerce.users` WHERE EXTRACT(YEAR FROM created_at)=2023 GROUP BY traffic_source ORDER BY n DESC","SELECT traffic_source,
+       COUNT(id) AS customer_count
+FROM `bigquery-public-data.thelook_ecommerce.users`
+WHERE created_at >= '2023-01-01 00:00:00 UTC'
+  AND created_at < '2024-01-01 00:00:00 UTC'
+GROUP BY 1
+ORDER BY customer_count DESC",MATCH,True,,,job_wKdRhQI9ijdUbcrfsZe165l9JMCB,0,0
+ta040#rep0,holdout,control,2404ed0d5166,which month of 2024 had the highest revenue,"SELECT FORMAT_TIMESTAMP('%Y-%m', oi.created_at) AS month, ROUND(SUM(oi.sale_price),2) AS revenue
+FROM `bigquery-public-data.thelook_ecommerce.order_items` oi
+WHERE oi.status NOT IN ('Cancelled','Returned') AND EXTRACT(YEAR FROM oi.created_at)=2024
+GROUP BY month ORDER BY revenue DESC LIMIT 1","SELECT TIMESTAMP_TRUNC(created_at, MONTH) AS MONTH,
+       SUM(sale_price) AS total_revenue
+FROM `bigquery-public-data.thelook_ecommerce.order_items`
+WHERE created_at >= '2024-01-01 00:00:00 UTC'
+  AND created_at < '2025-01-01 00:00:00 UTC'
+  AND status NOT IN ('Cancelled',
+                     'Returned')
+GROUP BY 1
+ORDER BY total_revenue DESC
+LIMIT 1",MISMATCH,False,,,job_Z0DlRnMOQ2qQo55uOahF9xTl3n_w,0,0
+ta043#rep0,holdout,control,2404ed0d5166,the revenue rank of each category within its department,"WITH c AS (SELECT p.department, p.category, SUM(oi.sale_price) AS revenue
+  FROM `bigquery-public-data.thelook_ecommerce.order_items` oi JOIN `bigquery-public-data.thelook_ecommerce.products` p ON p.id=oi.product_id WHERE oi.status NOT IN ('Cancelled','Returned') GROUP BY p.department, p.category)
+SELECT department, category, ROUND(revenue,2) AS revenue, RANK() OVER (PARTITION BY department ORDER BY revenue DESC) AS rank_in_department
+FROM c ORDER BY department, rank_in_department","SELECT p.department,
+       p.category,
+       ROUND(SUM(oi.sale_price), 2) AS revenue,
+       RANK() OVER (PARTITION BY p.department
+                    ORDER BY SUM(oi.sale_price) DESC) AS revenue_rank
+FROM `bigquery-public-data.thelook_ecommerce.order_items` AS oi
+INNER JOIN `bigquery-public-data.thelook_ecommerce.products` AS p ON oi.product_id = p.id
+GROUP BY p.department,
+         p.category
+ORDER BY p.department,
+         revenue_rank;",MISMATCH,False,,,job_RIq-5K-4jookFafLDHD4ksuuKSQL,0,0
+ta052#rep0,holdout,control,2404ed0d5166,how many customers placed exactly one completed order,"WITH c AS (SELECT user_id, COUNT(*) AS n FROM `bigquery-public-data.thelook_ecommerce.orders` WHERE status='Complete' GROUP BY user_id)
+SELECT COUNT(*) AS customers FROM c WHERE n=1","SELECT COUNT(*) AS customer_count
+FROM
+  (SELECT user_id,
+          COUNT(DISTINCT order_id) AS completed_order_count
+   FROM `bigquery-public-data.thelook_ecommerce.orders`
+   WHERE LOWER(status) = 'complete'
+   GROUP BY user_id
+   HAVING completed_order_count = 1)",MATCH,True,,,job_4qybILx0CyK150L9Gk0fQ7A0EnD0,0,0
+ta055#rep0,holdout,control,2404ed0d5166,how many order items are still waiting to be shipped,"SELECT COUNT(*) AS n FROM `bigquery-public-data.thelook_ecommerce.order_items` WHERE shipped_at IS NULL AND status NOT IN ('Cancelled','Returned')","SELECT COUNT(*) AS waiting_to_be_shipped_count
+FROM `bigquery-public-data.thelook_ecommerce.order_items`
+WHERE status = 'Processing'
+  AND shipped_at IS NULL",MATCH,True,,,job_HtRzYsLEdqZJvEMtdTaBNRG1Y0vg,0,0
+ta056#rep0,holdout,control,2404ed0d5166,the longest time in hours between an order and its delivery,"SELECT MAX(TIMESTAMP_DIFF(delivered_at, created_at, HOUR)) AS hours FROM `bigquery-public-data.thelook_ecommerce.order_items` WHERE delivered_at IS NOT NULL","SELECT order_id,
+       user_id,
+       created_at,
+       delivered_at,
+       TIMESTAMP_DIFF(delivered_at, created_at, HOUR) AS delivery_time_hours
+FROM `bigquery-public-data.thelook_ecommerce.order_items`
+WHERE delivered_at IS NOT NULL
+  AND created_at IS NOT NULL
+  AND delivered_at >= created_at
+ORDER BY delivery_time_hours DESC
+LIMIT 1",MISMATCH,False,,,job_Z30GlHhxDCWpMiQIwGo59mESHBrl,0,0
+ta059#rep0,holdout,control,2404ed0d5166,return rate by customer country,"SELECT u.country, ROUND(SAFE_DIVIDE(COUNTIF(oi.status='Returned'), COUNTIF(oi.status<>'Cancelled'))*100,2) AS return_pct
+FROM `bigquery-public-data.thelook_ecommerce.order_items` oi JOIN `bigquery-public-data.thelook_ecommerce.users` u ON u.id=oi.user_id
+GROUP BY u.country ORDER BY return_pct DESC","SELECT users.country,
+       COUNT(order_items.id) AS total_items,
+       SUM(CASE
+               WHEN order_items.status = 'Returned' THEN 1
+               ELSE 0
+           END) AS returned_items,
+       ROUND(SAFE_DIVIDE(SUM(CASE
+                                 WHEN order_items.status = 'Returned' THEN 1
+                                 ELSE 0
+                             END), COUNT(order_items.id)) * 100, 2) AS return_rate_percentage
+FROM `bigquery-public-data.thelook_ecommerce.order_items` AS order_items
+INNER JOIN `bigquery-public-data.thelook_ecommerce.users` AS users ON order_items.user_id = users.id
+GROUP BY users.country
+ORDER BY return_rate_percentage DESC;",MISMATCH,False,,,job_haCLJs1jPCbB416UYlpLqhD1UJP-,0,1
+ta064#rep0,holdout,control,2404ed0d5166,which 10 products have the most units on hand,"SELECT product_name, COUNT(*) AS on_hand FROM `bigquery-public-data.thelook_ecommerce.inventory_items` WHERE sold_at IS NULL GROUP BY product_name ORDER BY on_hand DESC, product_name LIMIT 10","SELECT product_id,
+       product_name,
+       COUNT(*) AS units_on_hand
+FROM `bigquery-public-data.thelook_ecommerce.inventory_items`
+WHERE sold_at IS NULL
+GROUP BY product_id,
+         product_name
+ORDER BY units_on_hand DESC
+LIMIT 10",MISMATCH,False,,,job_JpZcgkAUjZlABk7NhzwsMq37RT95,0,0
+ta067#rep0,holdout,control,2404ed0d5166,how many distinct users had a session in 2024,SELECT COUNT(DISTINCT user_id) AS users FROM `bigquery-public-data.thelook_ecommerce.events` WHERE EXTRACT(YEAR FROM created_at)=2024 AND user_id IS NOT NULL,"SELECT COUNT(DISTINCT user_id) AS distinct_users_count
+FROM `bigquery-public-data.thelook_ecommerce.events`
+WHERE created_at >= '2024-01-01 00:00:00 UTC'
+  AND created_at < '2025-01-01 00:00:00 UTC'",MATCH,True,,,job_wKQ8vYtX691BAy_qvqBZUolLdWl5,0,0
+ta068#rep0,holdout,control,2404ed0d5166,the most common event type per browser,"WITH e AS (SELECT browser, event_type, COUNT(*) AS n, ROW_NUMBER() OVER (PARTITION BY browser ORDER BY COUNT(*) DESC, event_type) AS rn
+  FROM `bigquery-public-data.thelook_ecommerce.events` GROUP BY browser, event_type)
+SELECT browser, event_type, n FROM e WHERE rn=1 ORDER BY browser","WITH RankedEvents AS
+  (SELECT browser,
+          event_type,
+          COUNT(*) AS event_count,
+          ROW_NUMBER() OVER (PARTITION BY browser
+                             ORDER BY COUNT(*) DESC) AS rnk
+   FROM `bigquery-public-data.thelook_ecommerce.events`
+   GROUP BY browser,
+            event_type)
+SELECT browser,
+       event_type,
+       event_count
+FROM RankedEvents
+WHERE rnk = 1
+ORDER BY event_count DESC;",MISMATCH,False,,,job_w_DodjKsAYzYS8WiG9ngcyJrpDby,0,0
+tl002#rep0,holdout,treatment,c6782e448a4b,top 5 brands by revenue inside one category,"SELECT p.brand, ROUND(SUM(oi.sale_price), 2) AS revenue
+FROM `bigquery-public-data.thelook_ecommerce.order_items` oi
+JOIN `bigquery-public-data.thelook_ecommerce.products` p ON p.id = oi.product_id
+WHERE oi.status NOT IN ('Cancelled', 'Returned') AND p.category = 'Jeans'
+GROUP BY p.brand ORDER BY revenue DESC LIMIT 5",,PRED_ERROR,False,,,,0,0
+tl006#rep0,holdout,treatment,c6782e448a4b,average delivery time in hours by distribution center,"SELECT dc.name AS distribution_center,
+       ROUND(AVG(TIMESTAMP_DIFF(oi.delivered_at, oi.shipped_at, HOUR)), 1) AS avg_delivery_hours
+FROM `bigquery-public-data.thelook_ecommerce.order_items` oi
+JOIN `bigquery-public-data.thelook_ecommerce.products` p ON p.id = oi.product_id
+JOIN `bigquery-public-data.thelook_ecommerce.distribution_centers` dc ON dc.id = p.distribution_center_id
+WHERE oi.delivered_at IS NOT NULL AND oi.shipped_at IS NOT NULL
+GROUP BY dc.name ORDER BY avg_delivery_hours","SELECT dc.name AS distribution_center,
+       ROUND(AVG(TIMESTAMP_DIFF(oi.delivered_at, oi.shipped_at, MINUTE) / 60.0), 2) AS avg_delivery_time_hours
+FROM `bigquery-public-data.thelook_ecommerce.order_items` AS oi
+INNER JOIN `bigquery-public-data.thelook_ecommerce.inventory_items` AS ii ON oi.inventory_item_id = ii.id
+INNER JOIN `bigquery-public-data.thelook_ecommerce.distribution_centers` AS dc ON ii.product_distribution_center_id = dc.id
+WHERE oi.delivered_at IS NOT NULL
+GROUP BY dc.name
+ORDER BY avg_delivery_time_hours DESC",MISMATCH,False,,,job_pi1JJyosM-AbPh8y0xdHV5deSGFf,0,0
+tl007#rep0,holdout,treatment,c6782e448a4b,return rate by category,"SELECT p.category,
+       ROUND(COUNTIF(oi.status = 'Returned') / COUNTIF(oi.status <> 'Cancelled'), 4) AS return_rate
+FROM `bigquery-public-data.thelook_ecommerce.order_items` oi
+JOIN `bigquery-public-data.thelook_ecommerce.products` p ON p.id = oi.product_id
+GROUP BY p.category HAVING COUNTIF(oi.status <> 'Cancelled') >= 500
+ORDER BY return_rate DESC LIMIT 10","SELECT p.category,
+       ROUND(SAFE_DIVIDE(COUNTIF(LOWER(oi.status) = 'returned'), COUNTIF(LOWER(oi.status) != 'cancelled')) * 100, 2) AS return_rate
+FROM `bigquery-public-data.thelook_ecommerce.order_items` AS oi
+JOIN `bigquery-public-data.thelook_ecommerce.products` AS p ON oi.product_id = p.id
+GROUP BY p.category
+ORDER BY return_rate DESC",MISMATCH,False,,,job_Qf3iyAJjx9lytSJWShvBaiZNrvrm,0,0
+tl008#rep0,holdout,treatment,c6782e448a4b,top 10 states by number of customers,"SELECT state, COUNT(*) AS customers
+FROM `bigquery-public-data.thelook_ecommerce.users`
+GROUP BY state ORDER BY customers DESC LIMIT 10","SELECT state,
+       COUNT(DISTINCT id) AS customer_count
+FROM `bigquery-public-data.thelook_ecommerce.users`
+GROUP BY state
+ORDER BY customer_count DESC
+LIMIT 10",MATCH,True,,,job_MKNZxpaetRC0F_SLd-z1LKu368Nk,0,0
+tl013#rep0,holdout,treatment,c6782e448a4b,"repeat customers: customers with more than one completed order, by country","SELECT u.country, COUNT(*) AS repeat_customers
+FROM (
+  SELECT user_id, COUNT(*) AS completed
+  FROM `bigquery-public-data.thelook_ecommerce.orders`
+  WHERE status = 'Complete' GROUP BY user_id HAVING completed > 1
+) r
+JOIN `bigquery-public-data.thelook_ecommerce.users` u ON u.id = r.user_id
+GROUP BY u.country ORDER BY repeat_customers DESC LIMIT 10","SELECT u.country,
+       COUNT(DISTINCT u.id) AS repeat_customers
+FROM `bigquery-public-data.thelook_ecommerce.users` AS u
+JOIN
+  (SELECT user_id
+   FROM `bigquery-public-data.thelook_ecommerce.orders`
+   WHERE status = 'Complete'
+   GROUP BY user_id
+   HAVING COUNT(order_id) > 1) AS repeat_users ON u.id = repeat_users.user_id
+GROUP BY u.country
+ORDER BY repeat_customers DESC",MISMATCH,False,term:completed order,,job_pAXR_f32b1_rexqhCQ02TOe94F5L,0,1
+tl020#rep0,holdout,treatment,c6782e448a4b,best-selling product per category in 2024 by units,"SELECT category, name AS product, units
+FROM (
+  SELECT p.category, p.name, COUNT(*) AS units,
+         ROW_NUMBER() OVER (PARTITION BY p.category ORDER BY COUNT(*) DESC, p.name) AS rn
+  FROM `bigquery-public-data.thelook_ecommerce.order_items` oi
+  JOIN `bigquery-public-data.thelook_ecommerce.products` p ON p.id = oi.product_id
+  WHERE oi.status NOT IN ('Cancelled', 'Returned') AND EXTRACT(YEAR FROM oi.created_at) = 2024
+  GROUP BY p.category, p.name
+)
+WHERE rn = 1 ORDER BY units DESC LIMIT 10","WITH product_sales AS
+  (SELECT p.category,
+          p.name AS product_name,
+          COUNT(*) AS units_sold,
+          ROW_NUMBER() OVER (PARTITION BY p.category
+                             ORDER BY COUNT(*) DESC, p.name) AS rank
+   FROM `bigquery-public-data.thelook_ecommerce.order_items` oi
+   JOIN `bigquery-public-data.thelook_ecommerce.products` p ON oi.product_id = p.id
+   WHERE oi.status NOT IN ('Cancelled',
+                           'Returned')
+     AND EXTRACT(YEAR
+                 FROM oi.created_at) = 2024
+   GROUP BY p.category,
+            p.name)
+SELECT category,
+       product_name,
+       units_sold
+FROM product_sales
+WHERE rank = 1
+ORDER BY category;",MISMATCH,False,,,job_jj2wVS4-EIGZTU20ILar0w9PsAk5,0,0
+tm001#rep0,holdout,treatment,c6782e448a4b,"Which distribution centers have the most inventory on hand, and how many items do they have, returning distribution center ID, distribution center name, and inventory on hand count?","SELECT
+  dc.id AS distribution_center_id,
+  dc.name AS distribution_center_name,
+  COUNT(ii.id) AS inventory_on_hand_count
+FROM
+  `bigquery-public-data.thelook_ecommerce.distribution_centers` AS dc
+LEFT JOIN
+  `bigquery-public-data.thelook_ecommerce.inventory_items` AS ii
+  ON dc.id = ii.product_distribution_center_id
+  AND ii.sold_at IS NULL
+GROUP BY
+  dc.id,
+  dc.name
+ORDER BY
+  inventory_on_hand_count DESC;","SELECT dc.id AS distribution_center_id,
+       dc.name AS distribution_center_name,
+       COUNT(*) AS inventory_on_hand
+FROM `bigquery-public-data.thelook_ecommerce.inventory_items` AS ii
+JOIN `bigquery-public-data.thelook_ecommerce.distribution_centers` AS dc ON dc.id = ii.product_distribution_center_id
+WHERE ii.sold_at IS NULL
+GROUP BY distribution_center_id,
+         distribution_center_name
+ORDER BY inventory_on_hand DESC",MATCH,True,,,job_ljLyRQsng3EYabh1kU9o7_NGnz14,0,1
+tm004#rep0,holdout,treatment,c6782e448a4b,"What are the product ID, name, category, brand, and retail price of products that have never been ordered, ordered by product ID?","SELECT
+  p.id AS product_id,
+  p.name AS product_name,
+  p.category AS product_category,
+  p.brand AS product_brand,
+  p.retail_price AS product_retail_price
+FROM
+  `bigquery-public-data.thelook_ecommerce.products` AS p
+LEFT JOIN
+  `bigquery-public-data.thelook_ecommerce.order_items` AS oi
+  ON p.id = oi.product_id
+WHERE
+  oi.id IS NULL
+ORDER BY
+  p.id ASC","SELECT p.id AS product_id,
+       p.name,
+       p.category,
+       p.brand,
+       p.retail_price
+FROM `bigquery-public-data.thelook_ecommerce.products` p
+LEFT JOIN `bigquery-public-data.thelook_ecommerce.order_items` oi ON oi.product_id = p.id
+WHERE oi.id IS NULL
+ORDER BY product_id",MATCH,True,,,job_D4MIHSU5XF2rcOrv63Qtvjidm2Q8,0,0
+ta004#rep0,holdout,treatment,c6782e448a4b,revenue by day of week,"SELECT FORMAT_TIMESTAMP('%A', oi.created_at) AS day_name, ROUND(SUM(oi.sale_price),2) AS revenue
+FROM `bigquery-public-data.thelook_ecommerce.order_items` oi
+WHERE oi.status NOT IN ('Cancelled','Returned')
+GROUP BY day_name ORDER BY revenue DESC","SELECT FORMAT_TIMESTAMP('%A', oi.created_at) AS day_of_week,
+       ROUND(SUM(oi.sale_price), 2) AS revenue
+FROM `bigquery-public-data.thelook_ecommerce.order_items` AS oi
+WHERE oi.status NOT IN ('Cancelled',
+                        'Returned')
+GROUP BY day_of_week,
+         EXTRACT(DAYOFWEEK
+                 FROM oi.created_at)
+ORDER BY EXTRACT(DAYOFWEEK
+                 FROM oi.created_at)",MISMATCH,False,term:revenue,,job_JlI0he1ztUAT-_ZTrdWXlNZy_LTv,0,0
+ta007#rep0,holdout,treatment,c6782e448a4b,margin by brand for the top 10 brands,"SELECT p.brand, ROUND(SUM(oi.sale_price - p.cost),2) AS margin
+FROM `bigquery-public-data.thelook_ecommerce.order_items` oi JOIN `bigquery-public-data.thelook_ecommerce.products` p ON p.id=oi.product_id
+WHERE oi.status NOT IN ('Cancelled','Returned')
+GROUP BY p.brand ORDER BY margin DESC LIMIT 10","SELECT p.brand,
+       ROUND(SUM(oi.sale_price - p.cost), 2) AS gross_margin
+FROM `bigquery-public-data.thelook_ecommerce.order_items` oi
+JOIN `bigquery-public-data.thelook_ecommerce.products` p ON p.id = oi.product_id
+WHERE oi.status NOT IN ('Cancelled',
+                        'Returned')
+GROUP BY p.brand
+ORDER BY gross_margin DESC
+LIMIT 10",MATCH,True,example:gross margin by department,,job_9q82M-j8R6rOTCmxEUaqTaG2jwyn,0,1
+ta008#rep0,holdout,treatment,c6782e448a4b,margin per month in 2024,"SELECT FORMAT_TIMESTAMP('%Y-%m', oi.created_at) AS month, ROUND(SUM(oi.sale_price - p.cost),2) AS margin
+FROM `bigquery-public-data.thelook_ecommerce.order_items` oi JOIN `bigquery-public-data.thelook_ecommerce.products` p ON p.id=oi.product_id
+WHERE oi.status NOT IN ('Cancelled','Returned') AND EXTRACT(YEAR FROM oi.created_at)=2024
+GROUP BY month ORDER BY month","SELECT FORMAT_TIMESTAMP('%Y-%m', oi.created_at) AS MONTH,
+       ROUND(SUM(oi.sale_price - p.cost), 2) AS margin
+FROM `bigquery-public-data.thelook_ecommerce.order_items` AS oi
+JOIN `bigquery-public-data.thelook_ecommerce.products` AS p ON oi.product_id = p.id
+WHERE oi.status NOT IN ('Cancelled',
+                        'Returned')
+  AND EXTRACT(YEAR
+              FROM oi.created_at) = 2024
+GROUP BY MONTH
+ORDER BY MONTH;",MATCH,True,,,job_zr7zv5H5CvsIUC_BN0G4Kv2YxY7M,0,1
+ta011#rep0,holdout,treatment,c6782e448a4b,completed orders by gender,"SELECT gender, COUNT(*) AS n FROM `bigquery-public-data.thelook_ecommerce.orders` WHERE status='Complete' GROUP BY gender ORDER BY n DESC","SELECT u.gender,
+       COUNT(DISTINCT o.order_id) AS completed_orders
+FROM `bigquery-public-data.thelook_ecommerce.orders` AS o
+JOIN `bigquery-public-data.thelook_ecommerce.users` AS u ON o.user_id = u.id
+WHERE o.status = 'Complete'
+GROUP BY u.gender
+ORDER BY completed_orders DESC",MATCH,True,,,job_T58Pi8mv2rUFL6Swq4_YPtiZAEhl,0,0
+ta014#rep0,holdout,treatment,c6782e448a4b,average delivery time in days by month in 2024,"SELECT FORMAT_TIMESTAMP('%Y-%m', shipped_at) AS month, ROUND(AVG(TIMESTAMP_DIFF(delivered_at, shipped_at, HOUR))/24,2) AS days
+FROM `bigquery-public-data.thelook_ecommerce.order_items`
+WHERE delivered_at IS NOT NULL AND shipped_at IS NOT NULL AND EXTRACT(YEAR FROM shipped_at)=2024
+GROUP BY month ORDER BY month","SELECT FORMAT_TIMESTAMP('%Y-%m', created_at) AS MONTH,
+       ROUND(AVG(TIMESTAMP_DIFF(delivered_at, shipped_at, HOUR)) / 24, 2) AS avg_delivery_time_days
+FROM `bigquery-public-data.thelook_ecommerce.order_items`
+WHERE EXTRACT(YEAR
+              FROM created_at) = 2024
+  AND delivered_at IS NOT NULL
+GROUP BY MONTH
+ORDER BY MONTH",MISMATCH,False,term:delivery time,,job_epT_pGigVn5nVXXloHdh-vvNvWEb,0,0
+ta016#rep0,holdout,treatment,c6782e448a4b,average delivery time in hours by product department,"SELECT p.department, ROUND(AVG(TIMESTAMP_DIFF(oi.delivered_at, oi.shipped_at, HOUR)),2) AS hours
+FROM `bigquery-public-data.thelook_ecommerce.order_items` oi JOIN `bigquery-public-data.thelook_ecommerce.products` p ON p.id=oi.product_id
+WHERE oi.delivered_at IS NOT NULL AND oi.shipped_at IS NOT NULL
+GROUP BY p.department ORDER BY hours DESC","SELECT p.department AS product_department,
+       ROUND(AVG(TIMESTAMP_DIFF(oi.delivered_at, oi.shipped_at, HOUR)), 2) AS avg_delivery_time_hours
+FROM `bigquery-public-data.thelook_ecommerce.order_items` AS oi
+JOIN `bigquery-public-data.thelook_ecommerce.products` AS p ON oi.product_id = p.id
+WHERE oi.delivered_at IS NOT NULL
+  AND oi.shipped_at IS NOT NULL
+GROUP BY product_department
+ORDER BY avg_delivery_time_hours DESC",MATCH,True,term:delivery time,,job_BR--dRdPLCswklg8xL94rBzvHK_c,0,0
+ta020#rep0,holdout,treatment,c6782e448a4b,average order value by month in 2023,"SELECT FORMAT_TIMESTAMP('%Y-%m', oi.created_at) AS month, ROUND(SAFE_DIVIDE(SUM(oi.sale_price), COUNT(DISTINCT oi.order_id)),2) AS aov
+FROM `bigquery-public-data.thelook_ecommerce.order_items` oi
+WHERE oi.status NOT IN ('Cancelled','Returned') AND EXTRACT(YEAR FROM oi.created_at)=2023
+GROUP BY month ORDER BY month","SELECT FORMAT_TIMESTAMP('%Y-%m', oi.created_at) AS MONTH,
+       ROUND(SUM(oi.sale_price) / COUNT(DISTINCT oi.order_id), 2) AS average_order_value
+FROM `bigquery-public-data.thelook_ecommerce.order_items` oi
+WHERE oi.status = 'Complete'
+  AND EXTRACT(YEAR
+              FROM oi.created_at) = 2023
+GROUP BY MONTH
+ORDER BY MONTH",MISMATCH,False,example:average order value by customer age band,,job_rYmSjIGd3tyyS4F6OfjWJFEYxBv7,0,0
+ta021#rep0,holdout,treatment,c6782e448a4b,average order value by traffic source,"SELECT u.traffic_source, ROUND(SAFE_DIVIDE(SUM(oi.sale_price), COUNT(DISTINCT oi.order_id)),2) AS aov
+FROM `bigquery-public-data.thelook_ecommerce.order_items` oi JOIN `bigquery-public-data.thelook_ecommerce.users` u ON u.id=oi.user_id
+WHERE oi.status NOT IN ('Cancelled','Returned')
+GROUP BY u.traffic_source ORDER BY aov DESC","SELECT u.traffic_source,
+       ROUND(SAFE_DIVIDE(SUM(oi.sale_price), COUNT(DISTINCT oi.order_id)), 2) AS avg_order_value
+FROM `bigquery-public-data.thelook_ecommerce.order_items` oi
+JOIN `bigquery-public-data.thelook_ecommerce.users` u ON u.id = oi.user_id
+WHERE oi.status = 'Complete'
+GROUP BY u.traffic_source
+ORDER BY avg_order_value DESC",MISMATCH,False,term:completed order,,job_gv9d792nt-6kP7D5i-Uatz2hbwvI,0,0
+ta028#rep0,holdout,treatment,c6782e448a4b,how many events were there by event type,"SELECT event_type, COUNT(*) AS n FROM `bigquery-public-data.thelook_ecommerce.events` GROUP BY event_type ORDER BY n DESC","SELECT event_type,
+       COUNT(*) AS event_count
+FROM `bigquery-public-data.thelook_ecommerce.events`
+GROUP BY event_type
+ORDER BY event_count DESC",MATCH,True,,,job_KjgFc3pvvbI1fdqRElEh4svAs9c_,0,0
+ta030#rep0,holdout,treatment,c6782e448a4b,events by hour of day,"SELECT EXTRACT(HOUR FROM created_at) AS hour, COUNT(*) AS n FROM `bigquery-public-data.thelook_ecommerce.events` GROUP BY hour ORDER BY hour","SELECT EXTRACT(HOUR
+               FROM created_at) AS hour_of_day,
+       COUNT(*) AS event_count
+FROM `bigquery-public-data.thelook_ecommerce.events`
+GROUP BY hour_of_day
+ORDER BY hour_of_day",MATCH,True,,,job_RGMB4g47NxGj7QFWYBgxzZqVZNHI,0,0
+ta031#rep0,holdout,treatment,c6782e448a4b,the 10 states with the most sessions,"SELECT state, COUNT(DISTINCT session_id) AS sessions FROM `bigquery-public-data.thelook_ecommerce.events` GROUP BY state ORDER BY sessions DESC LIMIT 10","SELECT state,
+       COUNT(DISTINCT session_id) AS sessions
+FROM `bigquery-public-data.thelook_ecommerce.events`
+WHERE state IS NOT NULL
+GROUP BY state
+ORDER BY sessions DESC
+LIMIT 10",MATCH,True,,,job_iePC-qTplGvqExwDX5OQkCVRSjrg,0,0
+ta032#rep0,holdout,treatment,c6782e448a4b,how many customers are there by country,"SELECT country, COUNT(*) AS n FROM `bigquery-public-data.thelook_ecommerce.users` GROUP BY country ORDER BY n DESC","SELECT country,
+       COUNT(*) AS customer_count
+FROM `bigquery-public-data.thelook_ecommerce.users`
+GROUP BY country
+ORDER BY customer_count DESC;",MATCH,True,,,job_kXTaHUT4dq_cZHC181N0HrbX5XWd,0,0
+ta034#rep0,holdout,treatment,c6782e448a4b,customers acquired by traffic source in 2023,"SELECT traffic_source, COUNT(*) AS n FROM `bigquery-public-data.thelook_ecommerce.users` WHERE EXTRACT(YEAR FROM created_at)=2023 GROUP BY traffic_source ORDER BY n DESC","SELECT traffic_source,
+       COUNT(*) AS customers_acquired
+FROM `bigquery-public-data.thelook_ecommerce.users`
+WHERE EXTRACT(YEAR
+              FROM created_at) = 2023
+GROUP BY traffic_source
+ORDER BY customers_acquired DESC",MATCH,True,,,job_uXQ6pqUAP4D8Votaq-0vEVC4qQqU,0,0
+ta040#rep0,holdout,treatment,c6782e448a4b,which month of 2024 had the highest revenue,"SELECT FORMAT_TIMESTAMP('%Y-%m', oi.created_at) AS month, ROUND(SUM(oi.sale_price),2) AS revenue
+FROM `bigquery-public-data.thelook_ecommerce.order_items` oi
+WHERE oi.status NOT IN ('Cancelled','Returned') AND EXTRACT(YEAR FROM oi.created_at)=2024
+GROUP BY month ORDER BY revenue DESC LIMIT 1","SELECT FORMAT_TIMESTAMP('%Y-%m', oi.created_at) AS MONTH,
+       ROUND(SUM(oi.sale_price), 2) AS revenue
+FROM `bigquery-public-data.thelook_ecommerce.order_items` oi
+WHERE oi.status NOT IN ('Cancelled',
+                        'Returned')
+  AND EXTRACT(YEAR
+              FROM oi.created_at) = 2024
+GROUP BY MONTH
+ORDER BY revenue DESC
+LIMIT 1;",MATCH,True,"term:revenue;example:revenue by month, 2023",,job_O382g4ipWpxz3P6BU3kGLzBVXZQA,0,0
+ta043#rep0,holdout,treatment,c6782e448a4b,the revenue rank of each category within its department,"WITH c AS (SELECT p.department, p.category, SUM(oi.sale_price) AS revenue
+  FROM `bigquery-public-data.thelook_ecommerce.order_items` oi JOIN `bigquery-public-data.thelook_ecommerce.products` p ON p.id=oi.product_id WHERE oi.status NOT IN ('Cancelled','Returned') GROUP BY p.department, p.category)
+SELECT department, category, ROUND(revenue,2) AS revenue, RANK() OVER (PARTITION BY department ORDER BY revenue DESC) AS rank_in_department
+FROM c ORDER BY department, rank_in_department","SELECT p.department,
+       p.category,
+       ROUND(SUM(oi.sale_price), 2) AS revenue,
+       RANK() OVER (PARTITION BY p.department
+                    ORDER BY SUM(oi.sale_price) DESC) AS revenue_rank
+FROM `bigquery-public-data.thelook_ecommerce.order_items` AS oi
+JOIN `bigquery-public-data.thelook_ecommerce.products` AS p ON oi.product_id = p.id
+WHERE oi.status NOT IN ('Cancelled',
+                        'Returned')
+GROUP BY p.department,
+         p.category
+ORDER BY p.department,
+         revenue_rank",MATCH,True,term:revenue,,job_pLUoMJQASqMFFceGB8-26XrI4ouq,0,0
+ta052#rep0,holdout,treatment,c6782e448a4b,how many customers placed exactly one completed order,"WITH c AS (SELECT user_id, COUNT(*) AS n FROM `bigquery-public-data.thelook_ecommerce.orders` WHERE status='Complete' GROUP BY user_id)
+SELECT COUNT(*) AS customers FROM c WHERE n=1","SELECT COUNT(*) AS customer_count
+FROM
+  (SELECT user_id
+   FROM `bigquery-public-data.thelook_ecommerce.orders`
+   WHERE status = 'Complete'
+   GROUP BY user_id
+   HAVING COUNT(order_id) = 1)",MATCH,True,,,job_G7DONAv4gshc3AaI0dr_F0T-Hl_P,0,0
+ta055#rep0,holdout,treatment,c6782e448a4b,how many order items are still waiting to be shipped,"SELECT COUNT(*) AS n FROM `bigquery-public-data.thelook_ecommerce.order_items` WHERE shipped_at IS NULL AND status NOT IN ('Cancelled','Returned')","SELECT COUNT(*) AS items_waiting_to_be_shipped
+FROM `bigquery-public-data.thelook_ecommerce.order_items`
+WHERE status = 'Processing'",MATCH,True,,,job_YUv1rbeenSJHmxnCf6vV30_MZeqj,0,0
+ta056#rep0,holdout,treatment,c6782e448a4b,the longest time in hours between an order and its delivery,"SELECT MAX(TIMESTAMP_DIFF(delivered_at, created_at, HOUR)) AS hours FROM `bigquery-public-data.thelook_ecommerce.order_items` WHERE delivered_at IS NOT NULL","SELECT MAX(TIMESTAMP_DIFF(delivered_at, created_at, HOUR)) AS longest_delivery_time_hours
+FROM `bigquery-public-data.thelook_ecommerce.orders`
+WHERE delivered_at IS NOT NULL
+  AND delivered_at >= created_at",MISMATCH,False,,,job_HbcHWqUDf-L6bxVVC_AgI8z1hr6k,0,0
+ta059#rep0,holdout,treatment,c6782e448a4b,return rate by customer country,"SELECT u.country, ROUND(SAFE_DIVIDE(COUNTIF(oi.status='Returned'), COUNTIF(oi.status<>'Cancelled'))*100,2) AS return_pct
+FROM `bigquery-public-data.thelook_ecommerce.order_items` oi JOIN `bigquery-public-data.thelook_ecommerce.users` u ON u.id=oi.user_id
+GROUP BY u.country ORDER BY return_pct DESC","SELECT u.country,
+       ROUND(SAFE_DIVIDE(COUNTIF(oi.status = 'Returned'), COUNTIF(oi.status != 'Cancelled')) * 100, 2) AS return_rate_percentage
+FROM `bigquery-public-data.thelook_ecommerce.order_items` AS oi
+JOIN `bigquery-public-data.thelook_ecommerce.users` AS u ON oi.user_id = u.id
+GROUP BY u.country
+ORDER BY return_rate_percentage DESC",MATCH,True,,,job_-44bTwFYiQfo0DMVLWrK1kKc2PLE,0,0
+ta064#rep0,holdout,treatment,c6782e448a4b,which 10 products have the most units on hand,"SELECT product_name, COUNT(*) AS on_hand FROM `bigquery-public-data.thelook_ecommerce.inventory_items` WHERE sold_at IS NULL GROUP BY product_name ORDER BY on_hand DESC, product_name LIMIT 10","SELECT product_name,
+       COUNT(*) AS units_on_hand
+FROM `bigquery-public-data.thelook_ecommerce.inventory_items`
+WHERE sold_at IS NULL
+GROUP BY product_name
+ORDER BY units_on_hand DESC
+LIMIT 10",MISMATCH,False,term:on hand,,job_gbvCtAk4yQoxaeWUEuv5Jp906MYY,0,0
+ta067#rep0,holdout,treatment,c6782e448a4b,how many distinct users had a session in 2024,SELECT COUNT(DISTINCT user_id) AS users FROM `bigquery-public-data.thelook_ecommerce.events` WHERE EXTRACT(YEAR FROM created_at)=2024 AND user_id IS NOT NULL,"SELECT COUNT(DISTINCT user_id) AS distinct_users
+FROM `bigquery-public-data.thelook_ecommerce.events`
+WHERE EXTRACT(YEAR
+              FROM created_at) = 2024
+  AND user_id IS NOT NULL",MATCH,True,,,job_Uf_MzePo-fnvw8ZyA2oVrYTsa6fI,0,0
+ta068#rep0,holdout,treatment,c6782e448a4b,the most common event type per browser,"WITH e AS (SELECT browser, event_type, COUNT(*) AS n, ROW_NUMBER() OVER (PARTITION BY browser ORDER BY COUNT(*) DESC, event_type) AS rn
+  FROM `bigquery-public-data.thelook_ecommerce.events` GROUP BY browser, event_type)
+SELECT browser, event_type, n FROM e WHERE rn=1 ORDER BY browser","WITH event_counts AS
+  (SELECT browser,
+          event_type,
+          COUNT(*) AS event_count
+   FROM `bigquery-public-data.thelook_ecommerce.events`
+   GROUP BY browser,
+            event_type),
+     ranked_events AS
+  (SELECT browser,
+          event_type,
+          event_count,
+          ROW_NUMBER() OVER (PARTITION BY browser
+                             ORDER BY event_count DESC) AS rank
+   FROM event_counts)
+SELECT browser,
+       event_type,
+       event_count
+FROM ranked_events
+WHERE rank = 1
+ORDER BY event_count DESC;",MISMATCH,False,,,job_SDJV2rfTLZR5rOKAerd_VkQXS8-V,0,0

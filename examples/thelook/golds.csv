@@ -1,0 +1,389 @@
+id,question,gold_sql,author,origin
+tl000,"revenue by month, 2023","SELECT FORMAT_TIMESTAMP('%Y-%m', oi.created_at) AS month, ROUND(SUM(oi.sale_price), 2) AS revenue
+FROM `bigquery-public-data.thelook_ecommerce.order_items` oi
+WHERE oi.status NOT IN ('Cancelled', 'Returned') AND EXTRACT(YEAR FROM oi.created_at) = 2023
+GROUP BY month ORDER BY month",repo,SQL first: the query was written first and its comment describes it
+tl001,"top 10 product categories by revenue, all time","SELECT p.category, ROUND(SUM(oi.sale_price), 2) AS revenue
+FROM `bigquery-public-data.thelook_ecommerce.order_items` oi
+JOIN `bigquery-public-data.thelook_ecommerce.products` p ON p.id = oi.product_id
+WHERE oi.status NOT IN ('Cancelled', 'Returned')
+GROUP BY p.category ORDER BY revenue DESC LIMIT 10",repo,SQL first: the query was written first and its comment describes it
+tl002,top 5 brands by revenue in the Jeans category,"SELECT p.brand, ROUND(SUM(oi.sale_price), 2) AS revenue
+FROM `bigquery-public-data.thelook_ecommerce.order_items` oi
+JOIN `bigquery-public-data.thelook_ecommerce.products` p ON p.id = oi.product_id
+WHERE oi.status NOT IN ('Cancelled', 'Returned') AND p.category = 'Jeans'
+GROUP BY p.brand ORDER BY revenue DESC LIMIT 5",repo,SQL first: the query was written first and its comment describes it
+tl003,gross margin by department,"SELECT p.department, ROUND(SUM(oi.sale_price - p.cost), 2) AS gross_margin
+FROM `bigquery-public-data.thelook_ecommerce.order_items` oi
+JOIN `bigquery-public-data.thelook_ecommerce.products` p ON p.id = oi.product_id
+WHERE oi.status NOT IN ('Cancelled', 'Returned')
+GROUP BY p.department ORDER BY gross_margin DESC",repo,SQL first: the query was written first and its comment describes it
+tl004,completed orders per month in 2023,"SELECT FORMAT_TIMESTAMP('%Y-%m', created_at) AS month, COUNT(*) AS completed_orders
+FROM `bigquery-public-data.thelook_ecommerce.orders`
+WHERE status = 'Complete' AND EXTRACT(YEAR FROM created_at) = 2023
+GROUP BY month ORDER BY month",repo,SQL first: the query was written first and its comment describes it
+tl005,share of orders by status,"SELECT status, COUNT(*) AS orders, ROUND(COUNT(*) / SUM(COUNT(*)) OVER (), 4) AS share
+FROM `bigquery-public-data.thelook_ecommerce.orders`
+GROUP BY status ORDER BY orders DESC",repo,SQL first: the query was written first and its comment describes it
+tl006,average delivery time in hours by distribution center,"SELECT dc.name AS distribution_center,
+       ROUND(AVG(TIMESTAMP_DIFF(oi.delivered_at, oi.shipped_at, HOUR)), 1) AS avg_delivery_hours
+FROM `bigquery-public-data.thelook_ecommerce.order_items` oi
+JOIN `bigquery-public-data.thelook_ecommerce.products` p ON p.id = oi.product_id
+JOIN `bigquery-public-data.thelook_ecommerce.distribution_centers` dc ON dc.id = p.distribution_center_id
+WHERE oi.delivered_at IS NOT NULL AND oi.shipped_at IS NOT NULL
+GROUP BY dc.name ORDER BY avg_delivery_hours",repo,SQL first: the query was written first and its comment describes it
+tl007,"the 10 categories with the highest return rate, counting only categories with at least 500 non-cancelled items","SELECT p.category,
+       ROUND(COUNTIF(oi.status = 'Returned') / COUNTIF(oi.status <> 'Cancelled'), 4) AS return_rate
+FROM `bigquery-public-data.thelook_ecommerce.order_items` oi
+JOIN `bigquery-public-data.thelook_ecommerce.products` p ON p.id = oi.product_id
+GROUP BY p.category HAVING COUNTIF(oi.status <> 'Cancelled') >= 500
+ORDER BY return_rate DESC LIMIT 10",repo,SQL first: the query was written first and its comment describes it
+tl008,top 10 states by number of customers,"SELECT state, COUNT(*) AS customers
+FROM `bigquery-public-data.thelook_ecommerce.users`
+GROUP BY state ORDER BY customers DESC LIMIT 10",repo,SQL first: the query was written first and its comment describes it
+tl009,new customers per month in 2024,"SELECT FORMAT_TIMESTAMP('%Y-%m', created_at) AS month, COUNT(*) AS new_customers
+FROM `bigquery-public-data.thelook_ecommerce.users`
+WHERE EXTRACT(YEAR FROM created_at) = 2024
+GROUP BY month ORDER BY month",repo,SQL first: the query was written first and its comment describes it
+tl010,"revenue by customer traffic source, 2023","SELECT u.traffic_source, ROUND(SUM(oi.sale_price), 2) AS revenue
+FROM `bigquery-public-data.thelook_ecommerce.order_items` oi
+JOIN `bigquery-public-data.thelook_ecommerce.users` u ON u.id = oi.user_id
+WHERE oi.status NOT IN ('Cancelled', 'Returned') AND EXTRACT(YEAR FROM oi.created_at) = 2023
+GROUP BY u.traffic_source ORDER BY revenue DESC",repo,SQL first: the query was written first and its comment describes it
+tl011,average order value by customer age band,"SELECT CASE WHEN u.age < 25 THEN 'under 25' WHEN u.age < 40 THEN '25-39' WHEN u.age < 60 THEN '40-59' ELSE '60+' END AS age_band,
+       ROUND(SUM(oi.sale_price) / COUNT(DISTINCT oi.order_id), 2) AS avg_order_value
+FROM `bigquery-public-data.thelook_ecommerce.order_items` oi
+JOIN `bigquery-public-data.thelook_ecommerce.users` u ON u.id = oi.user_id
+WHERE oi.status = 'Complete'
+GROUP BY age_band ORDER BY age_band",repo,SQL first: the query was written first and its comment describes it
+tl012,top 10 customers by lifetime revenue,"SELECT u.id AS user_id, u.email, ROUND(SUM(oi.sale_price), 2) AS lifetime_revenue
+FROM `bigquery-public-data.thelook_ecommerce.order_items` oi
+JOIN `bigquery-public-data.thelook_ecommerce.users` u ON u.id = oi.user_id
+WHERE oi.status NOT IN ('Cancelled', 'Returned')
+GROUP BY u.id, u.email ORDER BY lifetime_revenue DESC LIMIT 10",repo,SQL first: the query was written first and its comment describes it
+tl013,"repeat customers: customers with more than one completed order, by country","SELECT u.country, COUNT(*) AS repeat_customers
+FROM (
+  SELECT user_id, COUNT(*) AS completed
+  FROM `bigquery-public-data.thelook_ecommerce.orders`
+  WHERE status = 'Complete' GROUP BY user_id HAVING completed > 1
+) r
+JOIN `bigquery-public-data.thelook_ecommerce.users` u ON u.id = r.user_id
+GROUP BY u.country ORDER BY repeat_customers DESC LIMIT 10",repo,SQL first: the query was written first and its comment describes it
+tl014,products never sold (no order item at all),"SELECT p.category, COUNT(*) AS products_never_sold
+FROM `bigquery-public-data.thelook_ecommerce.products` p
+LEFT JOIN `bigquery-public-data.thelook_ecommerce.order_items` oi ON oi.product_id = p.id
+WHERE oi.id IS NULL
+GROUP BY p.category ORDER BY products_never_sold DESC LIMIT 10",repo,SQL first: the query was written first and its comment describes it
+tl015,inventory on hand by distribution center,"SELECT dc.name AS distribution_center, COUNT(*) AS items_on_hand
+FROM `bigquery-public-data.thelook_ecommerce.inventory_items` ii
+JOIN `bigquery-public-data.thelook_ecommerce.distribution_centers` dc ON dc.id = ii.product_distribution_center_id
+WHERE ii.sold_at IS NULL
+GROUP BY dc.name ORDER BY items_on_hand DESC",repo,SQL first: the query was written first and its comment describes it
+tl016,purchase conversion by traffic source,"SELECT traffic_source,
+       ROUND(COUNT(DISTINCT IF(event_type = 'purchase', session_id, NULL)) / COUNT(DISTINCT session_id), 4) AS conversion_rate
+FROM `bigquery-public-data.thelook_ecommerce.events`
+GROUP BY traffic_source ORDER BY conversion_rate DESC",repo,SQL first: the query was written first and its comment describes it
+tl017,sessions by browser in 2024,"SELECT browser, COUNT(DISTINCT session_id) AS sessions
+FROM `bigquery-public-data.thelook_ecommerce.events`
+WHERE EXTRACT(YEAR FROM created_at) = 2024
+GROUP BY browser ORDER BY sessions DESC",repo,SQL first: the query was written first and its comment describes it
+tl018,"cart abandonment: sessions with a cart event and no purchase, by month in 2024","SELECT FORMAT_TIMESTAMP('%Y-%m', created_at) AS month, COUNTIF(has_cart AND NOT has_purchase) AS abandoned_sessions
+FROM (
+  SELECT session_id, MIN(created_at) AS created_at,
+         LOGICAL_OR(event_type = 'cart') AS has_cart,
+         LOGICAL_OR(event_type = 'purchase') AS has_purchase
+  FROM `bigquery-public-data.thelook_ecommerce.events`
+  WHERE EXTRACT(YEAR FROM created_at) = 2024
+  GROUP BY session_id
+)
+GROUP BY month ORDER BY month",repo,SQL first: the query was written first and its comment describes it
+tl019,"monthly revenue with month-over-month change, 2023","WITH monthly AS (
+  SELECT FORMAT_TIMESTAMP('%Y-%m', created_at) AS month, SUM(sale_price) AS revenue
+  FROM `bigquery-public-data.thelook_ecommerce.order_items`
+  WHERE status NOT IN ('Cancelled', 'Returned') AND EXTRACT(YEAR FROM created_at) = 2023
+  GROUP BY month
+)
+SELECT month, ROUND(revenue, 2) AS revenue,
+       ROUND(revenue - LAG(revenue) OVER (ORDER BY month), 2) AS change_from_previous_month
+FROM monthly ORDER BY month",repo,SQL first: the query was written first and its comment describes it
+tl020,best-selling product per category in 2024 by units,"SELECT category, name AS product, units
+FROM (
+  SELECT p.category, p.name, COUNT(*) AS units,
+         ROW_NUMBER() OVER (PARTITION BY p.category ORDER BY COUNT(*) DESC, p.name) AS rn
+  FROM `bigquery-public-data.thelook_ecommerce.order_items` oi
+  JOIN `bigquery-public-data.thelook_ecommerce.products` p ON p.id = oi.product_id
+  WHERE oi.status NOT IN ('Cancelled', 'Returned') AND EXTRACT(YEAR FROM oi.created_at) = 2024
+  GROUP BY p.category, p.name
+)
+WHERE rn = 1 ORDER BY units DESC LIMIT 10",repo,SQL first: the query was written first and its comment describes it
+tl021,"orders with more than 3 items, by month in 2024","SELECT FORMAT_TIMESTAMP('%Y-%m', created_at) AS month, COUNT(*) AS large_orders
+FROM `bigquery-public-data.thelook_ecommerce.orders`
+WHERE num_of_item > 3 AND EXTRACT(YEAR FROM created_at) = 2024
+GROUP BY month ORDER BY month",repo,SQL first: the query was written first and its comment describes it
+tl022,"average days from order to delivery by country, delivered orders only","SELECT u.country, ROUND(AVG(TIMESTAMP_DIFF(o.delivered_at, o.created_at, HOUR)) / 24, 2) AS avg_days_to_deliver
+FROM `bigquery-public-data.thelook_ecommerce.orders` o
+JOIN `bigquery-public-data.thelook_ecommerce.users` u ON u.id = o.user_id
+WHERE o.delivered_at IS NOT NULL
+GROUP BY u.country ORDER BY avg_days_to_deliver LIMIT 10",repo,SQL first: the query was written first and its comment describes it
+tl023,"revenue by gender and department, 2023","SELECT o.gender, p.department, ROUND(SUM(oi.sale_price), 2) AS revenue
+FROM `bigquery-public-data.thelook_ecommerce.order_items` oi
+JOIN `bigquery-public-data.thelook_ecommerce.orders` o ON o.order_id = oi.order_id
+JOIN `bigquery-public-data.thelook_ecommerce.products` p ON p.id = oi.product_id
+WHERE oi.status NOT IN ('Cancelled', 'Returned') AND EXTRACT(YEAR FROM oi.created_at) = 2023
+GROUP BY o.gender, p.department ORDER BY o.gender, p.department",repo,SQL first: the query was written first and its comment describes it
+tl024,"discount depth: products sold below retail price, share by category","SELECT p.category, ROUND(COUNTIF(oi.sale_price < p.retail_price) / COUNT(*), 4) AS share_sold_below_retail
+FROM `bigquery-public-data.thelook_ecommerce.order_items` oi
+JOIN `bigquery-public-data.thelook_ecommerce.products` p ON p.id = oi.product_id
+WHERE oi.status NOT IN ('Cancelled', 'Returned')
+GROUP BY p.category ORDER BY share_sold_below_retail DESC LIMIT 10",repo,SQL first: the query was written first and its comment describes it
+tl025,cancelled order share by month in 2024,"SELECT FORMAT_TIMESTAMP('%Y-%m', created_at) AS month,
+       ROUND(COUNTIF(status = 'Cancelled') / COUNT(*), 4) AS cancelled_share
+FROM `bigquery-public-data.thelook_ecommerce.orders`
+WHERE EXTRACT(YEAR FROM created_at) = 2024
+GROUP BY month ORDER BY month",repo,SQL first: the query was written first and its comment describes it
+tm000,"Which are the top 10 states by number of customers, and what is the customer_count for each?","SELECT state,
+       COUNT(DISTINCT id) AS customer_count
+FROM `bigquery-public-data.thelook_ecommerce.users`
+GROUP BY state
+ORDER BY customer_count DESC
+LIMIT 10",repo,"mined from the query log, question drafted by gemini-2.5-flash with --rules-in-context, kept by a model reviewer"
+tm001,"Which distribution centers have the most inventory on hand, and how many items do they have, returning distribution center ID, distribution center name, and inventory on hand count?","SELECT
+  dc.id AS distribution_center_id,
+  dc.name AS distribution_center_name,
+  COUNT(ii.id) AS inventory_on_hand_count
+FROM
+  `bigquery-public-data.thelook_ecommerce.distribution_centers` AS dc
+LEFT JOIN
+  `bigquery-public-data.thelook_ecommerce.inventory_items` AS ii
+  ON dc.id = ii.product_distribution_center_id
+  AND ii.sold_at IS NULL
+GROUP BY
+  dc.id,
+  dc.name
+ORDER BY
+  inventory_on_hand_count DESC;",repo,"mined from the query log, question drafted by gemini-2.5-flash with --rules-in-context, kept by a model reviewer"
+tm002,"For each month in 2024, what is the month number, the month, the total number of orders, the number of cancelled orders, and the cancelled_share_percentage, ordered by month number?","SELECT
+  EXTRACT(MONTH FROM DATE(created_at)) AS month_num,
+  FORMAT_DATE('%Y-%m', DATE(created_at)) AS month,
+  COUNT(DISTINCT order_id) AS total_orders,
+  COUNT(DISTINCT CASE WHEN LOWER(status) = 'cancelled' THEN order_id END) AS cancelled_orders,
+  ROUND(SAFE_DIVIDE(COUNT(DISTINCT CASE WHEN LOWER(status) = 'cancelled' THEN order_id END), COUNT(DISTINCT order_id)) * 100, 2) AS cancelled_share_percentage
+FROM
+  `bigquery-public-data.thelook_ecommerce.orders`
+WHERE
+  EXTRACT(YEAR FROM DATE(created_at)) = 2024
+GROUP BY
+  month_num,
+  month
+ORDER BY
+  month_num;",repo,"mined from the query log, question drafted by gemini-2.5-flash with --rules-in-context, kept by a model reviewer"
+tm003,"What are the total sessions, purchase sessions, and conversion rate percentage by traffic source, ordered by conversion rate percentage from highest to lowest?","SELECT
+  traffic_source,
+  COUNT(DISTINCT session_id) AS total_sessions,
+  COUNT(DISTINCT CASE WHEN LOWER(event_type) = 'purchase' THEN session_id END) AS purchase_sessions,
+  ROUND(SAFE_DIVIDE(COUNT(DISTINCT CASE WHEN LOWER(event_type) = 'purchase' THEN session_id END), COUNT(DISTINCT session_id)) * 100, 2) AS conversion_rate_percentage
+FROM
+  `bigquery-public-data.thelook_ecommerce.events`
+GROUP BY
+  traffic_source
+ORDER BY
+  conversion_rate_percentage DESC",repo,"mined from the query log, question drafted by gemini-2.5-flash with --rules-in-context, kept by a model reviewer"
+tm004,"What are the product ID, name, category, brand, and retail price of products that have never been ordered, ordered by product ID?","SELECT
+  p.id AS product_id,
+  p.name AS product_name,
+  p.category AS product_category,
+  p.brand AS product_brand,
+  p.retail_price AS product_retail_price
+FROM
+  `bigquery-public-data.thelook_ecommerce.products` AS p
+LEFT JOIN
+  `bigquery-public-data.thelook_ecommerce.order_items` AS oi
+  ON p.id = oi.product_id
+WHERE
+  oi.id IS NULL
+ORDER BY
+  p.id ASC",repo,"mined from the query log, question drafted by gemini-2.5-flash with --rules-in-context, kept by a model reviewer"
+ta000,"revenue by quarter, 2023","SELECT FORMAT_TIMESTAMP('%Y-Q', oi.created_at) AS q, CAST(CEIL(EXTRACT(MONTH FROM oi.created_at)/3) AS INT64) AS quarter, ROUND(SUM(oi.sale_price),2) AS revenue
+FROM `bigquery-public-data.thelook_ecommerce.order_items` oi
+WHERE oi.status NOT IN ('Cancelled','Returned') AND EXTRACT(YEAR FROM oi.created_at)=2023
+GROUP BY q, quarter ORDER BY q, quarter","model draft, reviewed against the live schema",written to widen coverage of the business rules and of SQL shape; the rule is never stated in the question
+ta001,revenue by department,"SELECT p.department, ROUND(SUM(oi.sale_price),2) AS revenue
+FROM `bigquery-public-data.thelook_ecommerce.order_items` oi JOIN `bigquery-public-data.thelook_ecommerce.products` p ON p.id=oi.product_id
+WHERE oi.status NOT IN ('Cancelled','Returned')
+GROUP BY p.department ORDER BY revenue DESC","model draft, reviewed against the live schema",written to widen coverage of the business rules and of SQL shape; the rule is never stated in the question
+ta002,revenue per customer country in 2024,"SELECT u.country, ROUND(SUM(oi.sale_price),2) AS revenue
+FROM `bigquery-public-data.thelook_ecommerce.order_items` oi JOIN `bigquery-public-data.thelook_ecommerce.users` u ON u.id=oi.user_id
+WHERE oi.status NOT IN ('Cancelled','Returned') AND EXTRACT(YEAR FROM oi.created_at)=2024
+GROUP BY u.country ORDER BY revenue DESC","model draft, reviewed against the live schema",written to widen coverage of the business rules and of SQL shape; the rule is never stated in the question
+ta003,the five brands with the highest revenue overall,"SELECT p.brand, ROUND(SUM(oi.sale_price),2) AS revenue
+FROM `bigquery-public-data.thelook_ecommerce.order_items` oi JOIN `bigquery-public-data.thelook_ecommerce.products` p ON p.id=oi.product_id
+WHERE oi.status NOT IN ('Cancelled','Returned')
+GROUP BY p.brand ORDER BY revenue DESC LIMIT 5","model draft, reviewed against the live schema",written to widen coverage of the business rules and of SQL shape; the rule is never stated in the question
+ta004,revenue by day of week,"SELECT FORMAT_TIMESTAMP('%A', oi.created_at) AS day_name, ROUND(SUM(oi.sale_price),2) AS revenue
+FROM `bigquery-public-data.thelook_ecommerce.order_items` oi
+WHERE oi.status NOT IN ('Cancelled','Returned')
+GROUP BY day_name ORDER BY revenue DESC","model draft, reviewed against the live schema",written to widen coverage of the business rules and of SQL shape; the rule is never stated in the question
+ta005,which categories earned more than 100000 in revenue,"SELECT p.category, ROUND(SUM(oi.sale_price),2) AS revenue
+FROM `bigquery-public-data.thelook_ecommerce.order_items` oi JOIN `bigquery-public-data.thelook_ecommerce.products` p ON p.id=oi.product_id
+WHERE oi.status NOT IN ('Cancelled','Returned')
+GROUP BY p.category HAVING SUM(oi.sale_price) > 100000 ORDER BY revenue DESC","model draft, reviewed against the live schema",written to widen coverage of the business rules and of SQL shape; the rule is never stated in the question
+ta006,margin by category,"SELECT p.category, ROUND(SUM(oi.sale_price - p.cost),2) AS margin
+FROM `bigquery-public-data.thelook_ecommerce.order_items` oi JOIN `bigquery-public-data.thelook_ecommerce.products` p ON p.id=oi.product_id
+WHERE oi.status NOT IN ('Cancelled','Returned')
+GROUP BY p.category ORDER BY margin DESC","model draft, reviewed against the live schema",written to widen coverage of the business rules and of SQL shape; the rule is never stated in the question
+ta007,margin by brand for the top 10 brands,"SELECT p.brand, ROUND(SUM(oi.sale_price - p.cost),2) AS margin
+FROM `bigquery-public-data.thelook_ecommerce.order_items` oi JOIN `bigquery-public-data.thelook_ecommerce.products` p ON p.id=oi.product_id
+WHERE oi.status NOT IN ('Cancelled','Returned')
+GROUP BY p.brand ORDER BY margin DESC LIMIT 10","model draft, reviewed against the live schema",written to widen coverage of the business rules and of SQL shape; the rule is never stated in the question
+ta008,margin per month in 2024,"SELECT FORMAT_TIMESTAMP('%Y-%m', oi.created_at) AS month, ROUND(SUM(oi.sale_price - p.cost),2) AS margin
+FROM `bigquery-public-data.thelook_ecommerce.order_items` oi JOIN `bigquery-public-data.thelook_ecommerce.products` p ON p.id=oi.product_id
+WHERE oi.status NOT IN ('Cancelled','Returned') AND EXTRACT(YEAR FROM oi.created_at)=2024
+GROUP BY month ORDER BY month","model draft, reviewed against the live schema",written to widen coverage of the business rules and of SQL shape; the rule is never stated in the question
+ta009,margin percentage by department,"SELECT p.department, ROUND(SAFE_DIVIDE(SUM(oi.sale_price - p.cost), SUM(oi.sale_price))*100,2) AS margin_pct
+FROM `bigquery-public-data.thelook_ecommerce.order_items` oi JOIN `bigquery-public-data.thelook_ecommerce.products` p ON p.id=oi.product_id
+WHERE oi.status NOT IN ('Cancelled','Returned')
+GROUP BY p.department ORDER BY margin_pct DESC","model draft, reviewed against the live schema",written to widen coverage of the business rules and of SQL shape; the rule is never stated in the question
+ta010,how many completed orders were there in 2024,SELECT COUNT(*) AS n FROM `bigquery-public-data.thelook_ecommerce.orders` WHERE status='Complete' AND EXTRACT(YEAR FROM created_at)=2024,"model draft, reviewed against the live schema",written to widen coverage of the business rules and of SQL shape; the rule is never stated in the question
+ta011,completed orders by gender,"SELECT gender, COUNT(*) AS n FROM `bigquery-public-data.thelook_ecommerce.orders` WHERE status='Complete' GROUP BY gender ORDER BY n DESC","model draft, reviewed against the live schema",written to widen coverage of the business rules and of SQL shape; the rule is never stated in the question
+ta012,"completed orders per customer state, top 15","SELECT u.state, COUNT(*) AS n
+FROM `bigquery-public-data.thelook_ecommerce.orders` o JOIN `bigquery-public-data.thelook_ecommerce.users` u ON u.id=o.user_id
+WHERE o.status='Complete'
+GROUP BY u.state ORDER BY n DESC LIMIT 15","model draft, reviewed against the live schema",written to widen coverage of the business rules and of SQL shape; the rule is never stated in the question
+ta013,"the share of orders that are completed, by month in 2023","SELECT FORMAT_TIMESTAMP('%Y-%m', created_at) AS month, ROUND(SAFE_DIVIDE(COUNTIF(status='Complete'), COUNT(*))*100,2) AS complete_pct
+FROM `bigquery-public-data.thelook_ecommerce.orders`
+WHERE EXTRACT(YEAR FROM created_at)=2023
+GROUP BY month ORDER BY month","model draft, reviewed against the live schema",written to widen coverage of the business rules and of SQL shape; the rule is never stated in the question
+ta014,average delivery time in days by month in 2024,"SELECT FORMAT_TIMESTAMP('%Y-%m', shipped_at) AS month, ROUND(AVG(TIMESTAMP_DIFF(delivered_at, shipped_at, HOUR))/24,2) AS days
+FROM `bigquery-public-data.thelook_ecommerce.order_items`
+WHERE delivered_at IS NOT NULL AND shipped_at IS NOT NULL AND EXTRACT(YEAR FROM shipped_at)=2024
+GROUP BY month ORDER BY month","model draft, reviewed against the live schema",written to widen coverage of the business rules and of SQL shape; the rule is never stated in the question
+ta015,the slowest 10 states to deliver to,"SELECT u.state, ROUND(AVG(TIMESTAMP_DIFF(oi.delivered_at, oi.shipped_at, HOUR)),2) AS hours
+FROM `bigquery-public-data.thelook_ecommerce.order_items` oi JOIN `bigquery-public-data.thelook_ecommerce.users` u ON u.id=oi.user_id
+WHERE oi.delivered_at IS NOT NULL AND oi.shipped_at IS NOT NULL
+GROUP BY u.state ORDER BY hours DESC LIMIT 10","model draft, reviewed against the live schema",written to widen coverage of the business rules and of SQL shape; the rule is never stated in the question
+ta016,average delivery time in hours by product department,"SELECT p.department, ROUND(AVG(TIMESTAMP_DIFF(oi.delivered_at, oi.shipped_at, HOUR)),2) AS hours
+FROM `bigquery-public-data.thelook_ecommerce.order_items` oi JOIN `bigquery-public-data.thelook_ecommerce.products` p ON p.id=oi.product_id
+WHERE oi.delivered_at IS NOT NULL AND oi.shipped_at IS NOT NULL
+GROUP BY p.department ORDER BY hours DESC","model draft, reviewed against the live schema",written to widen coverage of the business rules and of SQL shape; the rule is never stated in the question
+ta017,return rate by department,"SELECT p.department, ROUND(SAFE_DIVIDE(COUNTIF(oi.status='Returned'), COUNTIF(oi.status<>'Cancelled'))*100,2) AS return_pct
+FROM `bigquery-public-data.thelook_ecommerce.order_items` oi JOIN `bigquery-public-data.thelook_ecommerce.products` p ON p.id=oi.product_id
+GROUP BY p.department ORDER BY return_pct DESC","model draft, reviewed against the live schema",written to widen coverage of the business rules and of SQL shape; the rule is never stated in the question
+ta018,return rate by month in 2024,"SELECT FORMAT_TIMESTAMP('%Y-%m', created_at) AS month, ROUND(SAFE_DIVIDE(COUNTIF(status='Returned'), COUNTIF(status<>'Cancelled'))*100,2) AS return_pct
+FROM `bigquery-public-data.thelook_ecommerce.order_items`
+WHERE EXTRACT(YEAR FROM created_at)=2024
+GROUP BY month ORDER BY month","model draft, reviewed against the live schema",written to widen coverage of the business rules and of SQL shape; the rule is never stated in the question
+ta019,"the 10 brands with the worst return rate, among brands with over 500 items sold","SELECT p.brand, ROUND(SAFE_DIVIDE(COUNTIF(oi.status='Returned'), COUNTIF(oi.status<>'Cancelled'))*100,2) AS return_pct
+FROM `bigquery-public-data.thelook_ecommerce.order_items` oi JOIN `bigquery-public-data.thelook_ecommerce.products` p ON p.id=oi.product_id
+GROUP BY p.brand HAVING COUNTIF(oi.status<>'Cancelled') > 500 ORDER BY return_pct DESC LIMIT 10","model draft, reviewed against the live schema",written to widen coverage of the business rules and of SQL shape; the rule is never stated in the question
+ta020,average order value by month in 2023,"SELECT FORMAT_TIMESTAMP('%Y-%m', oi.created_at) AS month, ROUND(SAFE_DIVIDE(SUM(oi.sale_price), COUNT(DISTINCT oi.order_id)),2) AS aov
+FROM `bigquery-public-data.thelook_ecommerce.order_items` oi
+WHERE oi.status NOT IN ('Cancelled','Returned') AND EXTRACT(YEAR FROM oi.created_at)=2023
+GROUP BY month ORDER BY month","model draft, reviewed against the live schema",written to widen coverage of the business rules and of SQL shape; the rule is never stated in the question
+ta021,average order value by traffic source,"SELECT u.traffic_source, ROUND(SAFE_DIVIDE(SUM(oi.sale_price), COUNT(DISTINCT oi.order_id)),2) AS aov
+FROM `bigquery-public-data.thelook_ecommerce.order_items` oi JOIN `bigquery-public-data.thelook_ecommerce.users` u ON u.id=oi.user_id
+WHERE oi.status NOT IN ('Cancelled','Returned')
+GROUP BY u.traffic_source ORDER BY aov DESC","model draft, reviewed against the live schema",written to widen coverage of the business rules and of SQL shape; the rule is never stated in the question
+ta022,average order value by customer gender,"SELECT u.gender, ROUND(SAFE_DIVIDE(SUM(oi.sale_price), COUNT(DISTINCT oi.order_id)),2) AS aov
+FROM `bigquery-public-data.thelook_ecommerce.order_items` oi JOIN `bigquery-public-data.thelook_ecommerce.users` u ON u.id=oi.user_id
+WHERE oi.status NOT IN ('Cancelled','Returned')
+GROUP BY u.gender ORDER BY aov DESC","model draft, reviewed against the live schema",written to widen coverage of the business rules and of SQL shape; the rule is never stated in the question
+ta023,how many inventory items are on hand right now,SELECT COUNT(*) AS n FROM `bigquery-public-data.thelook_ecommerce.inventory_items` WHERE sold_at IS NULL,"model draft, reviewed against the live schema",written to widen coverage of the business rules and of SQL shape; the rule is never stated in the question
+ta024,inventory on hand by product category,"SELECT product_category, COUNT(*) AS on_hand FROM `bigquery-public-data.thelook_ecommerce.inventory_items` WHERE sold_at IS NULL GROUP BY product_category ORDER BY on_hand DESC","model draft, reviewed against the live schema",written to widen coverage of the business rules and of SQL shape; the rule is never stated in the question
+ta025,"the value of inventory on hand by department, at cost","SELECT product_department, ROUND(SUM(cost),2) AS cost_on_hand FROM `bigquery-public-data.thelook_ecommerce.inventory_items` WHERE sold_at IS NULL GROUP BY product_department ORDER BY cost_on_hand DESC","model draft, reviewed against the live schema",written to widen coverage of the business rules and of SQL shape; the rule is never stated in the question
+ta026,average age in days of inventory still on hand,"SELECT ROUND(AVG(TIMESTAMP_DIFF(CURRENT_TIMESTAMP(), created_at, DAY)),2) AS avg_age_days FROM `bigquery-public-data.thelook_ecommerce.inventory_items` WHERE sold_at IS NULL","model draft, reviewed against the live schema",written to widen coverage of the business rules and of SQL shape; the rule is never stated in the question
+ta027,"how many days on average does an item sit in inventory before it sells, by category","SELECT product_category, ROUND(AVG(TIMESTAMP_DIFF(sold_at, created_at, DAY)),2) AS days_to_sell
+FROM `bigquery-public-data.thelook_ecommerce.inventory_items`
+WHERE sold_at IS NOT NULL
+GROUP BY product_category ORDER BY days_to_sell DESC","model draft, reviewed against the live schema",written to widen coverage of the business rules and of SQL shape; the rule is never stated in the question
+ta028,how many events were there by event type,"SELECT event_type, COUNT(*) AS n FROM `bigquery-public-data.thelook_ecommerce.events` GROUP BY event_type ORDER BY n DESC","model draft, reviewed against the live schema",written to widen coverage of the business rules and of SQL shape; the rule is never stated in the question
+ta029,sessions by traffic source in 2024,"SELECT traffic_source, COUNT(DISTINCT session_id) AS sessions FROM `bigquery-public-data.thelook_ecommerce.events` WHERE EXTRACT(YEAR FROM created_at)=2024 GROUP BY traffic_source ORDER BY sessions DESC","model draft, reviewed against the live schema",written to widen coverage of the business rules and of SQL shape; the rule is never stated in the question
+ta030,events by hour of day,"SELECT EXTRACT(HOUR FROM created_at) AS hour, COUNT(*) AS n FROM `bigquery-public-data.thelook_ecommerce.events` GROUP BY hour ORDER BY hour","model draft, reviewed against the live schema",written to widen coverage of the business rules and of SQL shape; the rule is never stated in the question
+ta031,the 10 states with the most sessions,"SELECT state, COUNT(DISTINCT session_id) AS sessions FROM `bigquery-public-data.thelook_ecommerce.events` GROUP BY state ORDER BY sessions DESC LIMIT 10","model draft, reviewed against the live schema",written to widen coverage of the business rules and of SQL shape; the rule is never stated in the question
+ta032,how many customers are there by country,"SELECT country, COUNT(*) AS n FROM `bigquery-public-data.thelook_ecommerce.users` GROUP BY country ORDER BY n DESC","model draft, reviewed against the live schema",written to widen coverage of the business rules and of SQL shape; the rule is never stated in the question
+ta033,the average age of customers by gender,"SELECT gender, ROUND(AVG(age),2) AS avg_age FROM `bigquery-public-data.thelook_ecommerce.users` GROUP BY gender ORDER BY gender","model draft, reviewed against the live schema",written to widen coverage of the business rules and of SQL shape; the rule is never stated in the question
+ta034,customers acquired by traffic source in 2023,"SELECT traffic_source, COUNT(*) AS n FROM `bigquery-public-data.thelook_ecommerce.users` WHERE EXTRACT(YEAR FROM created_at)=2023 GROUP BY traffic_source ORDER BY n DESC","model draft, reviewed against the live schema",written to widen coverage of the business rules and of SQL shape; the rule is never stated in the question
+ta035,how many products are there in each category,"SELECT category, COUNT(*) AS n FROM `bigquery-public-data.thelook_ecommerce.products` GROUP BY category ORDER BY n DESC","model draft, reviewed against the live schema",written to widen coverage of the business rules and of SQL shape; the rule is never stated in the question
+ta036,the 10 most expensive products by retail price,"SELECT name, category, brand, retail_price FROM `bigquery-public-data.thelook_ecommerce.products` ORDER BY retail_price DESC LIMIT 10","model draft, reviewed against the live schema",written to widen coverage of the business rules and of SQL shape; the rule is never stated in the question
+ta037,average retail price by department,"SELECT department, ROUND(AVG(retail_price),2) AS avg_price FROM `bigquery-public-data.thelook_ecommerce.products` GROUP BY department ORDER BY avg_price DESC","model draft, reviewed against the live schema",written to widen coverage of the business rules and of SQL shape; the rule is never stated in the question
+ta038,how many distribution centers are there,SELECT COUNT(*) AS n FROM `bigquery-public-data.thelook_ecommerce.distribution_centers`,"model draft, reviewed against the live schema",written to widen coverage of the business rules and of SQL shape; the rule is never stated in the question
+ta039,how many products does each distribution center supply,"SELECT d.name, COUNT(*) AS n
+FROM `bigquery-public-data.thelook_ecommerce.products` p JOIN `bigquery-public-data.thelook_ecommerce.distribution_centers` d ON d.id=p.distribution_center_id
+GROUP BY d.name ORDER BY n DESC","model draft, reviewed against the live schema",written to widen coverage of the business rules and of SQL shape; the rule is never stated in the question
+ta040,which month of 2024 had the highest revenue,"SELECT FORMAT_TIMESTAMP('%Y-%m', oi.created_at) AS month, ROUND(SUM(oi.sale_price),2) AS revenue
+FROM `bigquery-public-data.thelook_ecommerce.order_items` oi
+WHERE oi.status NOT IN ('Cancelled','Returned') AND EXTRACT(YEAR FROM oi.created_at)=2024
+GROUP BY month ORDER BY revenue DESC LIMIT 1","model draft, reviewed against the live schema",written to widen coverage of the business rules and of SQL shape; the rule is never stated in the question
+ta041,revenue split between men's and women's departments in 2023,"SELECT p.department, ROUND(SUM(oi.sale_price),2) AS revenue
+FROM `bigquery-public-data.thelook_ecommerce.order_items` oi JOIN `bigquery-public-data.thelook_ecommerce.products` p ON p.id=oi.product_id
+WHERE oi.status NOT IN ('Cancelled','Returned') AND EXTRACT(YEAR FROM oi.created_at)=2023
+GROUP BY p.department ORDER BY p.department","model draft, reviewed against the live schema",written to widen coverage of the business rules and of SQL shape; the rule is never stated in the question
+ta042,cumulative revenue by month through 2023,"WITH m AS (SELECT FORMAT_TIMESTAMP('%Y-%m', oi.created_at) AS month, SUM(oi.sale_price) AS revenue
+  FROM `bigquery-public-data.thelook_ecommerce.order_items` oi WHERE oi.status NOT IN ('Cancelled','Returned') AND EXTRACT(YEAR FROM oi.created_at)=2023 GROUP BY month)
+SELECT month, ROUND(SUM(revenue) OVER (ORDER BY month),2) AS cumulative_revenue FROM m ORDER BY month","model draft, reviewed against the live schema",written to widen coverage of the business rules and of SQL shape; the rule is never stated in the question
+ta043,the revenue rank of each category within its department,"WITH c AS (SELECT p.department, p.category, SUM(oi.sale_price) AS revenue
+  FROM `bigquery-public-data.thelook_ecommerce.order_items` oi JOIN `bigquery-public-data.thelook_ecommerce.products` p ON p.id=oi.product_id WHERE oi.status NOT IN ('Cancelled','Returned') GROUP BY p.department, p.category)
+SELECT department, category, ROUND(revenue,2) AS revenue, RANK() OVER (PARTITION BY department ORDER BY revenue DESC) AS rank_in_department
+FROM c ORDER BY department, rank_in_department","model draft, reviewed against the live schema",written to widen coverage of the business rules and of SQL shape; the rule is never stated in the question
+ta044,how much revenue came from customers who joined in 2022,"SELECT ROUND(SUM(oi.sale_price),2) AS revenue
+FROM `bigquery-public-data.thelook_ecommerce.order_items` oi JOIN `bigquery-public-data.thelook_ecommerce.users` u ON u.id=oi.user_id
+WHERE oi.status NOT IN ('Cancelled','Returned') AND EXTRACT(YEAR FROM u.created_at)=2022","model draft, reviewed against the live schema",written to widen coverage of the business rules and of SQL shape; the rule is never stated in the question
+ta045,revenue by customer age band,"SELECT CASE WHEN u.age < 25 THEN 'under 25' WHEN u.age < 40 THEN '25 to 39' WHEN u.age < 60 THEN '40 to 59' ELSE '60 and over' END AS age_band, ROUND(SUM(oi.sale_price),2) AS revenue
+FROM `bigquery-public-data.thelook_ecommerce.order_items` oi JOIN `bigquery-public-data.thelook_ecommerce.users` u ON u.id=oi.user_id
+WHERE oi.status NOT IN ('Cancelled','Returned')
+GROUP BY age_band ORDER BY revenue DESC","model draft, reviewed against the live schema",written to widen coverage of the business rules and of SQL shape; the rule is never stated in the question
+ta046,the 10 products that earned the most revenue,"SELECT p.name, ROUND(SUM(oi.sale_price),2) AS revenue
+FROM `bigquery-public-data.thelook_ecommerce.order_items` oi JOIN `bigquery-public-data.thelook_ecommerce.products` p ON p.id=oi.product_id
+WHERE oi.status NOT IN ('Cancelled','Returned')
+GROUP BY p.name ORDER BY revenue DESC LIMIT 10","model draft, reviewed against the live schema",written to widen coverage of the business rules and of SQL shape; the rule is never stated in the question
+ta047,units sold by category in 2024,"SELECT p.category, COUNT(*) AS units
+FROM `bigquery-public-data.thelook_ecommerce.order_items` oi JOIN `bigquery-public-data.thelook_ecommerce.products` p ON p.id=oi.product_id
+WHERE oi.status NOT IN ('Cancelled','Returned') AND EXTRACT(YEAR FROM oi.created_at)=2024
+GROUP BY p.category ORDER BY units DESC","model draft, reviewed against the live schema",written to widen coverage of the business rules and of SQL shape; the rule is never stated in the question
+ta048,margin per unit sold by category,"SELECT p.category, ROUND(AVG(oi.sale_price - p.cost),2) AS margin_per_unit
+FROM `bigquery-public-data.thelook_ecommerce.order_items` oi JOIN `bigquery-public-data.thelook_ecommerce.products` p ON p.id=oi.product_id
+WHERE oi.status NOT IN ('Cancelled','Returned')
+GROUP BY p.category ORDER BY margin_per_unit DESC","model draft, reviewed against the live schema",written to widen coverage of the business rules and of SQL shape; the rule is never stated in the question
+ta051,"how many orders did each customer place, for the top 10 customers","SELECT o.user_id, COUNT(*) AS orders FROM `bigquery-public-data.thelook_ecommerce.orders` o WHERE o.status='Complete' GROUP BY o.user_id ORDER BY orders DESC, o.user_id LIMIT 10","model draft, reviewed against the live schema",written to widen coverage of the business rules and of SQL shape; the rule is never stated in the question
+ta052,how many customers placed exactly one completed order,"WITH c AS (SELECT user_id, COUNT(*) AS n FROM `bigquery-public-data.thelook_ecommerce.orders` WHERE status='Complete' GROUP BY user_id)
+SELECT COUNT(*) AS customers FROM c WHERE n=1","model draft, reviewed against the live schema",written to widen coverage of the business rules and of SQL shape; the rule is never stated in the question
+ta053,completed orders by number of items in the order,"SELECT num_of_item, COUNT(*) AS orders FROM `bigquery-public-data.thelook_ecommerce.orders` WHERE status='Complete' GROUP BY num_of_item ORDER BY num_of_item","model draft, reviewed against the live schema",written to widen coverage of the business rules and of SQL shape; the rule is never stated in the question
+ta054,the share of completed orders by traffic source,"SELECT u.traffic_source, ROUND(SAFE_DIVIDE(COUNT(*), SUM(COUNT(*)) OVER ())*100,2) AS share_pct
+FROM `bigquery-public-data.thelook_ecommerce.orders` o JOIN `bigquery-public-data.thelook_ecommerce.users` u ON u.id=o.user_id
+WHERE o.status='Complete'
+GROUP BY u.traffic_source ORDER BY share_pct DESC","model draft, reviewed against the live schema",written to widen coverage of the business rules and of SQL shape; the rule is never stated in the question
+ta055,how many order items are still waiting to be shipped,"SELECT COUNT(*) AS n FROM `bigquery-public-data.thelook_ecommerce.order_items` WHERE shipped_at IS NULL AND status NOT IN ('Cancelled','Returned')","model draft, reviewed against the live schema",written to widen coverage of the business rules and of SQL shape; the rule is never stated in the question
+ta056,the longest time in hours between an order and its delivery,"SELECT MAX(TIMESTAMP_DIFF(delivered_at, created_at, HOUR)) AS hours FROM `bigquery-public-data.thelook_ecommerce.order_items` WHERE delivered_at IS NOT NULL","model draft, reviewed against the live schema",written to widen coverage of the business rules and of SQL shape; the rule is never stated in the question
+ta057,"median-ish delivery time: the 90th percentile in hours, by distribution center","SELECT d.name, ROUND(APPROX_QUANTILES(TIMESTAMP_DIFF(oi.delivered_at, oi.shipped_at, HOUR), 100)[OFFSET(90)],2) AS p90_hours
+FROM `bigquery-public-data.thelook_ecommerce.order_items` oi JOIN `bigquery-public-data.thelook_ecommerce.products` p ON p.id=oi.product_id JOIN `bigquery-public-data.thelook_ecommerce.distribution_centers` d ON d.id=p.distribution_center_id
+WHERE oi.delivered_at IS NOT NULL AND oi.shipped_at IS NOT NULL
+GROUP BY d.name ORDER BY p90_hours DESC","model draft, reviewed against the live schema",written to widen coverage of the business rules and of SQL shape; the rule is never stated in the question
+ta058,how many items were returned in 2024,SELECT COUNT(*) AS n FROM `bigquery-public-data.thelook_ecommerce.order_items` WHERE status='Returned' AND EXTRACT(YEAR FROM created_at)=2024,"model draft, reviewed against the live schema",written to widen coverage of the business rules and of SQL shape; the rule is never stated in the question
+ta059,return rate by customer country,"SELECT u.country, ROUND(SAFE_DIVIDE(COUNTIF(oi.status='Returned'), COUNTIF(oi.status<>'Cancelled'))*100,2) AS return_pct
+FROM `bigquery-public-data.thelook_ecommerce.order_items` oi JOIN `bigquery-public-data.thelook_ecommerce.users` u ON u.id=oi.user_id
+GROUP BY u.country ORDER BY return_pct DESC","model draft, reviewed against the live schema",written to widen coverage of the business rules and of SQL shape; the rule is never stated in the question
+ta060,how much revenue was lost to returns in 2024,"SELECT ROUND(SUM(sale_price),2) AS returned_value FROM `bigquery-public-data.thelook_ecommerce.order_items` WHERE status='Returned' AND EXTRACT(YEAR FROM created_at)=2024","model draft, reviewed against the live schema",written to widen coverage of the business rules and of SQL shape; the rule is never stated in the question
+ta061,average order value overall,"SELECT ROUND(SAFE_DIVIDE(SUM(oi.sale_price), COUNT(DISTINCT oi.order_id)),2) AS aov FROM `bigquery-public-data.thelook_ecommerce.order_items` oi WHERE oi.status NOT IN ('Cancelled','Returned')","model draft, reviewed against the live schema",written to widen coverage of the business rules and of SQL shape; the rule is never stated in the question
+ta062,"average order value by customer country, top 10","SELECT u.country, ROUND(SAFE_DIVIDE(SUM(oi.sale_price), COUNT(DISTINCT oi.order_id)),2) AS aov
+FROM `bigquery-public-data.thelook_ecommerce.order_items` oi JOIN `bigquery-public-data.thelook_ecommerce.users` u ON u.id=oi.user_id
+WHERE oi.status NOT IN ('Cancelled','Returned')
+GROUP BY u.country ORDER BY aov DESC LIMIT 10","model draft, reviewed against the live schema",written to widen coverage of the business rules and of SQL shape; the rule is never stated in the question
+ta063,"inventory on hand by distribution center, by cost","SELECT d.name, ROUND(SUM(i.cost),2) AS cost_on_hand
+FROM `bigquery-public-data.thelook_ecommerce.inventory_items` i JOIN `bigquery-public-data.thelook_ecommerce.distribution_centers` d ON d.id=i.product_distribution_center_id
+WHERE i.sold_at IS NULL
+GROUP BY d.name ORDER BY cost_on_hand DESC","model draft, reviewed against the live schema",written to widen coverage of the business rules and of SQL shape; the rule is never stated in the question
+ta064,which 10 products have the most units on hand,"SELECT product_name, COUNT(*) AS on_hand FROM `bigquery-public-data.thelook_ecommerce.inventory_items` WHERE sold_at IS NULL GROUP BY product_name ORDER BY on_hand DESC, product_name LIMIT 10","model draft, reviewed against the live schema",written to widen coverage of the business rules and of SQL shape; the rule is never stated in the question
+ta065,how many inventory items were created in 2024 and are still unsold,SELECT COUNT(*) AS n FROM `bigquery-public-data.thelook_ecommerce.inventory_items` WHERE sold_at IS NULL AND EXTRACT(YEAR FROM created_at)=2024,"model draft, reviewed against the live schema",written to widen coverage of the business rules and of SQL shape; the rule is never stated in the question
+ta066,"the share of inventory that has sold, by department","SELECT product_department, ROUND(SAFE_DIVIDE(COUNTIF(sold_at IS NOT NULL), COUNT(*))*100,2) AS sold_pct
+FROM `bigquery-public-data.thelook_ecommerce.inventory_items` GROUP BY product_department ORDER BY sold_pct DESC","model draft, reviewed against the live schema",written to widen coverage of the business rules and of SQL shape; the rule is never stated in the question
+ta067,how many distinct users had a session in 2024,SELECT COUNT(DISTINCT user_id) AS users FROM `bigquery-public-data.thelook_ecommerce.events` WHERE EXTRACT(YEAR FROM created_at)=2024 AND user_id IS NOT NULL,"model draft, reviewed against the live schema",written to widen coverage of the business rules and of SQL shape; the rule is never stated in the question
+ta068,the most common event type per browser,"WITH e AS (SELECT browser, event_type, COUNT(*) AS n, ROW_NUMBER() OVER (PARTITION BY browser ORDER BY COUNT(*) DESC, event_type) AS rn
+  FROM `bigquery-public-data.thelook_ecommerce.events` GROUP BY browser, event_type)
+SELECT browser, event_type, n FROM e WHERE rn=1 ORDER BY browser","model draft, reviewed against the live schema",written to widen coverage of the business rules and of SQL shape; the rule is never stated in the question
+ta069,average number of events per session,"WITH s AS (SELECT session_id, COUNT(*) AS n FROM `bigquery-public-data.thelook_ecommerce.events` GROUP BY session_id)
+SELECT ROUND(AVG(n),2) AS avg_events FROM s","model draft, reviewed against the live schema",written to widen coverage of the business rules and of SQL shape; the rule is never stated in the question
+ta070,sessions per month in 2024,"SELECT FORMAT_TIMESTAMP('%Y-%m', created_at) AS month, COUNT(DISTINCT session_id) AS sessions FROM `bigquery-public-data.thelook_ecommerce.events` WHERE EXTRACT(YEAR FROM created_at)=2024 GROUP BY month ORDER BY month","model draft, reviewed against the live schema",written to widen coverage of the business rules and of SQL shape; the rule is never stated in the question
+ta071,how many customers have never placed an order,SELECT COUNT(*) AS n FROM `bigquery-public-data.thelook_ecommerce.users` u WHERE NOT EXISTS (SELECT 1 FROM `bigquery-public-data.thelook_ecommerce.orders` o WHERE o.user_id=u.id),"model draft, reviewed against the live schema",written to widen coverage of the business rules and of SQL shape; the rule is never stated in the question
+ta072,the 10 cities with the most customers,"SELECT city, COUNT(*) AS n FROM `bigquery-public-data.thelook_ecommerce.users` GROUP BY city ORDER BY n DESC, city LIMIT 10","model draft, reviewed against the live schema",written to widen coverage of the business rules and of SQL shape; the rule is never stated in the question
+ta073,how many products cost more than their category average,"WITH a AS (SELECT category, AVG(retail_price) AS avg_price FROM `bigquery-public-data.thelook_ecommerce.products` GROUP BY category)
+SELECT COUNT(*) AS n FROM `bigquery-public-data.thelook_ecommerce.products` p JOIN a ON a.category=p.category WHERE p.retail_price > a.avg_price","model draft, reviewed against the live schema",written to widen coverage of the business rules and of SQL shape; the rule is never stated in the question
+ta074,the markup percentage by category,"SELECT category, ROUND(SAFE_DIVIDE(AVG(retail_price - cost), AVG(cost))*100,2) AS markup_pct FROM `bigquery-public-data.thelook_ecommerce.products` GROUP BY category ORDER BY markup_pct DESC","model draft, reviewed against the live schema",written to widen coverage of the business rules and of SQL shape; the rule is never stated in the question

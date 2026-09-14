@@ -1,0 +1,15 @@
+- name: revenue
+  definition: The sale price of order items that are neither Cancelled nor Returned.
+  also_called: [net sales, sales]
+- name: margin
+  definition: Sale price minus product cost, summed over the same items as revenue.
+  also_called: [gross margin, profit]
+- name: completed order
+  definition: An order whose status is exactly the string 'Complete'.
+  also_called: [complete order, fulfilled order]
+- name: delivery time
+  definition: The time from shipped_at to delivered_at, for delivered items only.
+  also_called: [time to deliver, shipping time]
+- name: on hand
+  definition: Inventory items that have not been sold yet, meaning sold_at is null.
+  also_called: [in stock, available inventory]

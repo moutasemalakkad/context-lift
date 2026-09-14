@@ -1,0 +1,130 @@
+{
+ "note": "Every gate_detail an enterprise warehouse produced for the 179 candidates it flagged EXEC_FAIL, collapsed to distinct shapes with the counts kept. Project, dataset, table and column names are replaced and every number is N; the Google API hostname is left alone because it is not customer data. The classifier reads the error KIND, so nothing it needs was removed. The figures in docs/METHODOLOGY.md are recomputed from this file by tests/test_exec_fail_split.py, because the sheet itself is customer data and cannot ship.",
+ "total": 179,
+ "details": [
+  {
+   "count": 80,
+   "error": "rejected: the query would scan more than the N GB ceiling (dry-run: N GB); narrow it or raise --max-bytes"
+  },
+  {
+   "count": 34,
+   "error": "Forbidden: N POST https://bigquery.mtls.googleapis.com/bigquery/v2/projects/PROJECT/jobs?prettyPrint=false: VPC Service Controls: Request is prohibited by organization'NAME's autho"
+  },
+  {
+   "count": 24,
+   "error": "NotFound: N POST https://bigquery.mtls.googleapis.com/bigquery/v2/projects/PROJECT/jobs?prettyPrint=false: Not found: Table PROJECT:dataset.table was not found in location US Locat"
+  },
+  {
+   "count": 4,
+   "error": "BadRequest: N POST https://bigquery.mtls.googleapis.com/bigquery/v2/projects/PROJECT/jobs?prettyPrint=false: Table \"NAME\" must be qualified with a dataset (NAME. NAME). Location: N"
+  },
+  {
+   "count": 4,
+   "error": "rejected: the query would scan more than the N GB ceiling (dry-run: N GB); narrow it or raise --max-bytes; a filter is commented out, so the query does not apply it: -- material_do"
+  },
+  {
+   "count": 3,
+   "error": "rejected: the query would scan more than the N GB ceiling (dry-run: N GB); narrow it or raise --max-bytes; the answer returns N column the question never names (plan_demand_units_s"
+  },
+  {
+   "count": 2,
+   "error": "BadRequest: N POST https://bigquery.mtls.googleapis.com/bigquery/v2/projects/PROJECT/jobs?prettyPrint=false: Invalid time travel timestamp N for table PROJECT:NAME@N. Cannot read b"
+  },
+  {
+   "count": 2,
+   "error": "rejected: the query would scan more than the N GB ceiling (dry-run: N GB); narrow it or raise --max-bytes; a filter is commented out, so the query does not apply it: -- item_reques"
+  },
+  {
+   "count": 2,
+   "error": "rejected: the query would scan more than the N GB ceiling (dry-run: N GB); narrow it or raise --max-bytes; a filter is commented out, so the query does not apply it: -- select region_code"
+  },
+  {
+   "count": 2,
+   "error": "rejected: the query would scan more than the N GB ceiling (dry-run: N GB); narrow it or raise --max-bytes; the question may leave out N value the gold filters on (N): if it does, n"
+  },
+  {
+   "count": 2,
+   "error": "rejected: the query would scan more than the N GB ceiling (dry-run: N GB); narrow it or raise --max-bytes; the question may leave out N values the gold filters on (N, N): if it doe"
+  },
+  {
+   "count": 1,
+   "error": "BadRequest: N POST https://bigquery.mtls.googleapis.com/bigquery/v2/projects/PROJECT/jobs?prettyPrint=false: Unrecognized name: plant_text; Did you mean plant_name? at [N:N] Locati"
+  },
+  {
+   "count": 1,
+   "error": "BadRequest: N Query parameter 'NAME' not found at [N:N]; reason: invalidQuery, location: query, message: Query parameter 'NAME' not found at [N:N] Location: US Job ID: 2f729ad0-819"
+  },
+  {
+   "count": 1,
+   "error": "BadRequest: N Query parameter 'NAME' not found at [N:N]; reason: invalidQuery, location: query, message: Query parameter 'NAME' not found at [N:N] Location: US Job ID: N-8b03-4ac4-"
+  },
+  {
+   "count": 1,
+   "error": "rejected: the query would scan more than the N GB ceiling (dry-run: N GB); narrow it or raise --max-bytes; a filter is commented out, so the query does not apply it: -- SELECT -- p"
+  },
+  {
+   "count": 1,
+   "error": "rejected: the query would scan more than the N GB ceiling (dry-run: N GB); narrow it or raise --max-bytes; a filter is commented out, so the query does not apply it: -- and return_"
+  },
+  {
+   "count": 1,
+   "error": "rejected: the query would scan more than the N GB ceiling (dry-run: N GB); narrow it or raise --max-bytes; a filter is commented out, so the query does not apply it: -- and store_i"
+  },
+  {
+   "count": 1,
+   "error": "rejected: the query would scan more than the N GB ceiling (dry-run: N GB); narrow it or raise --max-bytes; a filter is commented out, so the query does not apply it: -- sales_organ"
+  },
+  {
+   "count": 1,
+   "error": "rejected: the query would scan more than the N GB ceiling (dry-run: N GB); narrow it or raise --max-bytes; the answer returns N column the question never names (cnt), so an agent h"
+  },
+  {
+   "count": 1,
+   "error": "rejected: the query would scan more than the N GB ceiling (dry-run: N GB); narrow it or raise --max-bytes; the answer returns N column the question never names (create_ts), so an a"
+  },
+  {
+   "count": 1,
+   "error": "rejected: the query would scan more than the N GB ceiling (dry-run: N GB); narrow it or raise --max-bytes; the answer returns N column the question never names (login_view_sum_inst"
+  },
+  {
+   "count": 1,
+   "error": "rejected: the query would scan more than the N GB ceiling (dry-run: N GB); narrow it or raise --max-bytes; the answer returns N columns the question never names (cnt, min_order_con"
+  },
+  {
+   "count": 1,
+   "error": "rejected: the query would scan more than the N GB ceiling (dry-run: N GB); narrow it or raise --max-bytes; the answer returns N columns the question never names (company_code_to_be"
+  },
+  {
+   "count": 1,
+   "error": "rejected: the query would scan more than the N GB ceiling (dry-run: N GB); narrow it or raise --max-bytes; the answer returns N columns the question never names (gdo_create_ts, arc"
+  },
+  {
+   "count": 1,
+   "error": "rejected: the query would scan more than the N GB ceiling (dry-run: N GB); narrow it or raise --max-bytes; the answer returns N columns the question never names (line_total_discoun"
+  },
+  {
+   "count": 1,
+   "error": "rejected: the query would scan more than the N GB ceiling (dry-run: N GB); narrow it or raise --max-bytes; the answer returns N columns the question never names (purchasers_total, "
+  },
+  {
+   "count": 1,
+   "error": "rejected: the query would scan more than the N GB ceiling (dry-run: N GB); narrow it or raise --max-bytes; the answer returns N columns the question never names (row_count, pct), s"
+  },
+  {
+   "count": 1,
+   "error": "rejected: the query would scan more than the N GB ceiling (dry-run: N GB); narrow it or raise --max-bytes; the answer returns N columns the question never names (week_ending_date, "
+  },
+  {
+   "count": 1,
+   "error": "rejected: the query would scan more than the N GB ceiling (dry-run: N GB); narrow it or raise --max-bytes; the question may leave out N value the gold filters on ($.page_type): if "
+  },
+  {
+   "count": 1,
+   "error": "rejected: the query would scan more than the N GB ceiling (dry-run: N GB); narrow it or raise --max-bytes; the question may leave out N values the gold filters on (LS, ZIBR, ZUB5, "
+  },
+  {
+   "count": 1,
+   "error": "rejected: the query would scan more than the N GB ceiling (dry-run: N GB); narrow it or raise --max-bytes; the question may leave out N values the gold filters on (LS, ZUB4, ZMS, A"
+  }
+ ]
+}

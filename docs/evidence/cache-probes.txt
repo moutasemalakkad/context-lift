@@ -1,0 +1,33 @@
+Implicit prompt caching on the blob arm, two probes, 2026-09-13
+
+Same 25 questions, same 22,340-character blob context, same model
+(gemini-2.5-flash), same four-thread pool. The prompt token count is
+identical in both runs, so the input really was the same.
+
+probe 1, earlier in the session:
+spent: 25 calls, 165,128 prompt + 1,523 output + 4,827 thinking tokens, $0.0654
+  of those, 18,340 prompt tokens (11%) came from the model's implicit
+  cache and are billed below the rate used above
+
+probe 2, re-run to give the number a committed source:
+spent: 25 calls, 165,128 prompt + 1,685 output + 5,144 thinking tokens, $0.0666
+    of those, 30,566 prompt tokens (19%) came from the model's implicit cache and are billed below the rate used above
+
+THE TWO PROBES DISAGREE: 11% and 19% on byte-identical input. That is
+the finding. A cache hit rate is not a property of the prompt; it
+depends on whether an earlier call has already populated the cache when
+a later one fires. The runner uses a four-thread pool, so the first
+several requests race and miss. Quote the floor and the mechanism; do
+not quote a rate.
+
+What IS stable across both probes:
+  - the blob arm is 6,605 prompt tokens per call, above the 2,048
+    minimum implicit caching needs on Flash
+  - some fraction is served from cache, so the arm is eligible
+  - the selection arm at 411 tokens per call is below the minimum and
+    cannot be cached at any hit rate
+
+Reproduce (about $0.07, 25 calls):
+  contextlift generate --questions <25 rows> --schema <schema.txt> \
+      --context <blob.txt> --out <out.csv> --reps 1 \
+      --project <project> --budget 0.15 --yes

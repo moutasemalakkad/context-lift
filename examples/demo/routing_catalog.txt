@@ -1,0 +1,6 @@
+# Every valid dataset.table the router may pick from, one per line.
+sales.orders
+sales.customers
+inventory.stock_levels
+hr.employees
+finance.invoices

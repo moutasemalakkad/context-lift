@@ -1,0 +1,96 @@
+The perturbation suite on BIRD, 2026-09-13
+
+gemini-2.5-flash, 1 repetition, 3 databases, 450 gate-cleaned questions.
+Arms differ ONLY in the blob text: same questions, same schema, same model.
+Cost: 2,700 calls, $6.54 actual against $5.28 estimated (the estimator
+omits thinking tokens; measured factor 1.24x here, 1.34x last time).
+
+without-context arm = the clean blob, every evidence sentence
+with-context arm    = the same blob with one defect injected
+So a NEGATIVE lift is the COST of that defect.
+
+WHY BIRD AND NOT THELOOK. The thelook suite ran first and its positive
+control measured -4.1 points on 74 working questions, which resolve a
+change above about 14 (power.smallest_resolvable(74)). A suite that
+cannot resolve its own control cannot resolve anything smaller. 450
+questions resolve about 4.7 points. See perturbation-positive-control.txt.
+
+=================== THE DEGRADATION CURVE, worst first ===================
+defect                                       lift 95% interval         ruling
+positive-control-drop-value-decoding       -18.9% [-23.3%, -14.5%]     REAL LOSS
+irrelevant-context                          -2.9% [-6.0%, +0.2%]       NOT PROVEN
+strip-subject                               -2.7% [-6.1%, +0.8%]       NOT PROVEN
+conflicting-definitions                     -1.1% [-4.5%, +2.3%]       NOT PROVEN
+unknown-column                              -0.2% [-3.2%, +2.8%]       NOT PROVEN
+
+=================== each one in full ===================
+
+--- positive-control-drop-value-decoding
+paired ablation on 450 questions (execution accuracy)
+  without context :  44.4%  [39.9%, 49.1%]
+  with context    :  25.6%  [21.7%, 29.8%]
+  lift            : -18.9%  [-23.3%, -14.5%]   (the two rates subtracted; 95% interval on the paired difference)
+
+  context fixed   : 17 questions
+  context broke   : 102 questions
+  McNemar p       : 0.0000   significant at 0.05
+  one repetition per arm: a single sample, not a measurement; run each arm again before quoting this (per-question and per-answer readings cannot differ here)
+  repetitions are identical within each arm: copies, not samples; the per-question test is the only reading and no interval widens for them
+  answers changed at 361 of 450 pairs; 119 changed the verdict, 242 moved without changing it
+
+
+--- irrelevant-context
+paired ablation on 450 questions (execution accuracy)
+  without context :  44.4%  [39.9%, 49.1%]
+  with context    :  41.6%  [37.1%, 46.2%]
+  lift            :  -2.9%  [-6.0%, +0.2%]   (the two rates subtracted; 95% interval on the paired difference)
+
+  context fixed   : 19 questions
+  context broke   : 32 questions
+  McNemar p       : 0.0919   not significant at 0.05
+  one repetition per arm: a single sample, not a measurement; run each arm again before quoting this (per-question and per-answer readings cannot differ here)
+  repetitions are identical within each arm: copies, not samples; the per-question test is the only reading and no interval widens for them
+  answers changed at 258 of 450 pairs; 51 changed the verdict, 207 moved without changing it
+
+
+--- strip-subject
+paired ablation on 450 questions (execution accuracy)
+  without context :  44.4%  [39.9%, 49.1%]
+  with context    :  41.8%  [37.3%, 46.4%]
+  lift            :  -2.7%  [-6.1%, +0.8%]   (the two rates subtracted; 95% interval on the paired difference)
+
+  context fixed   : 25 questions
+  context broke   : 37 questions
+  McNemar p       : 0.1619   not significant at 0.05
+  one repetition per arm: a single sample, not a measurement; run each arm again before quoting this (per-question and per-answer readings cannot differ here)
+  repetitions are identical within each arm: copies, not samples; the per-question test is the only reading and no interval widens for them
+  answers changed at 271 of 450 pairs; 62 changed the verdict, 209 moved without changing it
+
+
+--- conflicting-definitions
+paired ablation on 450 questions (execution accuracy)
+  without context :  44.4%  [39.9%, 49.1%]
+  with context    :  43.3%  [38.8%, 47.9%]
+  lift            :  -1.1%  [-4.5%, +2.3%]   (the two rates subtracted; 95% interval on the paired difference)
+
+  context fixed   : 28 questions
+  context broke   : 33 questions
+  McNemar p       : 0.6089   not significant at 0.05
+  one repetition per arm: a single sample, not a measurement; run each arm again before quoting this (per-question and per-answer readings cannot differ here)
+  repetitions are identical within each arm: copies, not samples; the per-question test is the only reading and no interval widens for them
+  answers changed at 252 of 450 pairs; 61 changed the verdict, 191 moved without changing it
+
+
+--- unknown-column
+paired ablation on 450 questions (execution accuracy)
+  without context :  44.4%  [39.9%, 49.1%]
+  with context    :  44.2%  [39.7%, 48.8%]
+  lift            :  -0.2%  [-3.2%, +2.8%]   (the two rates subtracted; 95% interval on the paired difference)
+
+  context fixed   : 23 questions
+  context broke   : 24 questions
+  McNemar p       : 1.0000   not significant at 0.05
+  one repetition per arm: a single sample, not a measurement; run each arm again before quoting this (per-question and per-answer readings cannot differ here)
+  repetitions are identical within each arm: copies, not samples; the per-question test is the only reading and no interval widens for them
+  answers changed at 261 of 450 pairs; 47 changed the verdict, 214 moved without changing it
+

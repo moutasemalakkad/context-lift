@@ -1,0 +1,7 @@
+id,question,gold_sql,pred_sql
+p1,"names of engineering employees","SELECT name FROM employee WHERE dept_id = 1","SELECT e.name FROM employee e JOIN department d ON e.dept_id = d.id WHERE d.name = 'Engineering'"
+p2,"the highest salary","SELECT MAX(salary) FROM employee","SELECT salary FROM employee ORDER BY salary DESC LIMIT 1"
+p3,"employees hired after 2020, by name","SELECT name FROM employee WHERE hire_year > 2020 ORDER BY name","SELECT name FROM employee WHERE hire_year > 2020 ORDER BY name DESC"
+p4,"average salary in sales","SELECT AVG(salary) FROM employee WHERE dept_id = 2","SELECT AVG(salary) FROM employee"
+p5,"number of employees","SELECT COUNT(*) FROM employee","SELECT COUNT(*) FROM employ"
+p6,"employees earning over 1M","SELECT name FROM employee WHERE salary > 1000000","SELECT name FROM employee WHERE salary > 2000000"

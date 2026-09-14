@@ -1,0 +1,247 @@
+The perturbation suite on BIRD, three repetitions per arm
+2026-09-14, gemini-2.5-flash, 450 gate-cleaned questions, 3 databases
+(toxicology, thrombosis_prediction, card_games), 1350 observations per arm.
+
+HOW TO REPRODUCE
+    python scripts/perturb_bird.py --work DIR --databases DIR --project P \
+        --reps 3 --budget 12 --yes
+    python scripts/perturb_bird_score.py --work DIR --databases DIR
+The second command scores and ablates an already-generated run, so a re-score
+costs no model calls.
+
+WHAT AN ARM IS. BIRD context is one evidence sentence per question. The `blob`
+arm hands every sentence for the database to every question. A perturbation
+transforms that blob text and nothing else: same questions, same schema, same
+model. The clean blob is the WITHOUT-context arm and the damaged blob is the
+WITH-context arm, so a NEGATIVE lift is the cost of that defect.
+
+WHY THREE REPETITIONS. The 1-repetition version of this run said, in its own
+output, "one repetition per arm: a single sample, not a measurement". This is
+the measurement. It also changed one of the four rankings -- see the last
+section.
+
+READ THE PER-QUESTION NUMBER. Three answers to one question are not three
+independent facts, so the per-answer test has an inflated denominator and its
+p-value reads low. Both are printed below; the per-question line is the one to
+quote.
+
+=================== positive-control-drop-value-decoding ===================
+pooled 3 repetitions per arm
+
+paired ablation on 1350 observations (450 questions x 3 reps, execution accuracy)
+  without context :  43.3%  [40.7%, 46.0%]
+  with context    :  26.3%  [24.0%, 28.7%]
+  lift            : -17.0%  [-21.5%, -13.1%]   (the two rates subtracted; 95% interval on the paired difference, per question)
+
+  each question counted once - the number to defend
+    fixed 14 / broke 92 of 450 questions
+    p = 0.0000   significant at 0.05
+
+  each answer counted separately - optimistic, because repeated
+  answers to one question are not independent
+    fixed 55 / broke 285 of 1350 observations
+    p = 0.0000   significant at 0.05
+  answers changed at 1071 of 1350 pairs; 340 changed the verdict, 731 moved without changing it
+
+  ruling          : REAL LOSS
+  a real loss: the context broke card_bird_0353 x3, card_bird_0415 x3, card_bird_0421 x3, card_bird_0426 x3, card_bird_0460 x3, card_bird_0466 x3, card_bird_0467 x3, card_bird_0471 x3 and 122 more; read those before anything else
+
+  how to read this: an 'arm' is one condition (context on or
+  off) and lift is one rate minus the other, in percentage
+  points. Both p-values are McNemar's paired test - the chance
+  a difference this size is luck - and they differ only in what
+  counts as one observation. Answering a question three times
+  gives three answers, not three independent facts, so the
+  per-answer test has an inflated denominator and reads low.
+  Quote the per-question number. If the two disagree, that gap
+  is the result: a handful of questions moved.
+
+=================== unknown-column ===================
+pooled 3 repetitions per arm
+
+paired ablation on 1350 observations (450 questions x 3 reps, execution accuracy)
+  without context :  43.3%  [40.7%, 46.0%]
+  with context    :  43.6%  [40.9%, 46.2%]
+  lift            :  +0.2%  [-2.4%, +3.7%]   (the two rates subtracted; 95% interval on the paired difference, per question)
+
+  each question counted once - the number to defend
+    fixed 26 / broke 23 of 450 questions
+    p = 0.7754   not significant at 0.05
+
+  each answer counted separately - optimistic, because repeated
+  answers to one question are not independent
+    fixed 90 / broke 87 of 1350 observations
+    p = 0.8806   not significant at 0.05
+  answers changed at 806 of 1350 pairs; 177 changed the verdict, 629 moved without changing it
+
+  ruling          : NOT PROVEN
+  at 450 questions this set can only prove a lift above about 5 points (1/sqrt(450)); to prove the +0.2% seen here you would need more than 5000 questions
+
+  how to read this: an 'arm' is one condition (context on or
+  off) and lift is one rate minus the other, in percentage
+  points. Both p-values are McNemar's paired test - the chance
+  a difference this size is luck - and they differ only in what
+  counts as one observation. Answering a question three times
+  gives three answers, not three independent facts, so the
+  per-answer test has an inflated denominator and reads low.
+  Quote the per-question number. If the two disagree, that gap
+  is the result: a handful of questions moved.
+
+=================== strip-subject ===================
+pooled 3 repetitions per arm
+
+paired ablation on 1350 observations (450 questions x 3 reps, execution accuracy)
+  without context :  43.3%  [40.7%, 46.0%]
+  with context    :  41.6%  [39.0%, 44.2%]
+  lift            :  -1.8%  [-5.9%, +0.5%]   (the two rates subtracted; 95% interval on the paired difference, per question)
+
+  each question counted once - the number to defend
+    fixed 21 / broke 33 of 450 questions
+    p = 0.1337   not significant at 0.05
+
+  each answer counted separately - optimistic, because repeated
+  answers to one question are not independent
+    fixed 75 / broke 99 of 1350 observations
+    p = 0.0809   not significant at 0.05
+  answers changed at 850 of 1350 pairs; 174 changed the verdict, 676 moved without changing it
+
+  ruling          : NOT PROVEN
+  at 450 questions this set can only prove a change above about 5 points (1/sqrt(450)); the -1.8% seen here is inside that
+
+  how to read this: an 'arm' is one condition (context on or
+  off) and lift is one rate minus the other, in percentage
+  points. Both p-values are McNemar's paired test - the chance
+  a difference this size is luck - and they differ only in what
+  counts as one observation. Answering a question three times
+  gives three answers, not three independent facts, so the
+  per-answer test has an inflated denominator and reads low.
+  Quote the per-question number. If the two disagree, that gap
+  is the result: a handful of questions moved.
+
+=================== conflicting-definitions ===================
+pooled 3 repetitions per arm
+
+paired ablation on 1350 observations (450 questions x 3 reps, execution accuracy)
+  without context :  43.3%  [40.7%, 46.0%]
+  with context    :  42.1%  [39.5%, 44.7%]
+  lift            :  -1.3%  [-4.3%, +1.6%]   (the two rates subtracted; 95% interval on the paired difference, per question)
+
+  each question counted once - the number to defend
+    fixed 20 / broke 26 of 450 questions
+    p = 0.4614   not significant at 0.05
+
+  each answer counted separately - optimistic, because repeated
+  answers to one question are not independent
+    fixed 71 / broke 88 of 1350 observations
+    p = 0.2043   not significant at 0.05
+  answers changed at 781 of 1350 pairs; 159 changed the verdict, 622 moved without changing it
+
+  ruling          : NOT PROVEN
+  at 450 questions this set can only prove a change above about 5 points (1/sqrt(450)); the -1.3% seen here is inside that
+
+  how to read this: an 'arm' is one condition (context on or
+  off) and lift is one rate minus the other, in percentage
+  points. Both p-values are McNemar's paired test - the chance
+  a difference this size is luck - and they differ only in what
+  counts as one observation. Answering a question three times
+  gives three answers, not three independent facts, so the
+  per-answer test has an inflated denominator and reads low.
+  Quote the per-question number. If the two disagree, that gap
+  is the result: a handful of questions moved.
+
+=================== irrelevant-context ===================
+pooled 3 repetitions per arm
+
+paired ablation on 1350 observations (450 questions x 3 reps, execution accuracy)
+  without context :  43.3%  [40.7%, 46.0%]
+  with context    :  43.0%  [40.4%, 45.7%]
+  lift            :  -0.3%  [-2.4%, +3.8%]   (the two rates subtracted; 95% interval on the paired difference, per question)
+
+  each question counted once - the number to defend
+    fixed 27 / broke 24 of 450 questions
+    p = 0.7798   not significant at 0.05
+
+  each answer counted separately - optimistic, because repeated
+  answers to one question are not independent
+    fixed 79 / broke 83 of 1350 observations
+    p = 0.8138   not significant at 0.05
+  answers changed at 800 of 1350 pairs; 162 changed the verdict, 638 moved without changing it
+
+  ruling          : NOT PROVEN
+  at 450 questions this set can only prove a change above about 5 points (1/sqrt(450)); the -0.3% seen here is inside that
+
+  how to read this: an 'arm' is one condition (context on or
+  off) and lift is one rate minus the other, in percentage
+  points. Both p-values are McNemar's paired test - the chance
+
+=========================== SUMMARY ===========================
+
+  defect                        lift (per question)   fixed/broke   p        ruling
+  positive-control              -17.0% [-21.5,-13.1]    14 / 92     0.0000   REAL LOSS
+  strip-subject                  -1.8% [ -5.9, +0.5]    21 / 33     0.1337   NOT PROVEN
+  conflicting-definitions        -1.3% [ -4.3, +1.6]    20 / 26     0.4614   NOT PROVEN
+  irrelevant-context             -0.3% [ -2.4, +3.8]    27 / 24     0.7798   NOT PROVEN
+  unknown-column                 +0.2% [ -2.4, +3.7]    26 / 23     0.7754   NOT PROVEN
+
+THE CONTROL HOLDS. Deleting every sentence that carries a quoted literal --
+the value decoding a schema cannot supply, `label = '+'` meaning carcinogenic
+-- cost 17.0 points and broke 92 questions against 14 fixed at p = 0.0000. So
+the harness registers damage it knows is there, and the four NOT PROVEN rows
+are measurements rather than a measurement of the harness's own deafness.
+
+WHAT CHANGED FROM ONE REPETITION TO THREE, and this is the reason the run was
+repeated.
+
+Both columns are per-question lift. The 1-rep column is quoted from
+docs/evidence/perturbation-bird.txt, not retyped from memory.
+
+    defect                     1 rep    3 reps   rank 1rep -> 3rep
+    positive-control           -18.9    -17.0      1 -> 1
+    irrelevant-context          -2.9     -0.3      2 -> 4   MOVED
+    strip-subject               -2.7     -1.8      3 -> 2
+    conflicting-definitions     -1.1     -1.3      4 -> 3
+    unknown-column              -0.2     +0.2      5 -> 5
+
+The control and the two ends of the table agree. What did not survive is the
+ORDERING of the middle.
+
+At one repetition `irrelevant-context` was the worst of the four realistic
+defects, and it was written up as a lead worth following: five extra sentences
+naming columns no question uses sat closer to the -24.3 distractor result than
+to the practice that says reference text is harmless. At three repetitions it
+is the LEAST harmful of the four, at -0.3 with an interval reaching +3.8.
+
+That lead is withdrawn. It was one sample of a quantity whose 1-rep interval
+already spanned six points, and the ranking it produced did not survive being
+measured again. At 450 questions the four realistic defects are not
+distinguishable from each other or from zero; what the 1-rep run reported as
+an ordering was noise read as a ranking. The ordering is not a result at this
+sample size and should not be quoted as one -- which is the whole reason the
+tool prints an interval beside every lift.
+
+WHAT THIS DOES NOT ESTABLISH.
+
+- 450 questions resolve a change above about 5 points. Every realistic defect
+  here is smaller than that. NOT PROVEN means the defect costs less than 5
+  points OR that this set cannot see it, and the tool says which: to resolve
+  the +0.2% on unknown-column would need more than 5000 questions.
+
+  TWO FLOOR FIGURES APPEAR IN THIS PROJECT AND THEY ARE NOT THE SAME THING.
+  The ablation output above prints 1/sqrt(450) = 4.7%, a rule of thumb.
+  `power.smallest_resolvable(450)` returns 4.0 points, and that is a real
+  power calculation: 80% power, alpha 0.05, assuming context damages 2% of
+  questions (the rate measured on the BEAVER holdout, 19 broken of 596).
+  `examples/bird/perturbation/reproduce.py` prints the 4.0. Both are stated
+  here so nobody reconciles them by picking one, and either way every
+  realistic defect in the table sits below both.
+
+  THE DENOMINATOR IS QUESTIONS, NOT ANSWERS. Using the 1350 answers would give
+  a floor of 2.0 points and claim a resolution this design does not have,
+  because three answers to one question are not three independent
+  observations. The first version of reproduce.py made exactly that mistake,
+  which is the same mistake found in ablate.py's OVERFIT check on the same
+  day.
+- One model, three BIRD databases, a clean schema. A defect costing nothing
+  here may cost a great deal on a 900-dataset estate where the wrong table is
+  expensive.
+- These are INJECTED defects on public data, not defects found in the wild.

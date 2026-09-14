@@ -1,0 +1,72 @@
+{
+  "glossary": "contextlift-roundtrip-probe",
+  "steps": [
+    {
+      "step": "upsert_term",
+      "term": "revenue",
+      "category": "(glossary)",
+      "state": "unchanged"
+    },
+    {
+      "step": "upsert_term",
+      "term": "attach-rate",
+      "category": "team-hardware-sales",
+      "state": "created"
+    },
+    {
+      "step": "read_terms",
+      "count": 2
+    },
+    {
+      "step": "compare",
+      "identical": true
+    },
+    {
+      "step": "tiers_in_one_list",
+      "tiers": [
+        "",
+        "team-hardware-sales"
+      ],
+      "both": true
+    },
+    {
+      "step": "delete_term",
+      "term": "attach-rate",
+      "state": "deleted",
+      "gone": true
+    }
+  ],
+  "verdict": "ROUND TRIP IS LOSSLESS",
+  "cleaned_up": true,
+  "written": [
+    [
+      "attach-rate",
+      "attach rate",
+      "accessories sold per device sold",
+      "team-hardware-sales"
+    ],
+    [
+      "revenue",
+      "revenue",
+      "the sale price of items that are neither Cancelled nor Returned",
+      ""
+    ]
+  ],
+  "read_back": [
+    [
+      "attach-rate",
+      "attach rate",
+      "accessories sold per device sold",
+      "team-hardware-sales"
+    ],
+    [
+      "revenue",
+      "revenue",
+      "the sale price of items that are neither Cancelled nor Returned",
+      ""
+    ]
+  ],
+  "identical": true,
+  "one_list_sees_both_tiers": true,
+  "delete_removed_it": true
+}

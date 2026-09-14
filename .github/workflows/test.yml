@@ -1,0 +1,69 @@
+name: test
+
+# Every pull request and every push to main runs the fast suite and the
+# secret scan. Both are offline: the core installs no cloud extras.
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    env:
+      # the floor in pyproject.toml; a break here is one a user would hit
+      UV_PYTHON: "3.10"
+    steps:
+      # the scan reads `git log --all -p`, so it needs the whole history
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: astral-sh/setup-uv@v5
+
+      - name: install
+        run: make install
+
+      - name: test
+        run: make test
+
+      # The scanner keeps its patterns outside the repo, so they never ship
+      # with the code that hides them. CI writes them from a repository
+      # secret. With no secret the scan says it scanned nothing and exits 0,
+      # so a fork or a first clone stays green.
+      - name: write the customer-string patterns, when the secret is set
+        env:
+          SECRET_PATTERNS: ${{ secrets.SECRET_PATTERNS }}
+        run: |
+          if [ -n "$SECRET_PATTERNS" ]; then
+            mkdir -p _personal
+            printf '%s\n' "$SECRET_PATTERNS" > _personal/secret_patterns.txt
+            echo "wrote $(grep -c . _personal/secret_patterns.txt) pattern(s)"
+          else
+            echo "no SECRET_PATTERNS secret set; the scan will report that it scanned nothing"
+          fi
+
+      # WHAT THIS PUSH ADDED, not the whole history. Setting the secret on
+      # 2026-09-14 turned `ALL=1` from a pass into a refusal: it found 72
+      # lines, nearly all in commits made before the rename, and history
+      # cannot be rewritten -- `refs/pull/N/head` keeps the old ones forever,
+      # which is exactly why the public release needs a FRESH repository.
+      #
+      # A check that can never go green is one people learn to ignore, and
+      # that is strictly worse than a check that guards new commits. So CI
+      # scans the range it can actually act on. `ALL=1` stays the pre-release
+      # audit, run by hand on the fresh repository.
+      #
+      # NOT plain `make scan`: with no flag the scanner reads the staged diff
+      # or the working tree, and a CI checkout has neither, so it would pass
+      # while reading zero lines. That is the same silent pass the missing
+      # pattern file used to produce.
+      - name: scan what this change adds
+        run: |
+          BASE="${{ github.event.pull_request.base.sha || github.event.before }}"
+          if [ -z "$BASE" ] || [ "$BASE" = "0000000000000000000000000000000000000000" ]; then
+            echo "no base commit for this event (first push or a new branch);"
+            echo "scanning the last commit instead"
+            BASE="HEAD~1"
+          fi
+          make scan SINCE="$BASE"

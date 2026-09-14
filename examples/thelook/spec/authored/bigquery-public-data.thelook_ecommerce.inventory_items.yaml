@@ -1,0 +1,3 @@
+columns:
+  sold_at:
+    description: When this item was sold. Null means it is still on hand, which is how inventory on hand is counted.

@@ -1,0 +1,77 @@
+examples/thelook/lookml-arm:
+  1 rules file, 1327 characters
+  7 tables, 0 with a description, 0 columns
+  0 authored column descriptions
+  0 terms
+  0 worked examples
+  0 join relationships
+  control   2404ed0d5166  0d control
+  treatment c6266a145763  1 authored
+  no split files beside examples/thelook/golds.csv, so the round makes its own from --holdout-share and --seed. Run `split` first if you built worked examples from one half
+[ok  ] table coverage: 91 of 104 golds have every table they need in the arm (88%); the arm carries 7
+[ok  ] pasted SQL: 0 of 30 rule lines contain a SELECT (0%)
+[ok  ] template twin: none of 0 items share a query shape with the 102 scored questions
+[ok  ] leak: 0 of 102 held-out questions appear in what the agent is handed
+208 calls, about 7 minutes at the quota, unknown (no price yet: the pricing page bills 'data tokens' and does not define one. Run a 20-question pilot and read the aggregate token count in Cloud Monitoring, then pass --usd-per-call)
+--yes with a budget of $40.00
+round/0d     11s  [################]      2/2     eta done
+                  asked 2  from disk 0
+round/1       9s  [################]      2/2     eta done
+                  asked 2  from disk 0
+round/0d   2m02s  [##--------------]     11/102   eta 16m54s
+                  asked 11  from disk 0
+round/0d   4m03s  [###-------------]     22/102   eta 14m44s
+                  asked 22  from disk 0
+round/0d   4m44s  [####------------]     25/102   eta 14m35s
+                  asked 25  from disk 0
+round/0d   6m51s  [######----------]     38/102   eta 11m33s
+                  asked 38  from disk 0
+round/0d   8m54s  [########--------]     50/102   eta 9m16s
+                  asked 50  from disk 0
+round/0d  11m02s  [##########------]     63/102   eta 6m50s
+                  asked 63  from disk 0
+round/0d  12m53s  [############----]     75/102   eta 4m38s
+                  asked 75  from disk 0
+round/0d  15m04s  [##############--]     87/102   eta 2m35s
+                  asked 87  from disk 0
+round/0d  17m06s  [###############-]    100/102   eta 20s
+                  asked 100  from disk 0
+round/0d  17m23s  [################]    102/102   eta done
+                  asked 102  from disk 0
+round/1    2m00s  [##--------------]     13/102   eta 13m47s
+                  asked 13  from disk 0
+round/1    4m02s  [####------------]     24/102   eta 13m07s
+                  asked 24  from disk 0
+round/1    4m19s  [####------------]     25/102   eta 13m17s
+                  asked 25  from disk 0
+round/1    6m27s  [######----------]     37/102   eta 11m19s
+                  asked 37  from disk 0
+round/1    8m29s  [########--------]     49/102   eta 9m10s
+                  asked 49  from disk 0
+round/1    8m46s  [########--------]     50/102   eta 9m07s
+                  asked 50  from disk 0
+round/1   10m53s  [##########------]     64/102   eta 6m27s
+                  asked 64  from disk 0
+round/1   12m31s  [############----]     75/102   eta 4m30s
+                  asked 75  from disk 0
+round/1   14m35s  [##############--]     89/102   eta 2m07s
+                  asked 89  from disk 0
+round/1   16m18s  [###############-]    100/102   eta 19s
+                  asked 100  from disk 0
+round/1   16m37s  [################]    102/102   eta done
+                  asked 102  from disk 0
+verdict: NOT PROVEN
+  102 held-out questions could have shown a 10-point lift and did not (p = 0.6875)
+safety: MIXED
+  4 fixed, 2 broke, of 102 on the held-out questions. Read the broken ones before keeping this context. A net gain that costs working answers is a trade, not a win
+  broke: tl018, ta002
+  on the working questions: 0 fixed, 0 broke, of 2. The rules were written from these, so this number is weaker evidence
+  held out: 102 questions, +2.0 points
+  fit on the working questions: 2 questions, +0.0 points
+  gap: -2.0 points [-6.7, +2.7], the working-set lift minus the held-out one. It includes zero, so there is no evidence the context fitted the questions it was written from
+  on a 102-question holdout, about 60 questions would resolve the target
+  arms 2404ed0d5166 against c6266a145763, K=1, 208 answers scored
+what to write next, from the working questions:
+  2 of 2 failures are COLUMN_COUNT: worked examples. the answer returns columns the question never asked for, or misses one: an example fixes the shape a sentence would have to describe
+  This reads a count, not a cause. Read three failing pairs side by side before writing anything.
+Container called exit(0).

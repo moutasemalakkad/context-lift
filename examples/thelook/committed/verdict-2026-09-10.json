@@ -1,0 +1,52 @@
+{
+ "round": {
+  "verdict": "REAL GAIN",
+  "reason": "the held-out questions moved +20.0 points (p = 0.0312), and they were read once",
+  "lift_pp": 19.999999999999996,
+  "p_value": 0.03125,
+  "n_curate": 74,
+  "n_holdout": 30,
+  "n_scored_curate": 52,
+  "n_scored_holdout": 30,
+  "lookups_curate": 22,
+  "lookups_holdout": 0,
+  "k_repeats": 1,
+  "holdout_reads": 1,
+  "gap_pp": 10.769230769230775,
+  "gap_ci_low_pp": -8.26345115821889,
+  "gap_ci_high_pp": 29.801912696680432,
+  "resolution": null,
+  "questions_needed": null,
+  "target_pp": 10.0,
+  "model_alias": "LATEST_GA_MODEL",
+  "arm_control_hash": "2404ed0d5166",
+  "arm_treatment_hash": "c6782e448a4b"
+ },
+ "gates": [
+  [
+   "pasted SQL",
+   true,
+   "0 of 43 rule lines contain a SELECT (0%)"
+  ],
+  [
+   "template twin",
+   true,
+   "none of 22 items share a query shape with the 30 scored questions"
+  ],
+  [
+   "leak",
+   true,
+   "0 of 30 held-out questions appear in what the agent is handed"
+  ],
+  [
+   "holdout reads",
+   true,
+   "read once, by one arm pair"
+  ],
+  [
+   "stored-example lookups",
+   true,
+   "0 held-out answers ran a stored example; 22 working answer(s) did, and those are excluded from the lift rather than scored as text-to-SQL"
+  ]
+ ]
+}

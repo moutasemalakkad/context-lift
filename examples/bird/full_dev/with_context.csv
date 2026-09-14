@@ -1,0 +1,646 @@
+db_id,id,question,gold_sql,pred_sql
+california_schools,california_schools_000,What is the highest eligible free rate for K-12 students in the schools in Alameda County?,SELECT `Free Meal Count (K-12)` / `Enrollment (K-12)` FROM frpm WHERE `County Name` = 'Alameda' ORDER BY (CAST(`Free Meal Count (K-12)` AS REAL) / `Enrollment (K-12)`) DESC LIMIT 1,"SELECT
+  MAX(CAST(T1.`Free Meal Count (K-12)` AS REAL) / T1.`Enrollment (K-12)`)
+FROM frpm AS T1
+INNER JOIN schools AS T2
+  ON T1.CDSCode = T2.CDSCode
+WHERE
+  T2.County = 'Alameda'"
+california_schools,california_schools_001,Please list the lowest three eligible free rates for students aged 5-17 in continuation schools.,SELECT `Free Meal Count (Ages 5-17)` / `Enrollment (Ages 5-17)` FROM frpm WHERE `Educational Option Type` = 'Continuation School' AND `Free Meal Count (Ages 5-17)` / `Enrollment (Ages 5-17)` IS NOT NULL ORDER BY `Free Meal Count (Ages 5-17)` / `Enrollment (Ages 5-17)` ASC LIMIT 3,"SELECT
+  CAST(T1.`Free Meal Count (Ages 5-17)` AS REAL) / T1.`Enrollment (Ages 5-17)`
+FROM frpm AS T1
+INNER JOIN schools AS T2
+  ON T1.CDSCode = T2.CDSCode
+WHERE
+  T2.EdOpsName = 'Continuation'
+ORDER BY
+  CAST(T1.`Free Meal Count (Ages 5-17)` AS REAL) / T1.`Enrollment (Ages 5-17)`
+LIMIT 3"
+california_schools,california_schools_002,"Among the schools with an SAT excellence rate of over 0.3, what is the highest eligible free rate for students aged 5-17?",SELECT MAX(CAST(T1.`Free Meal Count (Ages 5-17)` AS REAL) / T1.`Enrollment (Ages 5-17)`) FROM frpm AS T1 INNER JOIN satscores AS T2 ON T1.CDSCode = T2.cds WHERE CAST(T2.NumGE1500 AS REAL) / T2.NumTstTakr > 0.3,"SELECT
+  MAX(CAST(T1.`Free Meal Count (Ages 5-17)` AS REAL) / T1.`Enrollment (Ages 5-17)`)
+FROM frpm AS T1
+INNER JOIN satscores AS T2
+  ON T1.CDSCode = T2.cds
+WHERE
+  CAST(T2.NumGE1500 AS REAL) / T2.NumTstTakr > 0.3"
+california_schools,california_schools_003,Please list the phone numbers of the schools with the top 3 SAT excellence rate.,SELECT T1.Phone FROM schools AS T1 INNER JOIN satscores AS T2 ON T1.CDSCode = T2.cds ORDER BY CAST(T2.NumGE1500 AS REAL) / T2.NumTstTakr DESC LIMIT 3,"SELECT
+  T1.Phone
+FROM schools AS T1
+INNER JOIN satscores AS T2
+  ON T1.CDSCode = T2.cds
+ORDER BY
+  CAST(T2.NumGE1500 AS REAL) / T2.NumTstTakr DESC
+LIMIT 3"
+california_schools,california_schools_004,What is the eligible free rate of the 10th and 11th schools with the highest enrolment for students in grades 1 through 12?,"SELECT CAST(`Free Meal Count (K-12)` AS REAL) / `Enrollment (K-12)` FROM frpm ORDER BY `Enrollment (K-12)` DESC LIMIT 9, 2","SELECT
+  ""Free Meal Count (K-12)"" * 1.0 / ""Enrollment (K-12)""
+FROM frpm
+ORDER BY
+  ""Enrollment (K-12)"" DESC
+LIMIT 2 OFFSET 9"
+california_schools,california_schools_005,What is the eligible free or reduced price meal rate for the top 5 schools in grades 1-12 with the highest free or reduced price meal count of the schools with the ownership code 66?,SELECT CAST(T1.`FRPM Count (K-12)` AS REAL) / T1.`Enrollment (K-12)` FROM frpm AS T1 INNER JOIN schools AS T2 ON T1.CDSCode = T2.CDSCode WHERE T2.SOC = 66 ORDER BY T1.`FRPM Count (K-12)` DESC LIMIT 5,"SELECT
+  CAST(T1.`FRPM Count (K-12)` AS REAL) / T1.`Enrollment (K-12)`
+FROM frpm AS T1
+INNER JOIN schools AS T2
+  ON T1.CDSCode = T2.CDSCode
+WHERE
+  T2.DOC = 66
+ORDER BY
+  T1.`FRPM Count (K-12)` DESC
+LIMIT 5"
+california_schools,california_schools_006,What is the free rate for students between the ages of 5 and 17 at the school run by Kacey Gibson?,SELECT CAST(T2.`Free Meal Count (Ages 5-17)` AS REAL) / T2.`Enrollment (Ages 5-17)` FROM schools AS T1 INNER JOIN frpm AS T2 ON T1.CDSCode = T2.CDSCode WHERE T1.AdmFName1 = 'Kacey' AND T1.AdmLName1 = 'Gibson',SELECT T1.`Free Meal Count (Ages 5-17)` / T1.`Enrollment (Ages 5-17)` FROM frpm AS T1 INNER JOIN schools AS T2 ON T1.CDSCode = T2.CDSCode WHERE T2.AdmFName1 = 'KACEY' AND T2.AdmLName1 = 'GIBSON'
+california_schools,california_schools_007,What is the administrator's email address of the chartered school with the fewest students enrolled in grades 1 through 12?,SELECT T2.AdmEmail1 FROM frpm AS T1 INNER JOIN schools AS T2 ON T1.CDSCode = T2.CDSCode WHERE T1.`Charter School (Y/N)` = 1 ORDER BY T1.`Enrollment (K-12)` ASC LIMIT 1,"SELECT
+  T1.AdmEmail1
+FROM schools AS T1
+INNER JOIN frpm AS T2
+  ON T1.CDSCode = T2.CDSCode
+WHERE
+  T2.`Charter School (Y/N)` = 1
+ORDER BY
+  T2.`Enrollment (K-12)`
+LIMIT 1"
+california_schools,california_schools_008,What is the monthly average number of schools that opened in Alameda County under the jurisdiction of the Elementary School District in 1980?,"SELECT CAST(COUNT(School) AS REAL) / 12 FROM schools WHERE DOC = 52 AND County = 'Alameda' AND strftime('%Y', OpenDate) = '1980'",SELECT CAST(COUNT(T1.CDSCode) AS REAL) / 12 FROM schools AS T1 WHERE T1.County = 'Alameda' AND T1.DOC = '52' AND T1.OpenDate LIKE '1980%'
+california_schools,california_schools_009,"Of the schools with a mailing state address in California, what is the ratio of the schools located in the county of Colusa against the school located in the county of Humboldt?",SELECT CAST(SUM(CASE WHEN County = 'Colusa' THEN 1 ELSE 0 END) AS REAL) / SUM(CASE WHEN County = 'Humboldt' THEN 1 ELSE 0 END) FROM schools WHERE MailState = 'CA',"SELECT
+  CAST(SUM(CASE WHEN T1.County = 'Colusa' THEN 1 ELSE 0 END) AS REAL) / SUM(CASE WHEN T1.County = 'Humboldt' THEN 1 ELSE 0 END)
+FROM schools AS T1
+WHERE
+  T1.MailState = 'CA'"
+california_schools,california_schools_010,What is the total number of non-chartered schools in the county of Los Angeles with a percent (%) of eligible free meals for grades 1 through 12 that is less than 0.18%?,SELECT COUNT(T2.School) FROM frpm AS T1 INNER JOIN schools AS T2 ON T1.CDSCode = T2.CDSCode WHERE T2.County = 'Los Angeles' AND T2.Charter = 0 AND CAST(T1.`Free Meal Count (K-12)` AS REAL) * 100 / T1.`Enrollment (K-12)` < 0.18,"SELECT
+  COUNT(T1.CDSCode)
+FROM frpm AS T1
+INNER JOIN schools AS T2
+  ON T1.CDSCode = T2.CDSCode
+WHERE
+  T2.County = 'Los Angeles' AND T2.Charter = 0 AND T1.`Percent (%) Eligible Free (K-12)` < 0.18"
+california_schools,california_schools_011,What is the ratio in percentage of Santa Clara County schools that are locally funded compared to all other types of charter school funding?,SELECT CAST(SUM(CASE WHEN FundingType = 'Locally funded' THEN 1 ELSE 0 END) AS REAL) * 100 / SUM(CASE WHEN FundingType != 'Locally funded' THEN 1 ELSE 0 END) FROM schools WHERE County = 'Santa Clara' AND Charter = 1,SELECT CAST(SUM(CASE WHEN T1.County = 'Santa Clara' AND T1.FundingType = 'LOCAL' THEN 1 ELSE 0 END) AS REAL) * 100 / COUNT(T1.CDSCode) FROM schools AS T1 WHERE T1.County = 'Santa Clara'
+card_games,card_games_000,Calculate the percentage of the cards availabe in Chinese Simplified.,SELECT CAST(SUM(CASE WHEN T2.language = 'Chinese Simplified' THEN 1 ELSE 0 END) AS REAL) * 100 / COUNT(T1.id) FROM cards AS T1 INNER JOIN foreign_data AS T2 ON T1.uuid = T2.uuid,SELECT CAST(SUM(CASE WHEN T1.language = 'Chinese Simplified' THEN 1 ELSE 0 END) AS REAL) * 100 / COUNT(T1.id) FROM foreign_data AS T1
+card_games,card_games_001,How many cards have infinite power?,SELECT COUNT(*) FROM cards WHERE power = '*',"SELECT
+  COUNT(id)
+FROM cards
+WHERE
+  power = '*'"
+card_games,card_games_002,What is the percentage of borderless cards?,SELECT CAST(SUM(CASE WHEN borderColor = 'borderless' THEN 1 ELSE 0 END) AS REAL) * 100 / COUNT(id) FROM cards,SELECT CAST(SUM(CASE WHEN borderColor = 'borderless' THEN 1 ELSE 0 END) AS REAL) * 100 / COUNT(id) FROM cards
+card_games,card_games_003,What is the percentage of cards whose language is French among the Story Spotlight cards?,SELECT CAST(SUM(CASE WHEN T2.language = 'French' THEN 1 ELSE 0 END) AS REAL) * 100 / COUNT(T1.id) FROM cards AS T1 INNER JOIN foreign_data AS T2 ON T1.uuid = T2.uuid WHERE T1.isStorySpotlight = 1,SELECT CAST(SUM(CASE WHEN T1.language = 'French' THEN 1 ELSE 0 END) AS REAL) * 100 / COUNT(T1.id) FROM foreign_data AS T1 INNER JOIN cards AS T2 ON T1.uuid = T2.uuid WHERE T2.isStorySpotlight = 1
+card_games,card_games_004,What percentage of legendary frame effect cards that are only available in online game variations?,SELECT SUM(CASE WHEN isOnlineOnly = 1 THEN 1.0 ELSE 0 END) / COUNT(id) * 100 FROM cards WHERE frameEffects = 'legendary',SELECT CAST(SUM(CASE WHEN isOnlineOnly = 1 THEN 1 ELSE 0 END) AS REAL) * 100 / COUNT(id) FROM cards WHERE frameEffects = 'legendary'
+card_games,card_games_005,What is the percentage of Story Spotlight cards that do not have a text box? List them by their ID.,SELECT CAST(SUM(CASE WHEN isTextless = 0 THEN 1 ELSE 0 END) AS REAL) * 100 / COUNT(id) FROM cards WHERE isStorySpotlight = 1,"SELECT
+  CAST(SUM(CASE WHEN isStorySpotlight = 1 AND isTextless = 0 THEN 1 ELSE 0 END) AS REAL) * 100 / COUNT(id)
+FROM cards"
+card_games,card_games_006,What percentage of cards with format commander and legal status do not have a content warning?,SELECT CAST(SUM(CASE WHEN T1.hasContentWarning = 0 THEN 1 ELSE 0 END) AS REAL) * 100 / COUNT(T1.id) FROM cards AS T1 INNER JOIN legalities AS T2 ON T1.uuid = T2.uuid WHERE T2.format = 'commander' AND T2.status = 'Legal',SELECT CAST(SUM(CASE WHEN T1.hasContentWarning = 0 THEN 1 ELSE 0 END) AS REAL) * 100 / COUNT(T1.id) FROM cards AS T1 INNER JOIN legalities AS T2 ON T1.uuid = T2.uuid WHERE T2.format = 'commander' AND T2.status = 'Legal'
+card_games,card_games_007,What percentage of cards without power are in French?,SELECT CAST(SUM(CASE WHEN T2.language = 'French' THEN 1 ELSE 0 END) AS REAL) * 100 / COUNT(T1.id) FROM cards AS T1 INNER JOIN foreign_data AS T2 ON T1.uuid = T2.uuid WHERE T1.power IS NULL OR T1.power = '*',SELECT CAST(SUM(CASE WHEN T1.language = 'French' THEN 1 ELSE 0 END) AS REAL) * 100 / COUNT(T1.uuid) FROM foreign_data AS T1 INNER JOIN cards AS T2 ON T1.uuid = T2.uuid WHERE T2.power IS NULL OR T2.power = '*'
+card_games,card_games_008,What percentage of Japanese translated sets are expansion sets?,SELECT CAST(SUM(CASE WHEN T2.language = 'Japanese' THEN 1 ELSE 0 END) AS REAL) * 100 / COUNT(T1.id) FROM sets AS T1 INNER JOIN set_translations AS T2 ON T1.code = T2.setCode WHERE T1.type = 'expansion',SELECT CAST(SUM(CASE WHEN T1.language = 'Japanese' AND T2.type = 'expansion' THEN 1 ELSE 0 END) AS REAL) * 100 / COUNT(T1.language) FROM set_translations AS T1 INNER JOIN sets AS T2 ON T1.setCode = T2.code
+card_games,card_games_009,Please list top three unknown power cards that have promotional types for arena league in alphabetical order.,SELECT name FROM cards WHERE (power IS NULL OR power LIKE '%*%') AND promoTypes = 'arenaleague' ORDER BY name LIMIT 3,SELECT name FROM cards WHERE (power IS NULL OR power = '*') AND promoTypes = 'arenaleague' ORDER BY name ASC LIMIT 3
+card_games,card_games_010,What proportion of cards do not have a text box with a normal layout?,SELECT CAST(SUM(CASE WHEN isTextless = 1 AND layout = 'normal' THEN 1 ELSE 0 END) AS REAL) * 100 / COUNT(*) FROM cards,SELECT CAST(SUM(CASE WHEN isTextless = 1 AND layout = 'normal' THEN 1 ELSE 0 END) AS REAL) * 100 / COUNT(*) FROM cards
+card_games,card_games_011,What is the percentage of the set of cards that have Chinese Simplified as the language and are only available for online games?,SELECT CAST(SUM(CASE WHEN T2.language = 'Chinese Simplified' AND T1.isOnlineOnly = 1 THEN 1 ELSE 0 END) AS REAL) * 100 / COUNT(*) FROM sets AS T1 INNER JOIN set_translations AS T2 ON T1.code = T2.setCode,SELECT CAST(SUM(CASE WHEN T1.language = 'Chinese Simplified' AND T2.isOnlineOnly = 1 THEN 1 ELSE 0 END) AS REAL) * 100 / COUNT(T1.uuid) FROM foreign_data AS T1 INNER JOIN cards AS T2 ON T1.uuid = T2.uuid
+card_games,card_games_012,"Among the cards with a white border color, how many of them have unknown power?",SELECT SUM(CASE WHEN power LIKE '%*%' OR power IS NULL THEN 1 ELSE 0 END) FROM cards WHERE borderColor = 'white',"SELECT
+  COUNT(id)
+FROM cards
+WHERE
+  borderColor = 'White' AND (
+    power = '*' OR power IS NULL
+  )"
+card_games,card_games_013,"Among the cards with converted mana cost higher than 5 in the set Coldsnap, how many of them have unknown power?",SELECT SUM(CASE WHEN T1.power LIKE '*' OR T1.power IS NULL THEN 1 ELSE 0 END) FROM cards AS T1 INNER JOIN sets AS T2 ON T2.code = T1.setCode WHERE T2.name = 'Coldsnap' AND T1.convertedManaCost > 5,"SELECT
+  COUNT(T1.uuid)
+FROM cards AS T1
+INNER JOIN sets AS T2
+  ON T1.setCode = T2.code
+WHERE
+  T2.name = 'Coldsnap' AND T1.convertedManaCost > 5 AND (
+    T1.power = '*' OR T1.power IS NULL
+  )"
+card_games,card_games_014,What is the percentage of the cards with a converted mana cost of 7 in the set Coldsnap?,SELECT CAST(SUM(CASE WHEN T1.convertedManaCost = 7 THEN 1 ELSE 0 END) AS REAL) * 100 / COUNT(T1.id) FROM cards AS T1 INNER JOIN sets AS T2 ON T2.code = T1.setCode WHERE T2.name = 'Coldsnap',SELECT CAST(SUM(CASE WHEN T1.convertedManaCost = 7 THEN 1 ELSE 0 END) AS REAL) * 100 / COUNT(T1.convertedManaCost) FROM cards AS T1 INNER JOIN sets AS T2 ON T1.setCode = T2.code WHERE T2.name = 'Coldsnap'
+card_games,card_games_015,What is the percentage of incredibly powerful cards in the set Coldsnap?,SELECT CAST(SUM(CASE WHEN T1.cardKingdomFoilId IS NOT NULL AND T1.cardKingdomId IS NOT NULL THEN 1 ELSE 0 END) AS REAL) * 100 / COUNT(T1.id) FROM cards AS T1 INNER JOIN sets AS T2 ON T2.code = T1.setCode WHERE T2.name = 'Coldsnap',SELECT CAST(SUM(CASE WHEN T1.cardKingdomFoilId IS NOT NULL AND T1.cardKingdomId IS NOT NULL THEN 1 ELSE 0 END) AS REAL) * 100 / COUNT(T1.name) FROM cards AS T1 INNER JOIN sets AS T2 ON T1.setCode = T2.code WHERE T2.name = 'Coldsnap'
+card_games,card_games_016,"For all the set of cards that has Japanese translation, what is the percentage of them are only available in non-foil?",SELECT CAST(SUM(CASE WHEN isNonFoilOnly = 1 THEN 1 ELSE 0 END) AS REAL) * 100 / COUNT(id) FROM sets WHERE code IN ( SELECT setCode FROM set_translations WHERE language = 'Japanese' ),SELECT CAST(SUM(T1.isNonFoilOnly) AS REAL) * 100 / COUNT(T1.id) FROM sets AS T1 INNER JOIN set_translations AS T2 ON T1.code = T2.setCode WHERE T2.language = 'Japanese'
+card_games,card_games_017,"For all the set of cards that has Brazil Portuguese translation, what is the percentage of them are only available online?",SELECT CAST(SUM(CASE WHEN isOnlineOnly = 1 THEN 1 ELSE 0 END) AS REAL) * 100 / COUNT(id) FROM sets WHERE code IN ( SELECT setCode FROM set_translations WHERE language = 'Portuguese (Brazil)' ),SELECT CAST(SUM(T1.isOnlineOnly) AS REAL) * 100 / COUNT(T1.id) FROM sets AS T1 INNER JOIN set_translations AS T2 ON T1.code = T2.setCode WHERE T2.language = 'Portuguese (Brazil)'
+card_games,card_games_018,How many cards with unknown power that can't be found in foil is in duel deck A?,SELECT SUM(CASE WHEN power = '*' OR power IS NULL THEN 1 ELSE 0 END) FROM cards WHERE hasFoil = 0 AND duelDeck = 'a',"SELECT
+  COUNT(id)
+FROM cards
+WHERE
+  (
+    power IS NULL OR power = '*'
+  ) AND hasFoil = 0 AND duelDeck = 'a'"
+codebase_community,codebase_community_000,What is the average number of badges obtained by a user with over 200 views?,SELECT CAST(COUNT(T1.Id) AS REAL) / COUNT(DISTINCT T2.DisplayName) FROM badges AS T1 INNER JOIN users AS T2 ON T1.UserId = T2.Id WHERE T2.Views > 200,SELECT CAST(COUNT(T1.Id) AS REAL) / COUNT(T2.DisplayName) FROM badges AS T1 INNER JOIN users AS T2 ON T1.UserId = T2.Id WHERE T2.Views > 200
+codebase_community,codebase_community_001,"Among the posts with a score of over 5, what is the percentage of them being owned by an elder user?","SELECT CAST(SUM(IIF(T2.Age > 65, 1, 0)) AS REAL) * 100 / COUNT(T1.Id) FROM posts AS T1 INNER JOIN users AS T2 ON T1.OwnerUserId = T2.Id WHERE T1.Score > 5",SELECT CAST(SUM(CASE WHEN T1.Age > 65 THEN 1 ELSE 0 END) AS REAL) * 100 / COUNT(T1.Id) FROM users AS T1 INNER JOIN posts AS T2 ON T1.Id = T2.OwnerUserId WHERE T2.Score > 5
+codebase_community,codebase_community_002,"For the user No.24, how many times is the number of his/her posts compared to his/her votes?",SELECT CAST(COUNT(T2.Id) AS REAL) / COUNT(DISTINCT T1.Id) FROM votes AS T1 INNER JOIN posts AS T2 ON T1.UserId = T2.OwnerUserId WHERE T1.UserId = 24,SELECT CAST(COUNT(T1.Id) AS REAL) / COUNT(T2.Id) FROM posts AS T1 INNER JOIN votes AS T2 ON T1.OwnerUserId = T2.UserId WHERE T1.OwnerUserId = 24
+codebase_community,codebase_community_003,How many views did the post titled 'Integration of Weka and/or RapidMiner into Informatica PowerCenter/Developer' get?,SELECT ViewCount FROM posts WHERE Title = 'Integration of Weka and/or RapidMiner into Informatica PowerCenter/Developer',SELECT ViewCount FROM posts WHERE Title = 'Integration of Weka and/or RapidMiner into Informatica PowerCenter/Developer'
+codebase_community,codebase_community_004,What is the percentage difference of student badges given during 2010 and 2011?,"SELECT CAST(SUM(IIF(STRFTIME('%Y', Date) = '2010', 1, 0)) AS REAL) * 100 / COUNT(Id) - CAST(SUM(IIF(STRFTIME('%Y', Date) = '2011', 1, 0)) AS REAL) * 100 / COUNT(Id) FROM badges WHERE Name = 'Student'","SELECT CAST(SUM(CASE WHEN STRFTIME('%Y', Date) = '2010' THEN 1 ELSE 0 END) AS REAL) * 100 / COUNT(Name) - CAST(SUM(CASE WHEN STRFTIME('%Y', Date) = '2011' THEN 1 ELSE 0 END) AS REAL) * 100 / COUNT(Name) FROM badges WHERE Name = 'Student' AND (STRFTIME('%Y', Date) = '2010' OR STRFTIME('%Y', Date) = '2011')"
+codebase_community,codebase_community_005,"Among the users who obtained the ""Teacher"" badge, calculate their percentage of users",SELECT CAST(COUNT(T1.Id) AS REAL) * 100 / (SELECT COUNT(Id) FROM users) FROM users AS T1 INNER JOIN badges AS T2 ON T1.Id = T2.UserId WHERE T2.Name = 'Teacher',"SELECT
+  CAST(COUNT(CASE WHEN T1.Name = 'Teacher' THEN T1.UserId ELSE NULL END) AS REAL) * 100 / COUNT(T1.UserId)
+FROM badges AS T1"
+codebase_community,codebase_community_006,"Among the users who obtained the ""Organizer"" badges, calculate the percentage of users who are teenagers.","SELECT CAST(SUM(IIF(T2.Age BETWEEN 13 AND 18, 1, 0)) AS REAL) * 100 / COUNT(T1.Id) FROM badges AS T1 INNER JOIN users AS T2 ON T1.UserId = T2.Id WHERE T1.`Name` = 'Organizer'","SELECT
+  CAST(SUM(CASE WHEN T1.Age BETWEEN 13 AND 18 THEN 1 ELSE 0 END) AS REAL) * 100 / COUNT(T1.Id)
+FROM users AS T1
+INNER JOIN badges AS T2
+  ON T1.Id = T2.UserId
+WHERE
+  T2.Name = 'Organizer'"
+codebase_community,codebase_community_007,Calculate the ratio of votes in 2010 and 2011.,"SELECT CAST(SUM(IIF(STRFTIME('%Y', CreationDate) = '2010', 1, 0)) AS REAL) / SUM(IIF(STRFTIME('%Y', CreationDate) = '2011', 1, 0)) FROM votes","SELECT CAST(SUM(CASE WHEN STRFTIME('%Y', CreationDate) = '2010' THEN 1 ELSE 0 END) AS REAL) / SUM(CASE WHEN STRFTIME('%Y', CreationDate) = '2011' THEN 1 ELSE 0 END) FROM votes"
+codebase_community,codebase_community_008,"Based on posts posted by Community, calculate the percentage of posts that use the R language.","SELECT CAST(SUM(IIF(T3.TagName = 'r', 1, 0)) AS REAL) * 100 / COUNT(T1.Id) FROM users AS T1 INNER JOIN postHistory AS T2 ON T1.Id = T2.UserId INNER JOIN tags AS T3 ON T3.ExcerptPostId = T2.PostId WHERE T1.DisplayName = 'Community'",SELECT CAST(SUM(CASE WHEN T2.TagName = 'r' THEN 1 ELSE 0 END) AS REAL) * 100 / COUNT(T1.Id) FROM posts AS T1 INNER JOIN tags AS T2 ON T1.Id = T2.ExcerptPostId INNER JOIN users AS T3 ON T1.OwnerUserId = T3.Id WHERE T3.DisplayName = 'Community'
+codebase_community,codebase_community_009,What is the average monthly number of links created in 2010 for posts that have no more than 2 answers?,"SELECT CAST(COUNT(T1.Id) AS REAL) / 12 FROM postLinks AS T1 INNER JOIN posts AS T2 ON T1.PostId = T2.Id WHERE T2.AnswerCount <= 2 AND STRFTIME('%Y', T1.CreationDate) = '2010'","SELECT CAST(COUNT(T1.Id) AS REAL) / 12 FROM postLinks AS T1 INNER JOIN posts AS T2 ON T1.PostId = T2.Id WHERE STRFTIME('%Y', T1.CreationDate) = '2010' AND T2.AnswerCount <= 2"
+codebase_community,codebase_community_010,What is the percentage of posts whose owners had a reputation of over 1000 in 2011?,"SELECT CAST(SUM(IIF(STRFTIME('%Y', T2.CreaionDate) = '2011' AND T1.Reputation > 1000, 1, 0)) AS REAL) * 100 / COUNT(T1.Id) FROM users AS T1 INNER JOIN posts AS T2 ON T1.Id = T2.OwnerUserId","SELECT
+  CAST(SUM(CASE WHEN T1.Reputation > 1000 AND STRFTIME('%Y', T2.CreaionDate) = '2011' THEN 1 ELSE 0 END) AS REAL) * 100 / COUNT(T2.Id)
+FROM users AS T1
+INNER JOIN posts AS T2
+  ON T1.Id = T2.OwnerUserId"
+codebase_community,codebase_community_011,Identify the percentage of teenage users.,"SELECT CAST(SUM(IIF(Age BETWEEN 13 AND 18, 1, 0)) AS REAL) * 100 / COUNT(Id) FROM users",SELECT CAST(SUM(CASE WHEN Age BETWEEN 13 AND 18 THEN 1 ELSE 0 END) AS REAL) * 100 / COUNT(Id) FROM users
+codebase_community,codebase_community_012,"Among all the posts posted by the most influential user, identify the percentage with a score above 50.",SELECT CAST(SUM(CASE WHEN T2.Score > 50 THEN 1 ELSE 0 END) AS REAL) * 100 / COUNT(T1.Id) FROM users T1 INNER JOIN posts T2 ON T1.Id = T2.OwnerUserId INNER JOIN ( SELECT MAX(Reputation) AS max_reputation FROM users ) T3 ON T1.Reputation = T3.max_reputation,SELECT CAST(SUM(CASE WHEN T1.Score > 50 THEN 1 ELSE 0 END) AS REAL) * 100 / COUNT(T1.Id) FROM posts AS T1 INNER JOIN users AS T2 ON T1.OwnerUserId = T2.Id WHERE T2.Id = (SELECT T1.Id FROM users AS T1 ORDER BY T1.Reputation DESC LIMIT 1)
+codebase_community,codebase_community_013,"Among the comments with scores between 5 to 10, what is the percentage of the users with 0 up votes?","SELECT CAST(SUM(IIF(T1.UpVotes = 0, 1, 0)) AS REAL) * 100/ COUNT(T1.Id) AS per FROM users AS T1 INNER JOIN comments AS T2 ON T1.Id = T2.UserId WHERE T2.Score BETWEEN 5 AND 10",SELECT CAST(SUM(CASE WHEN T1.UpVotes = 0 THEN 1 ELSE 0 END) AS REAL) * 100 / COUNT(T1.Id) FROM users AS T1 INNER JOIN comments AS T2 ON T1.Id = T2.UserId WHERE T2.Score BETWEEN 5 AND 10
+debit_card_specializing,debit_card_specializing_000,What is the ratio of customers who pay in EUR against customers who pay in CZK?,"SELECT CAST(SUM(IIF(Currency = 'EUR', 1, 0)) AS FLOAT) / SUM(IIF(Currency = 'CZK', 1, 0)) AS ratio FROM customers","SELECT
+  SUM(CASE WHEN Currency = 'EUR' THEN 1 ELSE 0 END) * 1.0 / SUM(CASE WHEN Currency = 'CZK' THEN 1 ELSE 0 END)
+FROM customers"
+debit_card_specializing,debit_card_specializing_001,What was the average monthly consumption of customers in SME for the year 2013?,"SELECT AVG(T2.Consumption) / 12 FROM customers AS T1 INNER JOIN yearmonth AS T2 ON T1.CustomerID = T2.CustomerID WHERE SUBSTR(T2.Date, 1, 4) = '2013' AND T1.Segment = 'SME'","SELECT
+  AVG(T1.Consumption) / 12
+FROM yearmonth AS T1
+INNER JOIN customers AS T2
+  ON T1.CustomerID = T2.CustomerID
+WHERE
+  SUBSTR(T1.Date, 1, 4) = '2013' AND T2.Segment = 'SME'"
+debit_card_specializing,debit_card_specializing_002,How many percent of LAM customer consumed more than 46.73?,"SELECT CAST(SUM(IIF(T2.Consumption > 46.73, 1, 0)) AS FLOAT) * 100 / COUNT(T1.CustomerID) FROM customers AS T1 INNER JOIN yearmonth AS T2 ON T1.CustomerID = T2.CustomerID WHERE T1.Segment = 'LAM'","SELECT
+  CAST(SUM(CASE WHEN T1.Consumption > 46.73 THEN 1 ELSE 0 END) AS REAL) * 100 / COUNT(T1.CustomerID)
+FROM yearmonth AS T1
+INNER JOIN customers AS T2
+  ON T1.CustomerID = T2.CustomerID
+WHERE
+  T2.Segment = 'LAM'"
+debit_card_specializing,debit_card_specializing_003,What percentage of KAM customers pay in euros?,SELECT CAST(SUM(Currency = 'EUR') AS FLOAT) * 100 / COUNT(CustomerID) FROM customers WHERE Segment = 'KAM',"SELECT
+  CAST(SUM(CASE WHEN T1.Currency = 'EUR' THEN 1 ELSE 0 END) AS REAL) * 100 / COUNT(T1.CustomerID)
+FROM customers AS T1
+INNER JOIN transactions_1k AS T2
+  ON T1.CustomerID = T2.CustomerID
+WHERE
+  T1.Segment = 'KAM'"
+debit_card_specializing,debit_card_specializing_004,What percentage of Slovakian gas stations are premium?,"SELECT CAST(SUM(IIF(Segment = 'Premium', 1, 0)) AS FLOAT) * 100 / COUNT(GasStationID) FROM gasstations WHERE Country = 'SVK'","SELECT
+  CAST(SUM(CASE WHEN T1.Segment = 'Premium' THEN 1 ELSE 0 END) AS REAL) * 100 / COUNT(T1.GasStationID)
+FROM gasstations AS T1
+WHERE
+  T1.Country = 'Slovakia'"
+debit_card_specializing,debit_card_specializing_005,What is the biggest monthly consumption of the customers who use euro as their currency?,SELECT SUM(T2.Consumption) / 12 AS MonthlyConsumption FROM customers AS T1 INNER JOIN yearmonth AS T2 ON T1.CustomerID = T2.CustomerID WHERE T1.Currency = 'EUR' GROUP BY T1.CustomerID ORDER BY MonthlyConsumption DESC LIMIT 1,"SELECT
+  MAX(T1.Consumption / 12)
+FROM yearmonth AS T1
+INNER JOIN customers AS T2
+  ON T1.CustomerID = T2.CustomerID
+WHERE
+  T2.Currency = 'EUR'"
+debit_card_specializing,debit_card_specializing_006,"For the customer who paid 634.8 in 2012/8/25, what was the consumption decrease rate from Year 2012 to 2013?","SELECT CAST(SUM(IIF(SUBSTR(Date, 1, 4) = '2012', Consumption, 0)) - SUM(IIF(SUBSTR(Date, 1, 4) = '2013', Consumption, 0)) AS FLOAT) / SUM(IIF(SUBSTR(Date, 1, 4) = '2012', Consumption, 0)) FROM yearmonth WHERE CustomerID = ( SELECT T1.CustomerID FROM transactions_1k AS T1 INNER JOIN gasstations AS T2 ON T1.GasStationID = T2.GasStationID WHERE T1.Date = '2012-08-25' AND T1.Price = 634.8 )","SELECT
+  CAST(SUM(CASE WHEN T2.Date LIKE '2012%' THEN T2.Consumption ELSE 0 END) AS REAL) - SUM(CASE WHEN T2.Date LIKE '2013%' THEN T2.Consumption ELSE 0 END) / SUM(CASE WHEN T2.Date LIKE '2012%' THEN T2.Consumption ELSE 0 END)
+FROM transactions_1k AS T1
+INNER JOIN yearmonth AS T2
+  ON T1.CustomerID = T2.CustomerID
+WHERE
+  T1.Date = '2012-08-25' AND T1.Price = 634.8"
+debit_card_specializing,debit_card_specializing_007,For all the people who paid more than 29.00 per unit of product id No.5. Give their consumption status in the August of 2012.,SELECT T2.Consumption FROM transactions_1k AS T1 INNER JOIN yearmonth AS T2 ON T1.CustomerID = T2.CustomerID WHERE T1.Price / T1.Amount > 29.00 AND T1.ProductID = 5 AND T2.Date = '201208',"SELECT
+  T1.Consumption
+FROM yearmonth AS T1
+INNER JOIN transactions_1k AS T2
+  ON T1.CustomerID = T2.CustomerID
+WHERE
+  T2.ProductID = 5 AND T2.Price / T2.Amount > 29 AND T1.Date = '201208'"
+european_football_2,european_football_2_000,Give the name of the league had the most goals in the 2016 season?,SELECT t2.name FROM Match AS t1 INNER JOIN League AS t2 ON t1.league_id = t2.id WHERE t1.season = '2015/2016' GROUP BY t2.name ORDER BY SUM(t1.home_team_goal + t1.away_team_goal) DESC LIMIT 1,"SELECT
+  L.name
+FROM League AS L
+JOIN Match AS M
+  ON L.id = M.league_id
+WHERE
+  M.season = '2015/2016'
+GROUP BY
+  L.name
+ORDER BY
+  SUM(M.home_team_goal + M.away_team_goal) DESC
+LIMIT 1"
+european_football_2,european_football_2_001,Which home team had lost the fewest matches in the 2016 season?,SELECT teamDetails.team_long_name FROM Match AS matchData INNER JOIN Team AS teamDetails ON matchData.home_team_api_id = teamDetails.team_api_id WHERE matchData.season = '2015/2016' AND matchData.home_team_goal - matchData.away_team_goal < 0 GROUP BY matchData.home_team_api_id ORDER BY COUNT(*) ASC LIMIT 1,"SELECT
+  T.team_long_name
+FROM Match AS M
+JOIN Team AS T
+  ON M.home_team_api_id = T.team_api_id
+WHERE
+  M.season = '2015/2016' AND M.home_team_goal < M.away_team_goal
+GROUP BY
+  T.team_long_name
+ORDER BY
+  COUNT(M.id) ASC
+LIMIT 1"
+european_football_2,european_football_2_002,"In Scotland Premier League, which away team won the most during the 2010 season?",SELECT teamInfo.team_long_name FROM League AS leagueData INNER JOIN Match AS matchData ON leagueData.id = matchData.league_id INNER JOIN Team AS teamInfo ON matchData.away_team_api_id = teamInfo.team_api_id WHERE leagueData.name = 'Scotland Premier League' AND matchData.season = '2009/2010' AND matchData.away_team_goal - matchData.home_team_goal > 0 GROUP BY matchData.away_team_api_id ORDER BY COUNT(*) DESC LIMIT 1,"SELECT
+  T.team_long_name
+FROM Match AS M
+JOIN Team AS T
+  ON M.away_team_api_id = T.team_api_id
+JOIN League AS L
+  ON M.league_id = L.id
+WHERE
+  L.name = 'Scotland Premier League' AND M.season = '2009/2010' AND M.away_team_goal > M.home_team_goal
+GROUP BY
+  T.team_long_name
+ORDER BY
+  COUNT(*) DESC
+LIMIT 1"
+european_football_2,european_football_2_003,Give the name of the league had the most matches end as draw in the 2016 season?,SELECT t2.name FROM Match AS t1 INNER JOIN League AS t2 ON t1.league_id = t2.id WHERE t1.season = '2015/2016' AND t1.home_team_goal = t1.away_team_goal GROUP BY t2.name ORDER BY COUNT(t1.id) DESC LIMIT 1,"SELECT
+  L.name
+FROM League AS L
+JOIN Match AS M
+  ON L.id = M.league_id
+WHERE
+  M.season = '2015/2016'
+GROUP BY
+  L.name
+ORDER BY
+  SUM(CASE WHEN M.home_team_goal = M.away_team_goal THEN 1 ELSE 0 END) DESC
+LIMIT 1"
+european_football_2,european_football_2_004,What is the average height of players born between 1990 and 1995?,"SELECT SUM(height) / COUNT(id) FROM Player WHERE SUBSTR(birthday, 1, 4) BETWEEN '1990' AND '1995'",SELECT AVG(height) FROM Player WHERE birthday >= '1990-01-01 00:00:00' AND birthday < '1996-01-01 00:00:00'
+european_football_2,european_football_2_005,"Calculate the percentage of players who prefer left foot, who were born between 1987 and 1992.","SELECT CAST(COUNT(CASE WHEN t2.preferred_foot = 'left' THEN t1.id ELSE NULL END) AS REAL) * 100 / COUNT(t1.id) percent FROM Player AS t1 INNER JOIN Player_Attributes AS t2 ON t1.player_api_id = t2.player_api_id WHERE SUBSTR(t1.birthday, 1, 4) BETWEEN '1987' AND '1992'","SELECT
+  CAST(SUM(CASE WHEN T1.preferred_foot = 'left' THEN 1 ELSE 0 END) AS REAL) * 100 / COUNT(T1.player_fifa_api_id)
+FROM Player_Attributes AS T1
+INNER JOIN Player AS T2
+  ON T1.player_fifa_api_id = T2.player_fifa_api_id
+WHERE
+  STRFTIME('%Y', T2.birthday) BETWEEN '1987' AND '1992'"
+european_football_2,european_football_2_006,Find the average number of long-shot done by Ahmed Samir Farag.,SELECT CAST(SUM(t2.long_shots) AS REAL) / COUNT(t2.`date`) FROM Player AS t1 INNER JOIN Player_Attributes AS t2 ON t1.player_api_id = t2.player_api_id WHERE t1.player_name = 'Ahmed Samir Farag',"SELECT
+  SUM(T1.long_shots) / COUNT(T1.player_fifa_api_id)
+FROM Player_Attributes AS T1
+INNER JOIN Player AS T2
+  ON T1.player_api_id = T2.player_api_id
+WHERE
+  T2.player_name = 'Ahmed Samir Farag'"
+european_football_2,european_football_2_007,List the top 10 players' names whose heights are above 180 in descending order of average heading accuracy.,SELECT t1.player_name FROM Player AS t1 INNER JOIN Player_Attributes AS t2 ON t1.player_api_id = t2.player_api_id WHERE t1.height > 180 GROUP BY t1.id ORDER BY CAST(SUM(t2.heading_accuracy) AS REAL) / COUNT(t2.`player_fifa_api_id`) DESC LIMIT 10,"SELECT
+  P.player_name
+FROM Player AS P
+JOIN Player_Attributes AS PA
+  ON P.player_api_id = PA.player_api_id
+WHERE
+  P.height > 180
+GROUP BY
+  P.player_name
+ORDER BY
+  SUM(PA.heading_accuracy) / COUNT(PA.player_fifa_api_id) DESC
+LIMIT 10"
+european_football_2,european_football_2_008,List the name of leagues in which the average goals by the home team is higher than the away team in the 2009/2010 season.,SELECT t1.name FROM League AS t1 INNER JOIN Match AS t2 ON t1.id = t2.league_id WHERE t2.season = '2009/2010' GROUP BY t1.name HAVING (CAST(SUM(t2.home_team_goal) AS REAL) / COUNT(DISTINCT t2.id)) - (CAST(SUM(t2.away_team_goal) AS REAL) / COUNT(DISTINCT t2.id)) > 0,"SELECT
+  L.name
+FROM League AS L
+JOIN Match AS M
+  ON L.id = M.league_id
+WHERE
+  M.season = '2009/2010'
+GROUP BY
+  L.name
+HAVING
+  CAST(SUM(M.home_team_goal) AS REAL) / COUNT(DISTINCT M.id) > CAST(SUM(M.away_team_goal) AS REAL) / COUNT(DISTINCT M.id)"
+european_football_2,european_football_2_009,Calculate the average home team goal in the 2010/2011 season in the country of Poland.,SELECT CAST(SUM(t2.home_team_goal) AS REAL) / COUNT(t2.id) FROM Country AS t1 INNER JOIN Match AS t2 ON t1.id = t2.country_id WHERE t1.name = 'Poland' AND t2.season = '2010/2011',"SELECT
+  SUM(T1.home_team_goal) / COUNT(DISTINCT T1.id)
+FROM Match AS T1
+INNER JOIN Country AS T2
+  ON T1.country_id = T2.id
+WHERE
+  T2.name = 'Poland' AND T1.season = '2010/2011'"
+european_football_2,european_football_2_010,"From 2010 to 2015, what was the average overall rating of players who are higher than 170?","SELECT CAST(SUM(t2.overall_rating) AS REAL) / COUNT(t2.id) FROM Player AS t1 INNER JOIN Player_Attributes AS t2 ON t1.player_api_id = t2.player_api_id WHERE t1.height > 170 AND STRFTIME('%Y',t2.`date`) >= '2010' AND STRFTIME('%Y',t2.`date`) <= '2015'",SELECT SUM(T2.overall_rating) / COUNT(T2.id) FROM Player AS T1 INNER JOIN Player_Attributes AS T2 ON T1.player_api_id = T2.player_api_id WHERE T1.height > 170 AND T2.date BETWEEN '2010-01-01' AND '2015-12-31'
+european_football_2,european_football_2_011,"What is the difference of the average ball control score between Abdou Diallo and Aaron Appindangoye
+?",SELECT CAST(SUM(CASE WHEN t1.player_name = 'Abdou Diallo' THEN t2.ball_control ELSE 0 END) AS REAL) / COUNT(CASE WHEN t1.player_name = 'Abdou Diallo' THEN t2.id ELSE NULL END) - CAST(SUM(CASE WHEN t1.player_name = 'Aaron Appindangoye' THEN t2.ball_control ELSE 0 END) AS REAL) / COUNT(CASE WHEN t1.player_name = 'Aaron Appindangoye' THEN t2.id ELSE NULL END) FROM Player AS t1 INNER JOIN Player_Attributes AS t2 ON t1.player_api_id = t2.player_api_id,"SELECT
+  SUM(CASE WHEN T1.player_name = 'Abdou Diallo' THEN T2.ball_control ELSE 0 END) * 1.0 / COUNT(CASE WHEN T1.player_name = 'Abdou Diallo' THEN T2.id ELSE NULL END) - SUM(CASE WHEN T1.player_name = 'Aaron Appindangoye' THEN T2.ball_control ELSE 0 END) * 1.0 / COUNT(CASE WHEN T1.player_name = 'Aaron Appindangoye' THEN T2.id ELSE NULL END)
+FROM Player AS T1
+INNER JOIN Player_Attributes AS T2
+  ON T1.player_api_id = T2.player_api_id
+WHERE
+  T1.player_name = 'Abdou Diallo' OR T1.player_name = 'Aaron Appindangoye'"
+european_football_2,european_football_2_012,Give the name of the league had the most matches in the 2008/2009 season?,SELECT t1.name FROM League AS t1 JOIN Match AS t2 ON t1.id = t2.league_id WHERE t2.season = '2008/2009' GROUP BY t1.name HAVING COUNT(t2.id) = (SELECT MAX(match_count) FROM (SELECT COUNT(t2.id) AS match_count FROM Match AS t2 WHERE t2.season = '2008/2009' GROUP BY t2.league_id)),"SELECT
+  L.name
+FROM League AS L
+JOIN Match AS M
+  ON L.id = M.league_id
+WHERE
+  M.season = '2008/2009'
+GROUP BY
+  L.name
+ORDER BY
+  COUNT(M.id) DESC
+LIMIT 1"
+european_football_2,european_football_2_013,What is the average overall rating of the players born before the year 1986?,"SELECT SUM(t2.overall_rating) / COUNT(t1.id) FROM Player AS t1 INNER JOIN Player_Attributes AS t2 ON t1.player_api_id = t2.player_api_id WHERE SUBSTR(t1.birthday, 1, 4) < '1986'","SELECT AVG(T1.overall_rating) FROM Player_Attributes AS T1 INNER JOIN Player AS T2 ON T1.player_api_id = T2.player_api_id WHERE strftime('%Y', T2.birthday) < '1986'"
+european_football_2,european_football_2_014,How much higher in percentage is Ariel Borysiuk's overall rating than that of Paulin Puel?,SELECT (SUM(CASE WHEN t1.player_name = 'Ariel Borysiuk' THEN t2.overall_rating ELSE 0 END) * 1.0 - SUM(CASE WHEN t1.player_name = 'Paulin Puel' THEN t2.overall_rating ELSE 0 END)) * 100 / SUM(CASE WHEN t1.player_name = 'Paulin Puel' THEN t2.overall_rating ELSE 0 END) FROM Player AS t1 INNER JOIN Player_Attributes AS t2 ON t1.player_api_id = t2.player_api_id,"SELECT
+  (
+    (T1.overall_rating - T2.overall_rating) * 100.0
+  ) / T2.overall_rating
+FROM Player_Attributes AS T1, Player_Attributes AS T2, Player AS T3, Player AS T4
+WHERE
+  T1.player_api_id = T3.player_api_id AND T2.player_api_id = T4.player_api_id AND T3.player_name = 'Ariel Borysiuk' AND T4.player_name = 'Paulin Puel'"
+european_football_2,european_football_2_015,What was the average overall rating for Marko Arnautovic from 2007/2/22 to 2016/4/21?,"SELECT CAST(SUM(t2.overall_rating) AS REAL) / COUNT(t2.id) FROM Player AS t1 INNER JOIN Player_Attributes AS t2 ON t1.player_fifa_api_id = t2.player_fifa_api_id WHERE t1.player_name = 'Marko Arnautovic' AND SUBSTR(t2.`date`, 1, 10) BETWEEN '2007-02-22' AND '2016-04-21'","SELECT
+  AVG(T1.overall_rating)
+FROM Player_Attributes AS T1
+INNER JOIN Player AS T2
+  ON T1.player_api_id = T2.player_api_id
+WHERE
+  T2.player_name = 'Marko Arnautovic' AND SUBSTR(T1.date, 1, 10) BETWEEN '2007-02-22' AND '2016-04-21'"
+european_football_2,european_football_2_016,What percentage is Landon Donovan's overall rating higher than Jordan Bowery on 2013/7/12?,"SELECT (SUM(CASE WHEN t1.player_name = 'Landon Donovan' THEN t2.overall_rating ELSE 0 END) * 1.0 - SUM(CASE WHEN t1.player_name = 'Jordan Bowery' THEN t2.overall_rating ELSE 0 END)) * 100 / SUM(CASE WHEN t1.player_name = 'Landon Donovan' THEN t2.overall_rating ELSE 0 END) LvsJ_percent FROM Player AS t1 INNER JOIN Player_Attributes AS t2 ON t1.player_fifa_api_id = t2.player_fifa_api_id WHERE SUBSTR(t2.`date`, 1, 10) = '2013-07-12'","SELECT
+  CAST(SUM(CASE WHEN P.player_name = 'Landon Donovan' THEN PA.overall_rating ELSE 0 END) - SUM(CASE WHEN P.player_name = 'Jordan Bowery' THEN PA.overall_rating ELSE 0 END) AS REAL) * 100 / SUM(CASE WHEN P.player_name = 'Landon Donovan' THEN PA.overall_rating ELSE 0 END)
+FROM Player_Attributes AS PA
+INNER JOIN Player AS P
+  ON PA.player_api_id = P.player_api_id
+WHERE
+  PA.date = '2013/7/12' AND P.player_name IN ('Landon Donovan', 'Jordan Bowery')"
+european_football_2,european_football_2_017,"In the 2015–2016 season, how many games were played in the Italian Serie A league?",SELECT COUNT(t2.id) FROM League AS t1 INNER JOIN Match AS t2 ON t1.id = t2.league_id WHERE t1.name = 'Italy Serie A' AND t2.season = '2015/2016',"SELECT
+  COUNT(T1.id)
+FROM Match AS T1
+INNER JOIN League AS T2
+  ON T1.league_id = T2.id
+WHERE
+  T1.season = '2015/2016' AND T2.name = 'Italy Serie A'"
+european_football_2,european_football_2_018,Which top 4 leagues had the most games in the 2015-2016 season?,SELECT t1.name FROM League AS t1 INNER JOIN Match AS t2 ON t1.id = t2.league_id WHERE t2.season = '2015/2016' GROUP BY t1.name ORDER BY COUNT(t2.id) DESC LIMIT 4,"SELECT
+  L.name
+FROM Match AS M
+JOIN League AS L
+  ON M.league_id = L.id
+WHERE
+  M.season = '2015/2016'
+GROUP BY
+  L.name
+ORDER BY
+  COUNT(M.id) DESC
+LIMIT 4"
+european_football_2,european_football_2_019,What is the percentage of players that are under 180 cm who have an overall strength of more than 70?,SELECT CAST(COUNT(CASE WHEN t2.overall_rating > 70 THEN t1.id ELSE NULL END) AS REAL) * 100 / COUNT(t1.id) percent FROM Player AS t1 INNER JOIN Player_Attributes AS t2 ON t1.player_api_id = t2.player_api_id WHERE t1.height < 180,"SELECT
+  CAST(SUM(CASE WHEN T1.height < 180 AND T2.overall_rating > 70 THEN 1 ELSE 0 END) AS REAL) * 100 / COUNT(T1.id)
+FROM Player AS T1
+INNER JOIN Player_Attributes AS T2
+  ON T1.player_api_id = T2.player_api_id"
+financial,financial_000,"For the branch which located in the south Bohemia with biggest number of inhabitants, what is the percentage of the male clients?",SELECT CAST(SUM(T1.gender = 'M') AS REAL) * 100 / COUNT(T1.client_id) FROM client AS T1 INNER JOIN district AS T2 ON T1.district_id = T2.district_id WHERE T2.A3 = 'south Bohemia' GROUP BY T2.A4 ORDER BY T2.A4 DESC LIMIT 1,"SELECT
+  CAST(SUM(CASE WHEN T3.gender = 'M' THEN 1 ELSE 0 END) AS REAL) * 100 / COUNT(T3.client_id)
+FROM district AS T1
+INNER JOIN account AS T2
+  ON T1.district_id = T2.district_id
+INNER JOIN disp AS T4
+  ON T2.account_id = T4.account_id
+INNER JOIN client AS T3
+  ON T4.client_id = T3.client_id
+WHERE
+  T1.A3 = 'south Bohemia'
+ORDER BY
+  T1.A4 DESC
+LIMIT 1"
+financial,financial_001,"For the client whose loan was approved first in 1993/7/5, what is the increase rate of his/her account balance from 1993/3/22 to 1998/12/27?","SELECT CAST((SUM(IIF(T3.date = '1998-12-27', T3.balance, 0)) - SUM(IIF(T3.date = '1993-03-22', T3.balance, 0))) AS REAL) * 100 / SUM(IIF(T3.date = '1993-03-22', T3.balance, 0)) FROM loan AS T1 INNER JOIN account AS T2 ON T1.account_id = T2.account_id INNER JOIN trans AS T3 ON T3.account_id = T2.account_id WHERE T1.date = '1993-07-05'","SELECT
+  CAST(SUM(CASE WHEN T2.date = '1998-12-27' THEN T2.balance ELSE 0 END) - SUM(CASE WHEN T2.date = '1993-03-22' THEN T2.balance ELSE 0 END) AS REAL) * 100 / SUM(CASE WHEN T2.date = '1993-03-22' THEN T2.balance ELSE 0 END)
+FROM loan AS T1
+INNER JOIN trans AS T2
+  ON T1.account_id = T2.account_id
+WHERE
+  T1.status = 'A' AND T1.date = '1993-07-05'"
+financial,financial_002,What is the percentage of loan amount that has been fully paid with no issue.,SELECT (CAST(SUM(CASE WHEN status = 'A' THEN amount ELSE 0 END) AS REAL) * 100) / SUM(amount) FROM loan,SELECT CAST(SUM(CASE WHEN status = 'A' THEN amount ELSE 0 END) AS REAL) * 100 / SUM(amount) FROM loan
+financial,financial_003,"For loan amount less than USD100,000, what is the percentage of accounts that is still running with no issue.",SELECT CAST(SUM(status = 'C') AS REAL) * 100 / COUNT(account_id) FROM loan WHERE amount < 100000,SELECT CAST(SUM(CASE WHEN T1.status = 'C' THEN 1 ELSE 0 END) AS REAL) * 100 / COUNT(T1.account_id) FROM loan AS T1 WHERE T1.amount < 100000
+financial,financial_004,"For loans contracts which are still running where client are in debt, list the district of the and the state the percentage unemployment rate increment from year 1995 to 1996.",SELECT CAST((T3.A13 - T3.A12) AS REAL) * 100 / T3.A12 FROM loan AS T1 INNER JOIN account AS T2 ON T1.account_id = T2.account_id INNER JOIN district AS T3 ON T2.district_id = T3.district_id WHERE T1.status = 'D',"SELECT
+  T1.A3,
+  (T1.A13 - T1.A12) * 100 / T1.A12
+FROM district AS T1
+INNER JOIN account AS T2
+  ON T1.district_id = T2.district_id
+INNER JOIN loan AS T3
+  ON T2.account_id = T3.account_id
+WHERE
+  T3.status = 'D'"
+financial,financial_005,How many percent of 'Gold' cards were issued prior to 1998?,"SELECT CAST(SUM(type = 'gold' AND STRFTIME('%Y', issued) < '1998') AS REAL) * 100 / COUNT(card_id) FROM card","SELECT
+  CAST(SUM(CASE WHEN T1.type = 'gold' AND STRFTIME('%Y', T1.issued) < '1998' THEN 1 ELSE 0 END) AS REAL) * 100 / COUNT(T1.card_id)
+FROM card AS T1"
+financial,financial_006,What was the growth rate of the total amount of loans across all accounts for a male client between 1996 and 1997?,"SELECT CAST((SUM(CASE WHEN STRFTIME('%Y', T1.date) = '1997' THEN T1.amount ELSE 0 END) - SUM(CASE WHEN STRFTIME('%Y', T1.date) = '1996' THEN T1.amount ELSE 0 END)) AS REAL) * 100 / SUM(CASE WHEN STRFTIME('%Y', T1.date) = '1996' THEN T1.amount ELSE 0 END) FROM loan AS T1 INNER JOIN account AS T2 ON T1.account_id = T2.account_id INNER JOIN disp AS T3 ON T3.account_id = T2.account_id INNER JOIN client AS T4 ON T4.client_id = T3.client_id WHERE T4.gender = 'M' AND T3.type = 'OWNER'","SELECT
+  CAST(SUM(CASE WHEN STRFTIME('%Y', T1.date) = '1997' THEN T1.amount ELSE 0 END) - SUM(CASE WHEN STRFTIME('%Y', T1.date) = '1996' THEN T1.amount ELSE 0 END) AS REAL) * 100 / SUM(CASE WHEN STRFTIME('%Y', T1.date) = '1996' THEN T1.amount ELSE 0 END)
+FROM loan AS T1
+INNER JOIN account AS T2
+  ON T1.account_id = T2.account_id
+INNER JOIN disp AS T3
+  ON T2.account_id = T3.account_id
+INNER JOIN client AS T4
+  ON T3.client_id = T4.client_id
+WHERE
+  T4.gender = 'M'"
+financial,financial_007,What proportion of customers who have accounts at the Prague branch are female?,SELECT CAST(SUM(T2.gender = 'F') AS REAL) / COUNT(T2.client_id) * 100 FROM district AS T1 INNER JOIN client AS T2 ON T1.district_id = T2.district_id WHERE T1.A3 = 'Prague',"SELECT
+  CAST(SUM(CASE WHEN T3.gender = 'F' THEN 1 ELSE 0 END) AS REAL) * 100 / COUNT(T1.client_id)
+FROM client AS T1
+INNER JOIN disp AS T2
+  ON T1.client_id = T2.client_id
+INNER JOIN account AS T3
+  ON T2.account_id = T3.account_id
+INNER JOIN district AS T4
+  ON T3.district_id = T4.district_id
+WHERE
+  T4.A3 = 'Prague'"
+financial,financial_008,What percentage of male clients request for weekly statements to be issued?,SELECT CAST(SUM(T1.gender = 'M') AS REAL) * 100 / COUNT(T1.client_id) FROM client AS T1 INNER JOIN district AS T3 ON T1.district_id = T3.district_id INNER JOIN account AS T2 ON T2.district_id = T3.district_id INNER JOIN disp as T4 on T1.client_id = T4.client_id AND T2.account_id = T4.account_id WHERE T2.frequency = 'POPLATEK TYDNE',"SELECT
+  CAST(SUM(CASE WHEN T1.gender = 'M' THEN 1 ELSE 0 END) AS REAL) * 100 / COUNT(T1.client_id)
+FROM client AS T1
+INNER JOIN disp AS T2
+  ON T1.client_id = T2.client_id
+INNER JOIN account AS T3
+  ON T2.account_id = T3.account_id
+WHERE
+  T3.frequency = 'POPLATEK TYDNE'"
+formula_1,formula_1_000,"Paul di Resta was in the No. 853 race, what percent faster did he finish in the 853rd race than the next race for the fastest lap speed?","SELECT (SUM(IIF(T2.raceId = 853, T2.fastestLapSpeed, 0)) - SUM(IIF(T2.raceId = 854, T2.fastestLapSpeed, 0))) * 100 / SUM(IIF(T2.raceId = 853, T2.fastestLapSpeed, 0)) FROM drivers AS T1 INNER JOIN results AS T2 ON T2.driverId = T1.driverId WHERE T1.forename = 'Paul' AND T1.surname = 'di Resta'",SELECT CAST((T1.fastestLapSpeed - T2.fastestLapSpeed) AS REAL) * 100 / T1.fastestLapSpeed FROM results AS T1 INNER JOIN results AS T2 ON T1.driverId = T2.driverId INNER JOIN drivers AS T3 ON T1.driverId = T3.driverId WHERE T3.forename = 'Paul' AND T3.surname = 'di Resta' AND T1.raceId = 853 AND T2.raceId = 854
+formula_1,formula_1_001,"For the drivers who took part in the race in 1983/7/16, what's their race completion rate?",SELECT CAST(COUNT(CASE WHEN T2.time IS NOT NULL THEN T2.driverId END) AS REAL) * 100 / COUNT(T2.driverId) FROM races AS T1 INNER JOIN results AS T2 ON T2.raceId = T1.raceId WHERE T1.date = '1983-07-16',SELECT CAST(SUM(CASE WHEN T1.time IS NOT NULL THEN 1 ELSE 0 END) AS REAL) * 100 / COUNT(T1.driverId) FROM results AS T1 INNER JOIN races AS T2 ON T1.raceId = T2.raceId WHERE T2.date = '1983-07-16'
+formula_1,formula_1_002,Calculate the percentage whereby Hamilton was not at the 1st track of the the f1 circuit since 2010.,SELECT CAST(COUNT(CASE WHEN T2.position <> 1 THEN T2.position END) AS REAL) * 100 / COUNT(T2.driverStandingsId) FROM races AS T1 INNER JOIN driverStandings AS T2 ON T2.raceId = T1.raceId INNER JOIN drivers AS T3 ON T3.driverId = T2.driverId WHERE T3.surname = 'Hamilton' AND T1.year >= 2010,"SELECT
+  CAST(SUM(CASE WHEN T3.surname = 'Hamilton' AND T1.position > 1 THEN 1 ELSE 0 END) AS REAL) * 100 / COUNT(T1.raceId)
+FROM results AS T1
+INNER JOIN races AS T2
+  ON T1.raceId = T2.raceId
+INNER JOIN drivers AS T3
+  ON T1.driverId = T3.driverId
+WHERE
+  T3.surname = 'Hamilton' AND T2.year >= 2010"
+formula_1,formula_1_003,"Among all European Grand Prix races, what is the percentage of the races were hosted in Germany?",SELECT CAST(COUNT(CASE WHEN T1.country = 'Germany' THEN T2.circuitID END) AS REAL) * 100 / COUNT(T2.circuitId) FROM circuits AS T1 INNER JOIN races AS T2 ON T2.circuitID = T1.circuitId WHERE T2.name = 'European Grand Prix',"SELECT
+  CAST(SUM(CASE WHEN T1.country = 'Germany' THEN 1 ELSE 0 END) AS REAL) * 100 / COUNT(T1.country)
+FROM circuits AS T1
+INNER JOIN races AS T2
+  ON T1.circuitId = T2.circuitId
+WHERE
+  T2.name = 'European Grand Prix'"
+formula_1,formula_1_004,What is the rate of drivers completing all the laps in the 2008 Australian Grand Prix?,"SELECT CAST(SUM(IIF(T1.time IS NOT NULL, 1, 0)) AS REAL) * 100 / COUNT(T1.resultId) FROM results AS T1 INNER JOIN races AS T2 ON T1.raceId = T2.raceId WHERE T2.name = 'Australian Grand Prix' AND T2.year = 2008",SELECT CAST(SUM(CASE WHEN T1.time IS NOT NULL THEN 1 ELSE 0 END) AS REAL) * 1.0 / COUNT(T1.raceId) FROM results AS T1 INNER JOIN races AS T2 ON T1.raceId = T2.raceId WHERE T2.name = 'Australian Grand Prix' AND T2.year = 2008
+formula_1,formula_1_005,How much faster in percentage is the champion than the driver who finished the race last in the 2008 Australian Grand Prix?,"WITH time_in_seconds AS ( SELECT T1.positionOrder, CASE WHEN T1.positionOrder = 1 THEN (CAST(SUBSTR(T1.time, 1, 1) AS REAL) * 3600) + (CAST(SUBSTR(T1.time, 3, 2) AS REAL) * 60) + CAST(SUBSTR(T1.time, 6) AS REAL) ELSE CAST(SUBSTR(T1.time, 2) AS REAL) END AS time_seconds FROM results AS T1 INNER JOIN races AS T2 ON T1.raceId = T2.raceId WHERE T2.name = 'Australian Grand Prix' AND T1.time IS NOT NULL AND T2.year = 2008 ), champion_time AS ( SELECT time_seconds FROM time_in_seconds WHERE positionOrder = 1), last_driver_incremental AS ( SELECT time_seconds FROM time_in_seconds WHERE positionOrder = (SELECT MAX(positionOrder) FROM time_in_seconds) ) SELECT (CAST((SELECT time_seconds FROM last_driver_incremental) AS REAL) * 100) / (SELECT time_seconds + (SELECT time_seconds FROM last_driver_incremental) FROM champion_time)","SELECT
+  CAST(SUM(CASE WHEN T1.position = 1 THEN T1.milliseconds ELSE 0 END) AS REAL) * 100 / SUM(CASE WHEN T1.position = (
+    SELECT
+      MAX(T1.position)
+    FROM results AS T1
+    INNER JOIN races AS T2
+      ON T1.raceId = T2.raceId
+    WHERE
+      T2.name = 'Australian Grand Prix' AND T2.year = 2008 AND T1.time IS NOT NULL
+  ) THEN T1.milliseconds ELSE 0 END) - 100
+FROM results AS T1
+INNER JOIN races AS T2
+  ON T1.raceId = T2.raceId
+WHERE
+  T2.name = 'Australian Grand Prix' AND T2.year = 2008 AND T1.time IS NOT NULL"
+formula_1,formula_1_006,Please calculate the race completion percentage of Japanese drivers from 2007 to 2009.,"SELECT CAST(SUM(IIF(T1.time IS NOT NULL, 1, 0)) AS REAL) * 100 / COUNT(T1.raceId) FROM results AS T1 INNER JOIN races AS T2 on T1.raceId = T2.raceId INNER JOIN drivers AS T3 on T1.driverId = T3.driverId WHERE T3.nationality = 'Japanese' AND T2.year BETWEEN 2007 AND 2009",SELECT CAST(SUM(CASE WHEN T1.time IS NOT NULL THEN 1 ELSE 0 END) AS REAL) * 100 / COUNT(T1.driverId) FROM results AS T1 INNER JOIN drivers AS T2 ON T1.driverId = T2.driverId INNER JOIN races AS T3 ON T1.raceId = T3.raceId WHERE T2.nationality = 'Japanese' AND T3.year BETWEEN 2007 AND 2009
+formula_1,formula_1_007,"From 2000 to 2005, what percentage of drivers who were born before 1985 and the lap numbers were over 50?","SELECT CAST(SUM(IIF(STRFTIME('%Y', T3.dob) < '1985' AND T1.laps > 50, 1, 0)) AS REAL) * 100 / COUNT(*) FROM results AS T1 INNER JOIN races AS T2 on T1.raceId = T2.raceId INNER JOIN drivers AS T3 on T1.driverId = T3.driverId WHERE T2.year BETWEEN 2000 AND 2005",SELECT CAST(SUM(CASE WHEN T1.dob < '1985-01-01' AND T3.laps > 50 THEN 1 ELSE 0 END) AS REAL) * 100 / COUNT(T1.driverId) FROM drivers AS T1 INNER JOIN results AS T3 ON T1.driverId = T3.driverId INNER JOIN races AS T2 ON T3.raceId = T2.raceId WHERE T2.year BETWEEN 2000 AND 2005
+formula_1,formula_1_008,"In the race a driver set the lap record for the Austrian Grand Prix Circuit, how long did he spent at the pit stop at that same race?","WITH fastest_lap_times AS ( SELECT T1.raceId, T1.driverId, T1.FastestLapTime, (CAST(SUBSTR(T1.FastestLapTime, 1, INSTR(T1.FastestLapTime, ':') - 1) AS REAL) * 60) + (CAST(SUBSTR(T1.FastestLapTime, INSTR(T1.FastestLapTime, ':') + 1, INSTR(T1.FastestLapTime, '.') - INSTR(T1.FastestLapTime, ':') - 1) AS REAL)) + (CAST(SUBSTR(T1.FastestLapTime, INSTR(T1.FastestLapTime, '.') + 1) AS REAL) / 1000) as time_in_seconds FROM results AS T1 WHERE T1.FastestLapTime IS NOT NULL), lap_record_race AS ( SELECT T1.raceId, T1.driverId FROM results AS T1 INNER JOIN races AS T2 on T1.raceId = T2.raceId INNER JOIN circuits AS T3 on T2.circuitId = T3.circuitId INNER JOIN ( SELECT MIN(fastest_lap_times.time_in_seconds) as min_time_in_seconds FROM fastest_lap_times INNER JOIN races AS T2 on fastest_lap_times.raceId = T2.raceId INNER JOIN circuits AS T3 on T2.circuitId = T3.circuitId WHERE T2.name = 'Austrian Grand Prix') AS T4 ON (CAST(SUBSTR(T1.FastestLapTime, 1, INSTR(T1.FastestLapTime, ':') - 1) AS REAL) * 60) + (CAST(SUBSTR(T1.FastestLapTime, INSTR(T1.FastestLapTime, ':') + 1, INSTR(T1.FastestLapTime, '.') - INSTR(T1.FastestLapTime, ':') - 1) AS REAL)) + (CAST(SUBSTR(T1.FastestLapTime, INSTR(T1.FastestLapTime, '.') + 1) AS REAL) / 1000) = T4.min_time_in_seconds WHERE T2.name = 'Austrian Grand Prix') SELECT T4.duration FROM lap_record_race INNER JOIN pitStops AS T4 on lap_record_race.raceId = T4.raceId AND lap_record_race.driverId = T4.driverId","SELECT
+  T3.duration
+FROM races AS T1
+INNER JOIN lapTimes AS T2
+  ON T1.raceId = T2.raceId
+INNER JOIN pitStops AS T3
+  ON T1.raceId = T3.raceId
+WHERE
+  T1.name = 'Austrian Grand Prix' AND T2.time = (
+    SELECT
+      MIN(time)
+    FROM lapTimes
+    WHERE
+      raceId = T1.raceId
+  )"
+student_club,student_club_000,What is the average attendance of meetings in 2020?,"SELECT CAST(COUNT(T2.link_to_event) AS REAL) / COUNT(DISTINCT T2.link_to_event) FROM event AS T1 INNER JOIN attendance AS T2 ON T1.event_id = T2.link_to_event WHERE SUBSTR(T1.event_date, 1, 4) = '2020' AND T1.type = 'Meeting'","SELECT CAST(COUNT(T1.link_to_member) AS REAL) / COUNT(DISTINCT T2.event_name) FROM attendance AS T1 INNER JOIN event AS T2 ON T1.link_to_event = T2.event_id WHERE T2.type = 'Meeting' AND STRFTIME('%Y', T2.event_date) = '2020'"
+student_club,student_club_001,"How many times was the budget in Advertisement for ""Yearly Kickoff"" meeting more than ""October Meeting""?",SELECT CAST(SUM(CASE WHEN T2.event_name = 'Yearly Kickoff' THEN T1.amount ELSE 0 END) AS REAL) / SUM(CASE WHEN T2.event_name = 'October Meeting' THEN T1.amount ELSE 0 END) FROM budget AS T1 INNER JOIN event AS T2 ON T1.link_to_event = T2.event_id WHERE T1.category = 'Advertisement' AND T2.type = 'Meeting',"SELECT
+  SUM(CASE WHEN T1.amount > T2.amount THEN 1 ELSE 0 END)
+FROM budget AS T1
+INNER JOIN budget AS T2
+  ON T1.link_to_event = T2.link_to_event
+WHERE
+  T1.category = 'Advertisement' AND T2.category = 'Advertisement' AND T1.link_to_event = (
+    SELECT
+      event_id
+    FROM event
+    WHERE
+      event_name = 'Yearly Kickoff'
+  ) AND T2.link_to_event = (
+    SELECT
+      event_id
+    FROM event
+    WHERE
+      event_name = 'October Meeting'
+  )"
+student_club,student_club_002,"What percentage was the budget for Parking to the total budget for the ""November Speaker""?",SELECT CAST(SUM(CASE WHEN T1.category = 'Parking' THEN T1.amount ELSE 0 END) AS REAL) * 100 / SUM(T1.amount) FROM budget AS T1 INNER JOIN event AS T2 ON T1.link_to_event = T2.event_id WHERE T2.event_name = 'November Speaker',SELECT CAST(SUM(CASE WHEN T1.category = 'Parking' THEN T1.amount ELSE 0 END) AS REAL) * 100 / SUM(T1.amount) FROM budget AS T1 INNER JOIN event AS T2 ON T1.link_to_event = T2.event_id WHERE T2.event_name = 'November Speaker'
+student_club,student_club_003,"Among all the closed events, which event has the highest spend-to-budget ratio?",SELECT T2.event_name FROM budget AS T1 INNER JOIN event AS T2 ON T1.link_to_event = T2.event_id WHERE T2.status = 'Closed' ORDER BY T1.spent / T1.amount DESC LIMIT 1,"SELECT
+  T1.event_name
+FROM event AS T1
+INNER JOIN budget AS T2
+  ON T1.event_id = T2.link_to_event
+WHERE
+  T1.status = 'Closed'
+ORDER BY
+  T2.spent / T2.amount DESC
+LIMIT 1"
+student_club,student_club_004,"Based on the total cost for all event, what is the percentage of cost for Yearly Kickoff event?",SELECT CAST(SUM(CASE WHEN T1.event_name = 'Yearly Kickoff' THEN T3.cost ELSE 0 END) AS REAL) * 100 / SUM(T3.cost) FROM event AS T1 INNER JOIN budget AS T2 ON T1.event_id = T2.link_to_event INNER JOIN expense AS T3 ON T2.budget_id = T3.link_to_budget,"SELECT
+  SUM(CASE WHEN T1.event_name = 'Yearly Kickoff' THEN T3.cost ELSE 0 END) * 100 / SUM(T3.cost)
+FROM event AS T1
+INNER JOIN budget AS T2
+  ON T1.event_id = T2.link_to_event
+INNER JOIN expense AS T3
+  ON T2.budget_id = T3.link_to_budget"
+student_club,student_club_005,"On average, how much did the Student_Club spend on food for the typical event in the past?",SELECT SUM(spent) / COUNT(spent) FROM budget WHERE category = 'Food' AND event_status = 'Closed',SELECT SUM(T1.spent) / COUNT(T1.spent) FROM budget AS T1 INNER JOIN event AS T2 ON T1.link_to_event = T2.event_id WHERE T1.category = 'Food' AND T2.status = 'Closed'
+student_club,student_club_006,"Among all events hold by the Student_Club in 2019, find the percentage share of events related to 'Community Service'","SELECT CAST(SUM(CASE WHEN type = 'Community Service' THEN 1 ELSE 0 END) AS REAL) * 100 / COUNT(type) FROM event WHERE SUBSTR(event_date, 1, 4) = '2019'",SELECT CAST(SUM(CASE WHEN type = 'Community Service' THEN 1 ELSE 0 END) AS REAL) * 100 / COUNT(event_id) FROM event WHERE event_date BETWEEN '2019-01-01' AND '2019-12-31'
+student_club,student_club_007,Calculate the percentage of members who are major Business in the list?,SELECT CAST(SUM(CASE WHEN T2.major_name = 'Business' THEN 1 ELSE 0 END) AS REAL) * 100 / COUNT(T1.member_id) FROM member AS T1 INNER JOIN major AS T2 ON T2.major_id = T1.link_to_major WHERE T1.position = 'Member',SELECT CAST(SUM(CASE WHEN T1.position = 'Member' AND T2.major_name = 'Business' THEN 1 ELSE 0 END) AS REAL) * 100 / COUNT(T1.member_id) FROM member AS T1 INNER JOIN major AS T2 ON T1.link_to_major = T2.major_id
+student_club,student_club_008,"Among the members with t-shirt size of medium, what is the percentage of the amount 50 received by the Student_Club?",SELECT CAST(SUM(CASE WHEN T2.amount = 50 THEN 1.0 ELSE 0 END) AS REAL) * 100 / COUNT(T2.income_id) FROM member AS T1 INNER JOIN income AS T2 ON T1.member_id = T2.link_to_member WHERE T1.position = 'Member' AND T1.t_shirt_size = 'Medium',SELECT CAST(SUM(CASE WHEN T1.amount = 50 THEN 1 ELSE 0 END) AS REAL) * 100 / COUNT(T1.member_id) FROM income AS T1 INNER JOIN member AS T2 ON T1.link_to_member = T2.member_id WHERE T2.t_shirt_size = 'Medium'
+student_club,student_club_009,What is the percentage of the events that went over budget?,SELECT CAST(SUM(CASE WHEN remaining < 0 THEN 1 ELSE 0 END) AS REAL) * 100 / COUNT(budget_id) FROM budget,SELECT CAST(SUM(CASE WHEN T1.remaining < 0 THEN 1 ELSE 0 END) AS REAL) * 100 / COUNT(T1.event_status) FROM budget AS T1
+student_club,student_club_010,Calculate the percentage of zip codes that are PO boxes.,SELECT CAST(SUM(CASE WHEN type = 'PO Box' THEN 1 ELSE 0 END) AS REAL) * 100 / COUNT(zip_code) FROM zip_code,SELECT CAST(SUM(CASE WHEN type = 'PO Box' THEN 1 ELSE 0 END) AS REAL) * 100 / COUNT(zip_code) FROM zip_code
+student_club,student_club_011,What is the percentage of the cost for the meeting events?,SELECT SUM(CASE WHEN T1.type = 'Meeting' THEN T3.cost ELSE 0 END) * 100 / SUM(T3.cost) FROM event AS T1 INNER JOIN budget AS T2 ON T1.event_id = T2.link_to_event INNER JOIN expense AS T3 ON T2.budget_id = T3.link_to_budget,SELECT CAST(SUM(T1.cost) AS REAL) * 100 / COUNT(T2.event_id) FROM expense AS T1 INNER JOIN budget AS T2 ON T1.link_to_budget = T2.budget_id INNER JOIN event AS T3 ON T2.link_to_event = T3.event_id WHERE T3.type = 'Meeting'
+student_club,student_club_012,Calculate the difference in the percentage of members in New Jersey and Vermont.,SELECT CAST((SUM(CASE WHEN T2.state = 'New Jersey' THEN 1 ELSE 0 END) - SUM(CASE WHEN T2.state = 'Vermont' THEN 1 ELSE 0 END)) AS REAL) * 100 / COUNT(T1.member_id) AS diff FROM member AS T1 INNER JOIN zip_code AS T2 ON T2.zip_code = T1.zip,"SELECT
+  CAST(SUM(CASE WHEN T3.state = 'New Jersey' THEN 1 ELSE 0 END) AS REAL) * 100 / COUNT(T1.member_id) - CAST(SUM(CASE WHEN T3.state = 'Vermont' THEN 1 ELSE 0 END) AS REAL) * 100 / COUNT(T1.member_id)
+FROM member AS T1
+INNER JOIN zip_code AS T3
+  ON T1.zip = T3.zip_code
+WHERE
+  T1.position = 'Member'"
+superhero,superhero_000,"In superheroes with height between 150 to 180, what is the percentage of heroes published by Marvel Comics?",SELECT CAST(COUNT(CASE WHEN T2.publisher_name = 'Marvel Comics' THEN 1 ELSE NULL END) AS REAL) * 100 / COUNT(T1.id) FROM superhero AS T1 INNER JOIN publisher AS T2 ON T1.publisher_id = T2.id WHERE T1.height_cm BETWEEN 150 AND 180,"SELECT
+  CAST(SUM(CASE WHEN T3.publisher_name = 'Marvel Comics' THEN 1 ELSE 0 END) AS REAL) * 100 / COUNT(T1.id)
+FROM superhero AS T1
+INNER JOIN publisher AS T3
+  ON T1.publisher_id = T3.id
+WHERE
+  T1.height_cm BETWEEN 150 AND 180"
+superhero,superhero_001,What is the average of superheroes with no skin colour?,SELECT CAST(COUNT(*) AS REAL) / SUM(CASE WHEN T2.id = 1 THEN 1 ELSE 0 END) FROM superhero AS T1 INNER JOIN colour AS T2 ON T1.skin_colour_id = T2.id,SELECT CAST(COUNT(id) AS REAL) / SUM(CASE WHEN skin_colour_id = 1 THEN 1 ELSE 0 END) FROM superhero
+superhero,superhero_002,What is the percentage of blue female superheroes among all female superheroes?,SELECT CAST(COUNT(CASE WHEN T3.colour = 'Blue' THEN T1.id ELSE NULL END) AS REAL) * 100 / COUNT(T1.id) FROM superhero AS T1 INNER JOIN gender AS T2 ON T1.gender_id = T2.id INNER JOIN colour AS T3 ON T1.skin_colour_id = T3.id WHERE T2.gender = 'Female',"SELECT
+  CAST(SUM(CASE WHEN T3.colour = 'Blue' THEN 1 ELSE 0 END) AS REAL) * 100 / COUNT(T1.id)
+FROM superhero AS T1
+INNER JOIN gender AS T2
+  ON T1.gender_id = T2.id
+INNER JOIN colour AS T3
+  ON T1.skin_colour_id = T3.id
+WHERE
+  T2.gender = 'Female'"
+superhero,superhero_003,How many percent of female heroes were published by Marvel Comics?,SELECT CAST(COUNT(CASE WHEN T2.publisher_name = 'Marvel Comics' THEN 1 ELSE NULL END) AS REAL) * 100 / COUNT(T1.id) FROM superhero AS T1 INNER JOIN publisher AS T2 ON T1.publisher_id = T2.id INNER JOIN gender AS T3 ON T1.gender_id = T3.id WHERE T3.gender = 'Female',SELECT CAST(SUM(CASE WHEN T2.gender = 'Female' THEN 1 ELSE 0 END) AS REAL) * 100 / COUNT(T1.id) FROM superhero AS T1 INNER JOIN gender AS T2 ON T1.gender_id = T2.id INNER JOIN publisher AS T3 ON T1.publisher_id = T3.id WHERE T3.publisher_name = 'Marvel Comics'
+superhero,superhero_004,Calculate the average height for each superhero.,SELECT CAST(SUM(height_cm) AS REAL) / COUNT(id) FROM superhero,"SELECT
+  superhero_name,
+  AVG(height_cm)
+FROM superhero
+GROUP BY
+  superhero_name"
+superhero,superhero_005,Calculate the percentage of superheroes with blue eyes.,SELECT CAST(COUNT(CASE WHEN T2.colour = 'Blue' THEN 1 ELSE NULL END) AS REAL) * 100 / COUNT(T1.id) FROM superhero AS T1 INNER JOIN colour AS T2 ON T1.eye_colour_id = T2.id,SELECT CAST(SUM(CASE WHEN T2.colour = 'Blue' THEN 1 ELSE 0 END) AS REAL) * 100 / COUNT(T1.id) FROM superhero AS T1 INNER JOIN colour AS T2 ON T1.eye_colour_id = T2.id
+superhero,superhero_006,Find the ratio between male superheroes and female superheroes.,SELECT CAST(COUNT(CASE WHEN T2.gender = 'Male' THEN T1.id ELSE NULL END) AS REAL) / COUNT(CASE WHEN T2.gender = 'Female' THEN T1.id ELSE NULL END) FROM superhero AS T1 INNER JOIN gender AS T2 ON T1.gender_id = T2.id,SELECT CAST(SUM(CASE WHEN T1.gender = 'Female' THEN 1 ELSE 0 END) AS REAL) / SUM(CASE WHEN T1.gender = 'Male' THEN 1 ELSE 0 END) FROM gender AS T1 INNER JOIN superhero AS T2 ON T1.id = T2.gender_id
+superhero,superhero_007,"Among the bad superheroes, what is the percentage of female superheroes?",SELECT CAST(COUNT(CASE WHEN T3.gender = 'Female' THEN T1.id ELSE NULL END) AS REAL) * 100 / COUNT(T1.id) FROM superhero AS T1 INNER JOIN alignment AS T2 ON T1.alignment_id = T2.id INNER JOIN gender AS T3 ON T1.gender_id = T3.id WHERE T2.alignment = 'Bad',"SELECT
+  CAST(SUM(CASE WHEN T2.gender = 'Female' THEN 1 ELSE 0 END) AS REAL) * 100 / COUNT(T1.id)
+FROM superhero AS T1
+INNER JOIN gender AS T2
+  ON T1.gender_id = T2.id
+INNER JOIN alignment AS T3
+  ON T1.alignment_id = T3.id
+WHERE
+  T3.alignment = 'Bad'"
+superhero,superhero_008,"Among all superheroes created by George Lucas, identify the percentage of female superheroes.",SELECT CAST(COUNT(CASE WHEN T3.gender = 'Female' THEN 1 ELSE NULL END) AS REAL) * 100 / COUNT(T1.id) FROM superhero AS T1 INNER JOIN publisher AS T2 ON T1.publisher_id = T2.id INNER JOIN gender AS T3 ON T1.gender_id = T3.id WHERE T2.publisher_name = 'George Lucas',SELECT CAST(SUM(CASE WHEN T2.gender = 'Female' THEN 1 ELSE 0 END) AS REAL) * 100 / COUNT(T1.id) FROM superhero AS T1 INNER JOIN gender AS T2 ON T1.gender_id = T2.id INNER JOIN publisher AS T3 ON T1.publisher_id = T3.id WHERE T3.publisher_name = 'George Lucas'
+superhero,superhero_009,"Among all superheroes in Marvel Comics, identify the percentage of 'good' superheroes.",SELECT CAST(COUNT(CASE WHEN T3.alignment = 'Good' THEN T1.id ELSE NULL END) AS REAL) * 100 / COUNT(T1.id) FROM superhero AS T1 INNER JOIN publisher AS T2 ON T1.publisher_id = T2.id INNER JOIN alignment AS T3 ON T1.alignment_id = T3.id WHERE T2.publisher_name = 'Marvel Comics',"SELECT
+  CAST(SUM(CASE WHEN T3.alignment = 'Good' THEN 1 ELSE 0 END) AS REAL) * 100 / COUNT(T1.id)
+FROM superhero AS T1
+INNER JOIN publisher AS T2
+  ON T1.publisher_id = T2.id
+INNER JOIN alignment AS T3
+  ON T1.alignment_id = T3.id
+WHERE
+  T2.publisher_name = 'Marvel Comics'"
+thrombosis_prediction,thrombosis_prediction_000,Are there more in-patient or outpatient who were male? What is the deviation in percentage?,SELECT CAST(SUM(CASE WHEN Admission = '+' THEN 1 ELSE 0 END) AS REAL) * 100 / SUM(CASE WHEN Admission = '-' THEN 1 ELSE 0 END) FROM Patient WHERE SEX = 'M',"SELECT
+  CASE WHEN SUM(CASE WHEN T1.SEX = 'M' AND T1.Admission = '+' THEN 1 ELSE 0 END) > SUM(CASE WHEN T1.SEX = 'M' AND T1.Admission = '-' THEN 1 ELSE 0 END) THEN 'in-patient' ELSE 'outpatient' END,
+  CAST(SUM(CASE WHEN T1.SEX = 'M' AND T1.Admission = '+' THEN 1 ELSE 0 END) AS REAL) * 100 / SUM(CASE WHEN T1.SEX = 'M' AND T1.Admission = '-' THEN 1 ELSE 0 END)
+FROM Patient AS T1"
+thrombosis_prediction,thrombosis_prediction_001,What is the percentage of female patient were born after 1930?,"SELECT CAST(SUM(CASE WHEN STRFTIME('%Y', Birthday) > '1930' THEN 1 ELSE 0 END) AS REAL) * 100 / COUNT(*) FROM Patient WHERE SEX = 'F'","SELECT CAST(SUM(CASE WHEN STRFTIME('%Y', Birthday) > '1930' AND SEX = 'F' THEN 1 ELSE 0 END) AS REAL) * 100 / SUM(CASE WHEN SEX = 'F' THEN 1 ELSE 0 END) FROM Patient"
+thrombosis_prediction,thrombosis_prediction_002,"For patient born between Year 1930 to 1940, how many percent of them were inpatient?","SELECT CAST(SUM(CASE WHEN Admission = '+' THEN 1 ELSE 0 END) AS REAL) * 100 / COUNT(*) FROM Patient WHERE STRFTIME('%Y', Birthday) BETWEEN '1930' AND '1940'","SELECT CAST(SUM(CASE WHEN T1.Admission = '+' THEN 1 ELSE 0 END) AS REAL) * 100 / COUNT(T1.ID) FROM Patient AS T1 WHERE strftime('%Y', T1.Birthday) BETWEEN '1930' AND '1940'"
+thrombosis_prediction,thrombosis_prediction_003,What is the ratio of outpatient to inpatient followed up treatment among all the 'SLE' diagnosed patient?,SELECT SUM(CASE WHEN Admission = '+' THEN 1.0 ELSE 0 END) / SUM(CASE WHEN Admission = '-' THEN 1 ELSE 0 END) FROM Patient WHERE Diagnosis = 'SLE',SELECT CAST(SUM(CASE WHEN T1.Diagnosis = 'SLE' AND T1.Admission = '-' THEN 1 ELSE 0 END) AS REAL) / SUM(CASE WHEN T1.Diagnosis = 'SLE' AND T1.Admission = '+' THEN 1 ELSE 0 END) FROM Patient AS T1
+thrombosis_prediction,thrombosis_prediction_004,What is the percentage of female patient had total protein not within the normal range?,SELECT CAST(SUM(CASE WHEN T1.SEX = 'F' AND (T2.TP < 6.0 OR T2.TP > 8.5) THEN 1 ELSE 0 END) AS REAL) * 100 / COUNT(*) FROM Patient AS T1 INNER JOIN Laboratory AS T2 ON T1.ID = T2.ID WHERE T1.SEX = 'F',SELECT CAST(SUM(CASE WHEN T1.SEX = 'F' AND (T2.TP < 6.0 OR T2.TP > 8.5) THEN 1 ELSE 0 END) AS REAL) * 100 / COUNT(T1.ID) FROM Patient AS T1 INNER JOIN Laboratory AS T2 ON T1.ID = T2.ID
+thrombosis_prediction,thrombosis_prediction_005,How many female patients who came at the hospital in 1997 was immediately followed at the outpatient clinic?,"SELECT COUNT(*) FROM Patient WHERE STRFTIME('%Y', Description) = '1997' AND SEX = 'F' AND Admission = '-'","SELECT COUNT(*) FROM Patient WHERE SEX = 'F' AND strftime('%Y', Description) = '1997' AND Admission = '-'"
+thrombosis_prediction,thrombosis_prediction_006,"For the year that concluded on December 31, 1998, how many male patients on average were tested in the lab each month?","SELECT CAST(COUNT(T1.ID) AS REAL) / 12 FROM Patient AS T1 INNER JOIN Laboratory AS T2 ON T1.ID = T2.ID WHERE STRFTIME('%Y', T2.Date) = '1998' AND T1.SEX = 'M'","SELECT
+  CAST(COUNT(T1.ID) AS REAL) / 12
+FROM Patient AS T1
+INNER JOIN Laboratory AS T2
+  ON T1.ID = T2.ID
+WHERE
+  T2.Date BETWEEN '1998-01-01' AND '1998-12-31' AND T1.SEX = 'M'"
+thrombosis_prediction,thrombosis_prediction_007,What is the ratio of male to female patients among all those with abnormal uric acid counts?,SELECT CAST(SUM(CASE WHEN T2.UA <= 8.0 AND T1.SEX = 'M' THEN 1 ELSE 0 END) AS REAL) / SUM(CASE WHEN T2.UA <= 6.5 AND T1.SEX = 'F' THEN 1 ELSE 0 END) FROM Patient AS T1 INNER JOIN Laboratory AS T2 ON T1.ID = T2.ID,SELECT CAST(SUM(CASE WHEN T1.SEX = 'M' AND T2.UA <= 8.0 THEN 1 ELSE 0 END) AS REAL) / SUM(CASE WHEN T1.SEX = 'F' AND T2.UA <= 6.5 THEN 1 ELSE 0 END) FROM Patient AS T1 INNER JOIN Laboratory AS T2 ON T1.ID = T2.ID WHERE (T1.SEX = 'M' AND T2.UA <= 8.0) OR (T1.SEX = 'F' AND T2.UA <= 6.5)
+thrombosis_prediction,thrombosis_prediction_008,"For the patient who first came to the hospital on 1991/6/13 who was diagnosed with SJS, what is the total number of his/her Laboratory tests in 1995?","SELECT COUNT(*) FROM Laboratory WHERE ID = ( SELECT ID FROM Patient WHERE `First Date` = '1991-06-13' AND Diagnosis = 'SJS' ) AND STRFTIME('%Y', Date) = '1995'","SELECT
+  COUNT(T1.ID)
+FROM Laboratory AS T1
+INNER JOIN Patient AS T2
+  ON T1.ID = T2.ID
+WHERE
+  T2.`First Date` = '1991-06-13' AND T2.Diagnosis = 'SJS' AND STRFTIME('%Y', T1.Date) = '1995'"
+thrombosis_prediction,thrombosis_prediction_009,"For the patient who was born on 1959/2/18, what is the decrease rate for his/her total cholesterol from November to December in 1981?",SELECT CAST((SUM(CASE WHEN T2.Date LIKE '1981-11-%' THEN T2.`T-CHO` ELSE 0 END) - SUM(CASE WHEN T2.Date LIKE '1981-12-%' THEN T2.`T-CHO` ELSE 0 END)) AS REAL) / SUM(CASE WHEN T2.Date LIKE '1981-12-%' THEN T2.`T-CHO` ELSE 0 END) FROM Patient AS T1 INNER JOIN Laboratory AS T2 ON T1.ID = T2.ID WHERE T1.Birthday = '1959-02-18',SELECT CAST(SUM(CASE WHEN T2.Birthday = '1959-02-18' AND T1.Date LIKE '1981-11-%' THEN T1.`T-CHO` ELSE 0 END) - SUM(CASE WHEN T2.Birthday = '1959-02-18' AND T1.Date LIKE '1981-12-%' THEN T1.`T-CHO` ELSE 0 END) AS REAL) / SUM(CASE WHEN T2.Birthday = '1959-02-18' AND T1.Date LIKE '1981-11-%' THEN T1.`T-CHO` ELSE 0 END) FROM Laboratory AS T1 INNER JOIN Patient AS T2 ON T1.ID = T2.ID WHERE T2.Birthday = '1959-02-18' AND T1.Date LIKE '1981-11-%' OR T1.Date LIKE '1981-12-%'
+thrombosis_prediction,thrombosis_prediction_010,"What number of patients with a degree of thrombosis level 2 and ANA pattern of only S, have a level of anti-Cardiolip in antibody (IgM) 20% higher than average?",SELECT COUNT(*) FROM Examination WHERE Thrombosis = 2 AND `ANA Pattern` = 'S' AND `aCL IgM` > (SELECT AVG(`aCL IgM`) * 1.2 FROM Examination WHERE Thrombosis = 2 AND `ANA Pattern` = 'S'),"SELECT
+  COUNT(T1.ID)
+FROM Examination AS T1
+INNER JOIN Patient AS T2
+  ON T1.ID = T2.ID
+WHERE
+  T1.Thrombosis = 2 AND T1.`ANA Pattern` = 'S' AND T1.`aCL IgM` > (
+    SELECT
+      AVG(T3.`aCL IgM`) * 1.2
+    FROM Examination AS T3
+  )"
+thrombosis_prediction,thrombosis_prediction_011,What percentage of patients with a proteinuria level within the normal range have a uric acid level below the normal range?,SELECT CAST(SUM(CASE WHEN UA <= 6.5 THEN 1 ELSE 0 END) AS REAL) * 100 / COUNT(ID) FROM Laboratory WHERE `U-PRO` > 0 AND `U-PRO` < 30,"SELECT
+  CAST(SUM(CASE WHEN T1.UA <= 6.5 THEN 1 ELSE 0 END) AS REAL) * 100 / COUNT(T1.ID)
+FROM Laboratory AS T1
+WHERE
+  T1.`U-PRO` > 0 AND T1.`U-PRO` < 30"
+thrombosis_prediction,thrombosis_prediction_012,What percentage of male patients who first presented to the hospital in 1981 were diagnosed with BEHCET?,"SELECT CAST(SUM(CASE WHEN Diagnosis = 'BEHCET' THEN 1 ELSE 0 END) AS REAL) * 100 / COUNT(ID) FROM Patient WHERE STRFTIME('%Y', `First Date`) = '1981' AND SEX = 'M'","SELECT
+  CAST(SUM(CASE WHEN T1.Diagnosis = 'BEHCET' THEN 1 ELSE 0 END) AS REAL) * 100 / COUNT(T1.ID)
+FROM Patient AS T1
+WHERE
+  T1.SEX = 'M' AND STRFTIME('%Y', T1.`First Date`) = '1981'"
+thrombosis_prediction,thrombosis_prediction_013,What proportion of patients who had signs of thrombocytopenia had SLE diagnosed?,SELECT CAST(SUM(CASE WHEN Diagnosis = 'SLE' THEN 1 ELSE 0 END) AS REAL) * 100 / COUNT(ID) FROM Examination WHERE Symptoms = 'thrombocytopenia',"SELECT
+  CAST(SUM(CASE WHEN T1.Symptoms LIKE '%thrombocytopenia%' AND T1.Diagnosis LIKE '%SLE%' THEN 1 ELSE 0 END) AS REAL) * 100 / SUM(CASE WHEN T1.Symptoms LIKE '%thrombocytopenia%' THEN 1 ELSE 0 END)
+FROM Examination AS T1"
+thrombosis_prediction,thrombosis_prediction_014,What percentage of patients who were born in 1980 and were diagnosed with RA are women?,"SELECT CAST(SUM(CASE WHEN SEX = 'F' THEN 1 ELSE 0 END) AS REAL) * 100 / COUNT(ID) FROM Patient WHERE Diagnosis = 'RA' AND STRFTIME('%Y', Birthday) = '1980'","SELECT CAST(SUM(CASE WHEN T1.SEX = 'F' THEN 1 ELSE 0 END) AS REAL) * 100 / COUNT(T1.ID) FROM Patient AS T1 INNER JOIN Examination AS T2 ON T1.ID = T2.ID WHERE STRFTIME('%Y', T1.Birthday) = '1980' AND T2.Diagnosis = 'RA'"
+thrombosis_prediction,thrombosis_prediction_015,"For all patients who are older than 55 years old, what is the percentage of female who has abnormal prothrombin time (PT)?","SELECT CAST(SUM(CASE WHEN T2.PT >= 14 AND T1.SEX = 'F' THEN 1 ELSE 0 END) AS REAL) * 100 / COUNT(*) FROM Patient AS T1 INNER JOIN Laboratory AS T2 ON T1.ID = T2.ID WHERE STRFTIME('%Y', CURRENT_TIMESTAMP) - STRFTIME('%Y', T1.Birthday) > 55","SELECT
+  CAST(SUM(CASE WHEN T1.SEX = 'F' AND T2.PT >= 14 THEN 1 ELSE 0 END) AS REAL) * 100 / SUM(CASE WHEN T2.PT >= 14 THEN 1 ELSE 0 END)
+FROM Patient AS T1
+INNER JOIN Laboratory AS T2
+  ON T1.ID = T2.ID
+WHERE
+  STRFTIME('%Y', 'now') - STRFTIME('%Y', T1.Birthday) > 55"
+thrombosis_prediction,thrombosis_prediction_016,"What is the percentage of patient who has a abnormal level of glutamic oxaloacetic transaminase level, yet he or she is diagnosed with SLE?",SELECT COUNT(CASE WHEN T1.Diagnosis LIKE '%SLE%' THEN T1.ID ELSE 0 END) / COUNT(T1.ID) FROM Patient AS T1 INNER JOIN Laboratory AS T2 ON T1.ID = T2.ID WHERE T2.`GOT` >= 60,SELECT CAST(SUM(CASE WHEN T1.GOT >= 60 AND T2.Diagnosis = 'SLE' THEN 1 ELSE 0 END) AS REAL) * 100 / COUNT(T1.ID) FROM Laboratory AS T1 INNER JOIN Patient AS T2 ON T1.ID = T2.ID WHERE T1.GOT >= 60
+toxicology,toxicology_000,What is the percentage of carbon in double-bond molecules?,SELECT CAST(COUNT(DISTINCT CASE WHEN T1.element = 'c' THEN T1.atom_id ELSE NULL END) AS REAL) * 100 / COUNT(DISTINCT T1.atom_id) FROM atom AS T1 INNER JOIN bond AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.bond_type = '=',SELECT CAST(SUM(CASE WHEN T1.element = 'c' THEN 1 ELSE 0 END) AS REAL) * 100 / COUNT(T1.atom_id) FROM atom AS T1 INNER JOIN bond AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.bond_type = '='
+toxicology,toxicology_001,What percentage of carcinogenic-type molecules does not contain fluorine?,SELECT CAST(COUNT(DISTINCT CASE WHEN T1.element <> 'f' THEN T2.molecule_id ELSE NULL END) AS REAL) * 100 / COUNT(DISTINCT T2.molecule_id) FROM atom AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.label = '+',SELECT CAST(SUM(CASE WHEN T1.element = 'F' THEN 0 ELSE 1 END) AS REAL) * 100 / COUNT(T1.atom_id) FROM atom AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.label = '+'
+toxicology,toxicology_002,What is the percentage of carcinogenic molecules in triple type bonds?,SELECT CAST(COUNT(DISTINCT CASE WHEN T2.label = '+' THEN T2.molecule_id ELSE NULL END) AS REAL) * 100 / COUNT(DISTINCT T2.molecule_id) FROM atom AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id INNER JOIN bond AS T3 ON T2.molecule_id = T3.molecule_id WHERE T3.bond_type = '#',SELECT CAST(SUM(CASE WHEN T1.bond_type = '#' THEN 1 ELSE 0 END) AS REAL) * 100 / COUNT(T1.bond_id) FROM bond AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.label = '+'
+toxicology,toxicology_003,What is the percentage of double bonds in the molecule TR008? Please provide your answer as a percentage with five decimal places.,"SELECT ROUND(CAST(COUNT(CASE WHEN T.bond_type = '=' THEN T.bond_id ELSE NULL END) AS REAL) * 100 / COUNT(T.bond_id),5) FROM bond AS T WHERE T.molecule_id = 'TR008'","SELECT PRINTF('%.5f', CAST(SUM(CASE WHEN T1.bond_type = '=' THEN 1 ELSE 0 END) AS REAL) * 100 / COUNT(T1.bond_id)) FROM bond AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.molecule_id = 'TR008'"
+toxicology,toxicology_004,What is the percentage of molecules that are carcinogenic? Please provide your answer as a percentage with three decimal places.,"SELECT ROUND(CAST(COUNT(CASE WHEN T.label = '+' THEN T.molecule_id ELSE NULL END) AS REAL) * 100 / COUNT(T.molecule_id),3) FROM molecule t","SELECT PRINTF('%.3f', CAST(SUM(CASE WHEN label = '+' THEN 1 ELSE 0 END) AS REAL) * 100 / COUNT(molecule_id)) FROM molecule"
+toxicology,toxicology_005,How much of the hydrogen in molecule TR206 is accounted for? Please provide your answer as a percentage with four decimal places.,"SELECT ROUND(CAST(COUNT(CASE WHEN T.element = 'h' THEN T.atom_id ELSE NULL END) AS REAL) * 100 / COUNT(T.atom_id),4) FROM atom AS T WHERE T.molecule_id = 'TR206'",SELECT CAST(SUM(CASE WHEN T1.element = 'h' THEN 1 ELSE 0 END) AS REAL) * 100 / COUNT(T1.atom_id) FROM atom AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.molecule_id = 'TR206'
+toxicology,toxicology_006,What is the average number of bonds the atoms with the element iodine have?,SELECT CAST(COUNT(T2.bond_id) AS REAL) / COUNT(T1.atom_id) FROM atom AS T1 INNER JOIN connected AS T2 ON T1.atom_id = T2.atom_id WHERE T1.element = 'i',SELECT CAST(COUNT(T2.bond_id) AS REAL) / COUNT(T1.atom_id) FROM atom AS T1 INNER JOIN connected AS T2 ON T1.atom_id = T2.atom_id WHERE T1.element = 'i'
+toxicology,toxicology_007,What percentage of bonds have the most common combination of atoms' elements?,SELECT CAST((SELECT COUNT(T1.atom_id) FROM connected AS T1 INNER JOIN bond AS T2 ON T1.bond_id = T2.bond_id GROUP BY T2.bond_type ORDER BY COUNT(T2.bond_id) DESC LIMIT 1 ) AS REAL) * 100 / ( SELECT COUNT(atom_id) FROM connected ),"SELECT CAST(COUNT(T1.bond_id) AS REAL) * 100 / (SELECT COUNT(bond_id) FROM bond) FROM bond AS T1 INNER JOIN connected AS T2 ON T1.bond_id = T2.bond_id INNER JOIN atom AS T3 ON T2.atom_id = T3.atom_id INNER JOIN atom AS T4 ON T2.atom_id2 = T4.atom_id GROUP BY T3.element, T4.element ORDER BY COUNT(T1.bond_id) DESC LIMIT 1"
+toxicology,toxicology_008,What proportion of single bonds are carcinogenic? Please provide your answer as a percentage with five decimal places.,"SELECT ROUND(CAST(COUNT(CASE WHEN T2.label = '+' THEN T1.bond_id ELSE NULL END) AS REAL) * 100 / COUNT(T1.bond_id),5) FROM bond AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T1.bond_type = '-'","SELECT PRINTF('%.5f', CAST(SUM(CASE WHEN T1.label = '+' THEN 1 ELSE 0 END) AS REAL) * 100 / COUNT(T2.bond_id)) FROM molecule AS T1 INNER JOIN bond AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.bond_type = '-'"
+toxicology,toxicology_009,What is the composition of element chlorine in percentage among the single bond molecules?,"SELECT CAST(COUNT(CASE WHEN T.element = 'cl' THEN T.atom_id ELSE NULL END) AS REAL) * 100 / COUNT(T.atom_id) FROM ( SELECT T1.atom_id, T1.element FROM atom AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id INNER JOIN bond AS T3 ON T2.molecule_id = T3.molecule_id WHERE T3.bond_type = '-' ) AS T",SELECT CAST(SUM(CASE WHEN T1.element = 'cl' THEN 1 ELSE 0 END) AS REAL) * 100 / COUNT(T1.atom_id) FROM atom AS T1 INNER JOIN bond AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.bond_type = '-'
+toxicology,toxicology_010,What is the percentage of element chlorine in carcinogenic molecules?,SELECT CAST(COUNT( CASE WHEN T1.element = 'cl' THEN T1.element ELSE NULL END) AS REAL) * 100 / COUNT(T1.element) FROM atom AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.label = '+',SELECT CAST(SUM(CASE WHEN T1.element = 'cl' THEN 1 ELSE 0 END) AS REAL) * 100 / COUNT(T1.molecule_id) FROM atom AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.label = '+'
+toxicology,toxicology_011,"Among all chemical compounds that contain molecule TR047, identify the percent that form a double-bond.",SELECT CAST(COUNT(CASE WHEN T.bond_type = '=' THEN T.bond_id ELSE NULL END) AS REAL) * 100 / COUNT(T.bond_id) FROM bond AS T WHERE T.molecule_id = 'TR047',SELECT CAST(SUM(CASE WHEN T1.bond_type = ' = ' THEN 1 ELSE 0 END) AS REAL) * 100 / COUNT(T1.bond_id) FROM bond AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id WHERE T2.molecule_id = 'TR047'
+toxicology,toxicology_012,Calculate the percentage of molecules containing carcinogenic compounds that element is hydrogen.,SELECT CAST(COUNT(CASE WHEN T1.element = 'h' AND T2.label = '+' THEN T2.molecule_id ELSE NULL END) AS REAL) * 100 / COUNT(T2.molecule_id) FROM atom AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id,SELECT CAST(SUM(CASE WHEN T1.label = '+' AND T2.element = 'h' THEN 1 ELSE 0 END) AS REAL) * 100 / COUNT(T1.molecule_id) FROM molecule AS T1 INNER JOIN atom AS T2 ON T1.molecule_id = T2.molecule_id
+toxicology,toxicology_013,Calculate the percentage of carcinogenic molecules which contain the Chlorine element.,SELECT COUNT(CASE WHEN T2.label = '+' AND T1.element = 'cl' THEN T2.molecule_id ELSE NULL END) * 100 / COUNT(T2.molecule_id) FROM atom AS T1 INNER JOIN molecule AS T2 ON T1.molecule_id = T2.molecule_id,SELECT CAST(SUM(CASE WHEN T1.label = '+' AND T2.element = 'Cl' THEN 1 ELSE 0 END) AS REAL) * 100 / COUNT(T1.molecule_id) FROM molecule AS T1 INNER JOIN atom AS T2 ON T1.molecule_id = T2.molecule_id
+toxicology,toxicology_014,Find the percentage of atoms with single bond.,SELECT CAST(COUNT(CASE WHEN T.bond_type = '-' THEN T.bond_id ELSE NULL END) AS REAL) * 100 / COUNT(T.bond_id) FROM bond t,SELECT CAST(SUM(CASE WHEN T2.bond_type = '-' THEN 1 ELSE 0 END) AS REAL) * 100 / COUNT(T1.atom_id) FROM connected AS T1 INNER JOIN bond AS T2 ON T1.bond_id = T2.bond_id
+toxicology,toxicology_015,Calculate the percentage of carcinogenic molecules with triple bonded Hidrogen atoms.,SELECT CAST(SUM(CASE WHEN T1.label = '+' THEN 1 ELSE 0 END) AS REAL) * 100 / COUNT(DISTINCT T1.molecule_id) FROM molecule AS T1 INNER JOIN atom AS T2 ON T1.molecule_id = T2.molecule_id INNER JOIN bond AS T3 ON T1.molecule_id = T3.molecule_id WHERE T3.bond_type = '#' AND T2.element = 'h',SELECT CAST(SUM(CASE WHEN T1.label = '+' THEN 1 ELSE 0 END) AS REAL) * 100 / COUNT(T1.molecule_id) FROM molecule AS T1 INNER JOIN atom AS T2 ON T1.molecule_id = T2.molecule_id INNER JOIN bond AS T3 ON T1.molecule_id = T3.molecule_id WHERE T2.element = 'h' AND T3.bond_type = '#'

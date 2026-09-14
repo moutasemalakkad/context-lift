@@ -1,0 +1,56 @@
+Self-Route on BIRD toxicology, 2026-09-13
+gemini-2.5-flash, 139 gate-cleaned questions, 1 repetition per arm.
+
+THE IDEA, from Self-Route (arXiv 2407.16833, EMNLP 2024). Send the model the
+small selected context and an escape hatch: if this is not enough, say so,
+and only then pay for the full context. The paper measures a 65% cost cut at
+comparable accuracy on long-context QA.
+
+THE RESULT: THE ROUTE IS CLOSED. The model almost never takes the hatch, so
+there is nothing to escalate and nothing to save.
+
+  strict wording    2 of 139 escalated   1.4%
+  soft wording      not recoverable -- see below
+
+A firmer instruction did not raise the rate. That is the finding: the model is
+not declining to escalate because the instruction was too gentle.
+
+THE TWO WORDINGS, VERBATIM
+
+  soft:
+    If the information above is not enough to write a correct query for the
+    question, do not guess. Reply with exactly this one word: INSUFFICIENT
+
+  strict:
+    Before answering, check the text above against the question. You may only
+    answer if the text above names EVERY column you need and EVERY literal
+    value you must filter on. If you would have to guess a column name, guess
+    a filter value, or infer which of several tables a column belongs to,
+    then the text is not enough: reply with exactly this one word and nothing
+    else: INSUFFICIENT
+
+WHAT WAS LOST, AND HOW. Both runs were given the same --out path, so the
+second overwrote the first. The strict arm is what survives on disk
+(toxicology-route1_rep1.csv, 2 of 139 INSUFFICIENT, ids bird_0277 and
+bird_0290). The soft arm's rate was reported as about 4% while the session was
+running and CANNOT NOW BE CHECKED, so it is not quoted as a result here. Its
+token counts do survive, which is the only proof the run happened at all:
+
+  soft    139 calls,  61,579 prompt +  9,267 output + 33,643 thinking, $0.1257
+  strict  139 calls,  68,390 prompt +  9,389 output + 41,735 thinking, $0.1483
+
+Recovering the soft number costs $0.13 and 4 minutes. It has not been re-run,
+because the strict arm already answers the question the route was for: at
+1.4%, escalation cannot pay for itself whichever wording is used.
+
+WHY THE ESCAPE HATCH GOES UNUSED, stated as a guess and not a result. The
+model can write syntactically valid SQL from the schema alone, so "not enough
+information" is not a state it recognises. It does not need the context to
+produce an answer; it needs the context to produce the RIGHT answer, and it
+cannot tell those apart from the inside. Testing that would need questions
+whose context is deliberately insufficient, which this set does not contain.
+
+WHAT THIS DOES NOT SHOW. One database, one model, one repetition. It does not
+refute the paper, which measured long-context document QA and not text-to-SQL,
+and it says nothing about a cheaper escalation signal computed outside the
+model -- a retrieval score, or a schema-coverage check on the selected text.

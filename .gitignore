@@ -1,0 +1,43 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+*.egg-info/
+dist/
+build/
+.env
+# scratch SQLite DBs produced by `make example`
+examples/*/*.db
+examples/*.db
+_personal/
+.claude/worktrees/
+
+# scratch notes and audit files that agents leave in the repo root; both have
+# been committed by accident by a `git add -A`
+RECOMMENDATIONS.md
+AGENT_EXCHANGE.md
+
+# uv writes this whenever a bare `uv` command runs in the checkout. The core
+# has no dependencies and the Makefile passes --no-project precisely so the
+# cloud extras are never locked into the stdlib-only fast path.
+uv.lock
+
+# a workspace directory, created by running the loop in the checkout. Five
+# files reached commits by `git add -A` in one day; these are the nets.
+context/
+arms/
+runs/
+index.json
+pins.json
+WS/
+.scratch/
+
+# background job logs; the CLAUDE.md convention is to stream them here, so
+# they are working files rather than repo content
+logs/
+
+# A generated schema dump. `contextlift schema --out schema.txt` at the repo
+# root overwrites it, which is what happened on 2026-09-14: a tracked copy
+# swept in by accident went from 148 lines to 1. AGENTS.md uses the
+# name as an example output path, so the name will keep being typed here.
+schema.txt

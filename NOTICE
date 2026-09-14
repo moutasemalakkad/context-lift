@@ -1,0 +1,9 @@
+contextlift
+Copyright 2026 Moutasem Akkad <moutasemalakkad@gmail.com>
+
+This product is licensed under the Apache License, Version 2.0 (see LICENSE).
+
+Portions of the execution-comparison algorithm (src/context_lift/compare.py)
+are adapted from the reference implementation in taoyds/test-suite-sql-eval
+(Zhong, Yu, Klein, "Semantic Evaluation for Text-to-SQL with Distilled Test
+Suites", EMNLP 2020), which is itself Apache-2.0 licensed.

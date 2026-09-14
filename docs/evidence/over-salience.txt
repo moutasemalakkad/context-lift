@@ -1,0 +1,25 @@
+Over-salience, counted by scripts/salience_counts.py, 2026-09-13
+
+$ python scripts/salience_counts.py --work <run> --evidence <work> \
+      --database toxicology --column label
+toxicology: 139 question(s) in both arms, 3 repetition(s) each
+the column the evidence keeps naming: 'label'
+
+1. runs that put 'label' in the SELECT LIST, per arm
+   blob           74 of 417 runs   (182 name it anywhere in the statement)
+   selection      97 of 417 runs   (205 name it anywhere in the statement)
+   ratio        97 selection against 74 blob
+
+2. blob right and selection wrong, split on whether the question's OWN sentence names 'label'
+   sentence names it    12 of 61  broke  (20%, n=61)
+   sentence does not     7 of 78  broke  (9%, n=78)
+   two-sided Fisher exact p = 0.0839
+
+3. the competing explanation: the value is spread across sentences
+   of 19 broken question(s), 0 name a value that appears in no other sentence
+   (if the blob's advantage were breadth, this would be most of them, not a few)
+
+The hand count this replaces. While the session was running, the same
+effect was counted by eye as 37 select-list mentions against 9, and a
+break rate of 29% (n=38) against 5% (n=78). Neither survived being
+computed by a program. The numbers above are the ones to use.

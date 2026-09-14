@@ -1,0 +1,33 @@
+{
+  "project": "<project>",
+  "location": "global",
+  "steps": [
+    {
+      "step": "create glossary",
+      "status": 200,
+      "error": null
+    },
+    {
+      "step": "create category",
+      "status": 200,
+      "error": null
+    },
+    {
+      "step": "create term_in_category",
+      "status": 200,
+      "error": null
+    },
+    {
+      "step": "create term_in_glossary",
+      "status": 200,
+      "error": null
+    }
+  ],
+  "verdict": "TERM UNDER A CATEGORY WORKS",
+  "stored_parents": {
+    "revenue": "glossary",
+    "attach-rate": "category"
+  },
+  "one_list_sees_both_tiers": true,
+  "cleaned_up": true
+}

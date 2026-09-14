@@ -1,0 +1,29 @@
+cff-version: 1.2.0
+message: >-
+  If you use this software or its results in academic work, please cite it.
+  Its closest neighbours are benchmarks and papers, so someone will want to
+  cite it rather than link it.
+title: "context-lift: controlled context ablation for text-to-SQL agents"
+abstract: >-
+  A measurement framework that answers one question: does written business
+  context make a text-to-SQL data agent more accurate? It runs the same gold
+  questions through two arms that differ only in the authored context, scores
+  them by executing both the predicted and the reference SQL, and reports a
+  paired lift with an exact McNemar test, a separate safety count of answers
+  the context broke, and a refusal when the question set is too small to
+  resolve the effect it is being asked about.
+type: software
+authors:
+  - family-names: Akkad
+    given-names: Moutasem
+    email: moutasemalakkad@gmail.com
+repository-code: "https://github.com/moutasemalakkad/context-lift"
+license: Apache-2.0
+version: 0.1.0
+keywords:
+  - text-to-SQL
+  - evaluation
+  - ablation
+  - data agents
+  - retrieval
+  - business context

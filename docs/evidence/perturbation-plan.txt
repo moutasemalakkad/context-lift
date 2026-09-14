@@ -1,0 +1,33 @@
+perturbation suite: 7 defect(s) against the clean arm c6782e448a4b
+
+  strip-subject                          arm 6c4515519525
+      breaks: the rule commands something and never says what it is about
+      free check: CAUGHT FREE
+  strip-binding                          arm ee1b5d5c446a
+      breaks: the prose survives and the column name is gone
+      free check: CAUGHT FREE
+  unknown-column                         arm bbaa3b25e25c
+      breaks: the rule points at a column no table carries
+      free check: unknown column COULD NOT RUN on this spec, so nothing is proven either way
+  ambiguous-column                       arm a1bb8550cd69
+      breaks: the column is on two tables and the rule does not say which
+      free check: ambiguous column COULD NOT RUN on this spec, so nothing is proven either way
+  conflicting-definitions                arm 30bd58a6b7e0
+      breaks: two lines define the same term differently
+      free check: no check claimed, but caught by no identifier
+  irrelevant-context                     arm 97756ae11b84
+      breaks: five rules name columns no question uses
+      free check: no question would change COULD NOT RUN on this spec, so nothing is proven either way
+  positive-control-remove-capitalisation arm fd8de628d735
+      breaks: a rule known to be load-bearing is deleted
+      free check: no free check sees it, as designed
+
+  3 check(s) could not run on this spec at all. That is a gap in the SPEC, not in the linter:
+      unknown column and ambiguous column: the spec carries no column names, so there is nothing to check a rule against. Run `scripts/spec_schema.py` to write them
+
+  to RUN: 7 arm(s) x 104 question(s) x 1 rep(s) = 728 model call(s).
+  Price it with `round --dry-run` before spending. Building and the linter pass above are free.
+
+  What this cannot produce: generality. A defect costing ten points on a clean
+  seven-table public schema may cost nothing on a 900-dataset estate. This
+  measures one agent on one schema.

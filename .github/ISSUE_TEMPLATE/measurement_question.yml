@@ -1,0 +1,36 @@
+name: A number looks wrong
+description: A figure this tool printed does not match what you can recompute
+labels: ["measurement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        This is the most useful kind of issue here. Every figure this project
+        prints is supposed to be recomputable from something committed, and
+        three once were not. If you can show a number with no source behind
+        it, that is a real defect.
+
+  - type: input
+    id: number
+    attributes:
+      label: The number
+      placeholder: "+2.0 points, or $0.0987, or p = 0.0290"
+    validations:
+      required: true
+
+  - type: input
+    id: where
+    attributes:
+      label: Where it appears
+      placeholder: "README.md line 40, or the verdict line of a round I ran"
+    validations:
+      required: true
+
+  - type: textarea
+    id: recompute
+    attributes:
+      label: What you computed instead, and how
+      description: The command or the file you computed it from.
+      render: shell
+    validations:
+      required: true

@@ -1,0 +1,36 @@
+examples/thelook/spec:
+  2 rules files, 2599 characters
+  7 tables, 0 with a description, 0 columns
+  7 authored column descriptions
+  5 terms
+  22 worked examples
+  0 join relationships
+  written about 7 evaluation view(s) instead of the production tables
+
+spec arm 7d7a83d66812
+
+7 entry/entries written
+  <project>.<dataset>
+  <project>.<dataset>.thelook_ecommerce__distribution_centers, 1 worked example(s)
+  <project>.<dataset>.thelook_ecommerce__events, 4 worked example(s)
+  <project>.<dataset>.thelook_ecommerce__order_items, 10 worked example(s)
+  <project>.<dataset>.thelook_ecommerce__orders, 6 worked example(s)
+  <project>.<dataset>.thelook_ecommerce__products
+  <project>.<dataset>.thelook_ecommerce__users, 1 worked example(s)
+  refused 7 authored column description(s): BigQuery owns column descriptions and the catalog has no home for them. Written onto the evaluation view they would reach the control arm as well, which is the one thing the room exists to prevent. File mode delivers them in the request instead
+  refused 5 glossary term(s): the catalog reader does not read terms back, so writing them would lose them silently. Keep them in the spec repo until the entry-link read exists
+
+served: all 7 entry/entries whole; 3 of 7 carry an overview at all
+  <project>.<dataset>.thelook_ecommerce__distribution_centers: WHOLE (nothing was stored, and nothing is missing)
+  <project>.<dataset>.thelook_ecommerce__events: WHOLE (nothing was stored, and nothing is missing)
+  <project>.<dataset>.thelook_ecommerce__inventory_items: WHOLE (nothing was stored, and nothing is missing)
+  <project>.<dataset>.thelook_ecommerce__order_items: WHOLE (100% of the stored page is in the bundle)
+  <project>.<dataset>.thelook_ecommerce__orders: WHOLE (100% of the stored page is in the bundle)
+  <project>.<dataset>.thelook_ecommerce__products: WHOLE (100% of the stored page is in the bundle)
+  <project>.<dataset>.thelook_ecommerce__users: WHOLE (nothing was stored, and nothing is missing)
+
+writable part of the spec d07c1f37980d, read back d07c1f37980d
+  the catalog reads back as what was written
+  it is NOT the whole spec: the arm from files is 7d7a83d66812. Everything refused above is missing from the catalog arm, so a round in catalog mode measures less context than one in file mode
+
+  provenance: 7 record(s) written and read back with matching hashes

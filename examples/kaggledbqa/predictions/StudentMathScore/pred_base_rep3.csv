@@ -1,0 +1,216 @@
+id,question,gold_sql,pred_sql
+q000,What are the top five states in descending order in terms of revenue provided to school districts?,SELECT T2.state FROM FINREV_FED_KEY_17 as T2 JOIN FINREV_FED_17 as T1 ON T1.state_code = T2.State_Code GROUP BY T1.state_code ORDER BY sum(t_fed_rev),"SELECT
+  T2.State,
+  SUM(T1.t_fed_rev) AS TotalRevenue
+FROM FINREV_FED_17 AS T1
+INNER JOIN FINREV_FED_KEY_17 AS T2
+  ON T1.state_code = T2.State_Code
+GROUP BY
+  T2.State
+ORDER BY
+  TotalRevenue DESC
+LIMIT 5;"
+q001,What are the top five states in descending order in terms of the number of school districts per state?,SELECT T2.state FROM FINREV_FED_17 as T1 JOIN FINREV_FED_KEY_17 as T2 ON T1.state_code = T2.state_code GROUP BY T2.state ORDER BY count(school_district) DESC LIMIT 5,"SELECT
+  T2.State
+FROM FINREV_FED_17 AS T1
+INNER JOIN FINREV_FED_KEY_17 AS T2
+  ON T1.state_code = T2.State_Code
+GROUP BY
+  T2.State
+ORDER BY
+  COUNT(DISTINCT T1.school_district) DESC
+LIMIT 5;"
+q002,"For each state, when was the last time the average score data was collected?","SELECT state, max(year) FROM NDECoreExcel_Math_Grade8 GROUP BY state","SELECT state, MAX(year) FROM NDECoreExcel_Math_Grade8 GROUP BY state"
+q003,"How much federal funding did Faifaix County, VA schools receive in all forms?","SELECT t_fed_rev FROM FINREV_FED_17 WHERE school_district = ""FAIRFAX CO SCHS""",SELECT SUM(T1.t_fed_rev) FROM FINREV_FED_17 AS T1 INNER JOIN FINREV_FED_KEY_17 AS T2 ON T1.state_code = T2.State_Code WHERE T1.school_district = 'Faifaix County' AND T2.State = 'VA'
+q004,How much did the federal government spend in No Child Left Behind funding in 2017?,SELECT sum(c14) FROM FINREV_FED_17 WHERE yr_data = 17,SELECT SUM(t_fed_rev) FROM FINREV_FED_17 WHERE yr_data = 2017
+q005,How many Wisconsin school districts receive federal funding?,"SELECT count(*) FROM FINREV_FED_17 WHERE school_district LIKE ""%Wisconsin%""","SELECT
+  COUNT(DISTINCT T1.school_district)
+FROM FINREV_FED_17 AS T1
+INNER JOIN FINREV_FED_KEY_17 AS T2
+  ON T1.state_code = T2.State_Code
+WHERE
+  T2.State = 'Wisconsin';"
+q006,Which state performs best on the NAEP 8th grade math test?,SELECT state FROM NDECoreExcel_Math_Grade8 ORDER BY average_scale_score DESC LIMIT 1,SELECT state FROM NDECoreExcel_Math_Grade8 ORDER BY average_scale_score DESC LIMIT 1
+q007,Which federally-funded state performs worst on the NAEP math exam for eighth graders?,SELECT state FROM NDECoreExcel_Math_Grade8 ORDER BY average_scale_score LIMIT 1,SELECT T2.State FROM FINREV_FED_17 AS T1 INNER JOIN FINREV_FED_KEY_17 AS T2 ON T1.state_code = T2.State_Code INNER JOIN NDECoreExcel_Math_Grade8 AS T3 ON T2.State = T3.state WHERE T3.average_scale_score IS NOT NULL GROUP BY T2.State ORDER BY MIN(T3.average_scale_score) ASC LIMIT 1
+q008,What is the average NAEP math score for all eighth graders in federally-funded states?,SELECT avg(average_scale_score) FROM NDECoreExcel_Math_Grade8,SELECT AVG(T2.average_scale_score) FROM FINREV_FED_KEY_17 AS T1 INNER JOIN NDECoreExcel_Math_Grade8 AS T2 ON T1.State = T2.state WHERE T1.State_Code IN (SELECT DISTINCT state_code FROM FINREV_FED_17)
+q009,Which school district receive the most of federal revenue through state in Wisconsin?,"SELECT T1.school_district FROM FINREV_FED_17 as T1 JOIN FINREV_FED_KEY_17 as T2 ON T1.state_code = T2.state_code WHERE T2.state = ""Wisconsin"" ORDER BY T1.t_fed_rev DESC LIMIT 1","SELECT
+  T1.school_district
+FROM FINREV_FED_17 AS T1
+INNER JOIN FINREV_FED_KEY_17 AS T2
+  ON T1.state_code = T2.State_Code
+WHERE
+  T2.State = 'Wisconsin'
+ORDER BY
+  T1.t_fed_rev DESC
+LIMIT 1;"
+q010,What is the average Title 1 fund in Virginia?,"SELECT avg(T1.c14) FROM FINREV_FED_17 as T1 JOIN FINREV_FED_KEY_17 as T2 ON T1.state_code = T2.state_code WHERE T2.state = ""Virginia""","SELECT
+  AVG(T1.c14)
+FROM FINREV_FED_17 AS T1
+INNER JOIN FINREV_FED_KEY_17 AS T2
+  ON T1.state_code = T2.State_Code
+WHERE
+  T2.State = 'Virginia';"
+q011,What are the top 10 states that have the highest average math score and federal revenue they got through different categories?,"SELECT T2.state, sum(c14),sum(c25) FROM FINREV_FED_17 as T1 JOIN FINREV_FED_KEY_17 as T2 ON T1.state_code = T2.state_code JOIN NDECoreExcel_Math_Grade8 as T3 ON T2.state = T3.state GROUP BY T2.state ORDER BY T3.average_scale_score DESC LIMIT 10","SELECT
+  T1.state,
+  AVG(T1.average_scale_score) AS avg_math_score,
+  SUM(T3.t_fed_rev + T3.c14 + T3.c25) AS total_federal_revenue
+FROM NDECoreExcel_Math_Grade8 AS T1
+JOIN FINREV_FED_KEY_17 AS T2
+  ON T1.state = T2.State
+JOIN FINREV_FED_17 AS T3
+  ON T2.State_Code = T3.state_code
+WHERE
+  T1.all_students = 'All Students'
+GROUP BY
+  T1.state
+ORDER BY
+  avg_math_score DESC,
+  total_federal_revenue DESC
+LIMIT 10;"
+q012,What are the schools with highest federal revenue in each federal revenue categories and what's their state average scores?,"SELECT T1.school_district, max(T1.c14), T3.average_scale_score FROM FINREV_FED_17 as T1 JOIN FINREV_FED_KEY_17 as T2 ON T1.state_code = T2.state_code JOIN NDECoreExcel_Math_Grade8 as T3 ON T2.state = T3.state UNION SELECT T1.school_district, max(T1.c25), T3.average_scale_score FROM FINREV_FED_17 as T1 JOIN FINREV_FED_KEY_17 as T2 ON T1.state_code = T2.state_code JOIN NDECoreExcel_Math_Grade8 as T3 ON T2.state = T3.state","SELECT
+  T1.school_district,
+  T3.State,
+  't_fed_rev' AS revenue_category,
+  T1.t_fed_rev AS federal_revenue,
+  T4.average_scale_score AS state_average_score
+FROM FINREV_FED_17 AS T1
+INNER JOIN FINREV_FED_KEY_17 AS T3
+  ON T1.state_code = T3.State_Code
+INNER JOIN NDECoreExcel_Math_Grade8 AS T4
+  ON T3.State = T4.state
+WHERE
+  T1.t_fed_rev = (
+    SELECT
+      MAX(t_fed_rev)
+    FROM FINREV_FED_17
+  )
+UNION ALL
+SELECT
+  T1.school_district,
+  T3.State,
+  'c14' AS revenue_category,
+  T1.c14 AS federal_revenue,
+  T4.average_scale_score AS state_average_score
+FROM FINREV_FED_17 AS T1
+INNER JOIN FINREV_FED_KEY_17 AS T3
+  ON T1.state_code = T3.State_Code
+INNER JOIN NDECoreExcel_Math_Grade8 AS T4
+  ON T3.State = T4.state
+WHERE
+  T1.c14 = (
+    SELECT
+      MAX(c14)
+    FROM FINREV_FED_17
+  )
+UNION ALL
+SELECT
+  T1.school_district,
+  T3.State,
+  'c25' AS revenue_category,
+  T1.c25 AS federal_revenue,
+  T4.average_scale_score AS state_average_score
+FROM FINREV_FED_17 AS T1
+INNER JOIN FINREV_FED_KEY_17 AS T3
+  ON T1.state_code = T3.State_Code
+INNER JOIN NDECoreExcel_Math_Grade8 AS T4
+  ON T3.State = T4.state
+WHERE
+  T1.c25 = (
+    SELECT
+      MAX(c25)
+    FROM FINREV_FED_17
+  );"
+q013,State with highest average math score,SELECT state FROM NDECoreExcel_Math_Grade8 ORDER BY average_scale_score DESC LIMIT 1,"SELECT
+  T1.state
+FROM NDECoreExcel_Math_Grade8 AS T1
+GROUP BY
+  T1.state
+ORDER BY
+  AVG(T1.average_scale_score) DESC
+LIMIT 1;"
+q014,School with highest ratio of total revenue and average scores,"SELECT T1.school_district, max(T1.t_fed_rev / T3.average_scale_score) FROM FINREV_FED_17 as T1 JOIN FINREV_FED_KEY_17 as T2 on T1.state_code = T2.state_code JOIN NDECoreExcel_Math_Grade8 as T3 ON T2.state = T3.state","SELECT
+  T1.school_district
+FROM FINREV_FED_17 AS T1
+INNER JOIN FINREV_FED_KEY_17 AS T2
+  ON T1.state_code = T2.State_Code
+INNER JOIN NDECoreExcel_Math_Grade8 AS T3
+  ON T2.State = T3.state AND T1.yr_data = T3.year
+WHERE
+  T3.average_scale_score IS NOT NULL AND T3.average_scale_score != 0
+ORDER BY
+  CAST(T1.t_fed_rev AS REAL) / T3.average_scale_score DESC
+LIMIT 1;"
+q015,Which state spent the most revenue towards schools and whats the state average score,"SELECT T2.state, T3.average_scale_score FROM FINREV_FED_KEY_17 as T2 JOIN FINREV_FED_17 as T1 ON T1.state_code = T2.state_code JOIN NDECoreExcel_Math_Grade8 as T3 ON T2.state = T3.state GROUP BY T2.state ORDER BY sum(T1.t_fed_rev) DESC LIMIT 1","SELECT
+  T2.State,
+  AVG(T3.average_scale_score)
+FROM FINREV_FED_17 AS T1
+INNER JOIN FINREV_FED_KEY_17 AS T2
+  ON T1.state_code = T2.State_Code
+INNER JOIN NDECoreExcel_Math_Grade8 AS T3
+  ON T2.State = T3.state
+GROUP BY
+  T2.State
+ORDER BY
+  SUM(T1.t_fed_rev) DESC
+LIMIT 1;"
+q016,School with lowest ratio of total revenue and average scores,"SELECT T1.school_district, min(T1.t_fed_rev / T3.average_scale_score) FROM FINREV_FED_17 as T1 JOIN FINREV_FED_KEY_17 as T2 on T1.state_code = T2.state_code JOIN NDECoreExcel_Math_Grade8 as T3 ON T2.state = T3.state","SELECT
+  T1.school_district
+FROM FINREV_FED_17 AS T1
+INNER JOIN FINREV_FED_KEY_17 AS T2
+  ON T1.state_code = T2.State_Code
+INNER JOIN NDECoreExcel_Math_Grade8 AS T3
+  ON T2.State = T3.state AND T1.yr_data = T3.year
+WHERE
+  T3.average_scale_score IS NOT NULL AND T3.average_scale_score != 0
+ORDER BY
+  CAST(T1.t_fed_rev AS REAL) / T3.average_scale_score
+LIMIT 1;"
+q017,Which state spent the least revenue towards schools and whats the state average score,"SELECT T2.state, T3.average_scale_score FROM FINREV_FED_KEY_17 as T2 JOIN FINREV_FED_17 as T1 ON T1.state_code = T2.state_code JOIN NDECoreExcel_Math_Grade8 as T3 ON T2.state = T3.state GROUP BY T2.state ORDER BY sum(T1.t_fed_rev) LIMIT 1","SELECT
+  T2.State,
+  (
+    SELECT
+      AVG(T3.average_scale_score)
+    FROM NDECoreExcel_Math_Grade8 AS T3
+    WHERE
+      T3.state = T2.State
+  )
+FROM FINREV_FED_17 AS T1
+INNER JOIN FINREV_FED_KEY_17 AS T2
+  ON T1.state_code = T2.State_Code
+ORDER BY
+  T1.t_fed_rev ASC
+LIMIT 1"
+q018,Which state has the highest average score in math exam?,SELECT state FROM NDECoreExcel_Math_Grade8 ORDER BY average_scale_score DESC LIMIT 1,"SELECT
+  state
+FROM NDECoreExcel_Math_Grade8
+ORDER BY
+  average_scale_score DESC
+LIMIT 1;"
+q019,What is the average match score of CA?,"SELECT average_scale_score FROM NDECoreExcel_Math_Grade8 WHERE state = ""California""",SELECT AVG(average_scale_score) FROM NDECoreExcel_Math_Grade8 WHERE state = 'CA'
+q020,How many unique school districts in Indiana?,"SELECT count(DISTINCT school_district) FROM FINREV_FED_17 as T1 JOIN FINREV_FED_KEY_17 as T2 ON T1.state_code = T2.state_code WHERE T2.state = ""Indiana""","SELECT
+  COUNT(DISTINCT T1.school_district)
+FROM FINREV_FED_17 AS T1
+INNER JOIN FINREV_FED_KEY_17 AS T2
+  ON T1.state_code = T2.State_Code
+WHERE
+  T2.State = 'Indiana';"
+q021,What is the state code of VA?,"SELECT state_code FROM FINREV_FED_KEY_17 WHERE state = ""Virginia""",SELECT State_Code FROM FINREV_FED_KEY_17 WHERE State = 'VA'
+q022,Which state get the highest revenue?,SELECT T2.state FROM FINREV_FED_KEY_17 as T2 JOIN FINREV_FED_17 as T1 ON T1.state_code = T2.state_code GROUP BY T2.state ORDER BY sum(t_fed_rev) DESC LIMIT 1,"SELECT
+  T2.State
+FROM FINREV_FED_17 AS T1
+INNER JOIN FINREV_FED_KEY_17 AS T2
+  ON T1.state_code = T2.State_Code
+GROUP BY
+  T2.State
+ORDER BY
+  SUM(T1.t_fed_rev) DESC
+LIMIT 1;"
+q023,How much funding does Colorado schools receive from Title 1 and the Child Nutrition program respectively?,"SELECT sum(T1.c14), sum(T1.c25) FROM FINREV_FED_17 as T1 JOIN FINREV_FED_KEY_17 as T2 ON T1.state_code = T2.state_code WHERE T2.state = ""Colorado""","SELECT SUM(T1.c14), SUM(T1.c25) FROM FINREV_FED_17 AS T1 INNER JOIN FINREV_FED_KEY_17 AS T2 ON T1.state_code = T2.State_Code WHERE T2.State = 'Colorado'"
+q024,How much federal funding does Pecatonia Area School district get?,"SELECT t_fed_rev FROM FINREV_FED_17 WHERE school_district LIKE ""%Pecatonia Area%""",SELECT t_fed_rev FROM FINREV_FED_17 WHERE school_district = 'Pecatonia Area School district'
+q025,What are the student scores on the NAEP math exam for 8th graders in North Carolina and South Carolina?,"SELECT average_scale_score FROM NDECoreExcel_Math_Grade8 WHERE state = ""North Carolina"" UNION SELECT average_scale_score FROM NDECoreExcel_Math_Grade8 WHERE state = ""South Carolina""","SELECT state, average_scale_score FROM NDECoreExcel_Math_Grade8 WHERE state IN ('North Carolina', 'South Carolina')"
+q026,What are the averge score of students in NC and in NY?,"SELECT average_scale_score FROM NDECoreExcel_Math_Grade8 WHERE state = ""North Carolina"" UNION SELECT average_scale_score FROM NDECoreExcel_Math_Grade8 WHERE state = ""New York""","SELECT state, AVG(average_scale_score) FROM NDECoreExcel_Math_Grade8 WHERE state IN ('NC', 'NY') GROUP BY state"
+q027,How many schools get higher revenue via Child Nutrition A than revenue via child left school behind act?,SELECT count(*) FROM FINREV_FED_17 WHERE c25 > c14,"SELECT
+  COUNT(DISTINCT nces_id)
+FROM FINREV_FED_17
+WHERE
+  c14 > c25;"

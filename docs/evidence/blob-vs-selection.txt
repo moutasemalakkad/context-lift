@@ -1,0 +1,101 @@
+blob vs oracle selection on BIRD, 2026-09-13
+gemini-2.5-flash, 3 repetitions per arm, gate-cleaned golds only.
+without-context arm = the blob (every evidence sentence for the database).
+with-context arm    = oracle selection (only this question's own sentence).
+So a NEGATIVE lift means the blob beat selection.
+
+=================== toxicology ===================
+pooled 3 repetitions per arm
+
+paired ablation on 417 observations (139 questions x 3 reps, execution accuracy)
+  without context :  52.0%  [47.2%, 56.8%]
+  with context    :  44.4%  [39.7%, 49.2%]
+  lift            :  -7.7%  [-15.7%, -1.6%]   (the two rates subtracted; 95% interval on the paired difference, per question)
+
+  each question counted once - the number to defend
+    fixed 7 / broke 19 of 139 questions
+    p = 0.0290   significant at 0.05
+
+  each answer counted separately - optimistic, because repeated
+  answers to one question are not independent
+    fixed 19 / broke 51 of 417 observations
+    p = 0.0002   significant at 0.05
+  answers changed at 333 of 417 pairs; 70 changed the verdict, 263 moved without changing it
+
+  ruling          : REAL LOSS
+  a real loss: the context broke bird_0232 x3, bird_0287 x3, bird_0288 x3, bird_0299 x3, bird_0309 x3, bird_0327 x3, bird_0330 x3, bird_0333 x3 and 19 more; read those before anything else
+
+
+=================== thrombosis_prediction ===================
+pooled 3 repetitions per arm
+
+paired ablation on 429 observations (143 questions x 3 reps, execution accuracy)
+  without context :  37.5%  [33.1%, 42.2%]
+  with context    :  41.0%  [36.5%, 45.7%]
+  lift            :  +3.5%  [-2.1%, +9.1%]   (the two rates subtracted; 95% interval on the paired difference, per question)
+
+  each question counted once - the number to defend
+    fixed 11 / broke 6 of 143 questions
+    p = 0.3323   not significant at 0.05
+
+  each answer counted separately - optimistic, because repeated
+  answers to one question are not independent
+    fixed 42 / broke 27 of 429 observations
+    p = 0.0912   not significant at 0.05
+  answers changed at 339 of 429 pairs; 69 changed the verdict, 270 moved without changing it
+
+  ruling          : NOT PROVEN
+  at 143 questions this set can only prove a lift above about 8 points (1/sqrt(143)); to prove the +3.5% seen here you would need about 449 questions
+
+
+=================== card_games ===================
+pooled 3 repetitions per arm
+
+paired ablation on 504 observations (168 questions x 3 reps, execution accuracy)
+  without context :  39.9%  [35.7%, 44.2%]
+  with context    :  39.1%  [34.9%, 43.4%]
+  lift            :  -0.8%  [-6.6%, +3.0%]   (the two rates subtracted; 95% interval on the paired difference, per question)
+
+  each question counted once - the number to defend
+    fixed 7 / broke 10 of 168 questions
+    p = 0.6291   not significant at 0.05
+
+  each answer counted separately - optimistic, because repeated
+  answers to one question are not independent
+    fixed 22 / broke 26 of 504 observations
+    p = 0.6655   not significant at 0.05
+  answers changed at 288 of 504 pairs; 48 changed the verdict, 240 moved without changing it
+
+  ruling          : NOT PROVEN
+  at 168 questions this set can only prove a change above about 8 points (1/sqrt(168)); the -0.8% seen here is inside that
+
+
+=================== POOLED, 3 databases ===================
+pooled 3 repetitions per arm
+
+paired ablation on 1350 observations (450 questions x 3 reps, execution accuracy)
+  without context :  42.9%  [40.3%, 45.5%]
+  with context    :  41.3%  [38.7%, 44.0%]
+  lift            :  -1.6%  [-5.6%, +1.1%]   (the two rates subtracted; 95% interval on the paired difference, per question)
+
+  each question counted once - the number to defend
+    fixed 25 / broke 35 of 450 questions
+    p = 0.2451   not significant at 0.05
+
+  each answer counted separately - optimistic, because repeated
+  answers to one question are not independent
+    fixed 83 / broke 104 of 1350 observations
+    p = 0.1434   not significant at 0.05
+  answers changed at 960 of 1350 pairs; 187 changed the verdict, 773 moved without changing it
+
+  ruling          : NOT PROVEN
+  at 450 questions this set can only prove a change above about 5 points (1/sqrt(450)); the -1.6% seen here is inside that
+
+
+=================== what each arm cost ===================
+spent: 417 calls, 2,754,714 prompt + 27,073 output + 81,844 thinking tokens, $1.0987
+spent: 417 calls, 171,393 prompt + 29,357 output + 86,371 thinking tokens, $0.3407
+spent: 429 calls, 3,197,904 prompt + 29,055 output + 115,792 thinking tokens, $1.3215
+spent: 429 calls, 331,989 prompt + 30,771 output + 98,184 thinking tokens, $0.4220
+spent: 504 calls, 3,107,367 prompt + 23,214 output + 78,590 thinking tokens, $1.1867
+spent: 504 calls, 605,706 prompt + 23,361 output + 77,733 thinking tokens, $0.4344

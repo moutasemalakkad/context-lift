@@ -1,0 +1,11 @@
+# Never build customer data into an image. `_personal/` is gitignored and
+# holds one customer's query logs, gold sets and answer keys.
+_personal/
+.venv/
+.git/
+logs/
+work/
+**/__pycache__/
+*.pyc
+.pytest_cache/
+tests/

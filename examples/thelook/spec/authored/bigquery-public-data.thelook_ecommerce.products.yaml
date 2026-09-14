@@ -1,0 +1,4 @@
+description: One row per product in the catalogue.
+columns:
+  cost:
+    description: What the product cost to buy. Margin is sale_price minus this, never minus a price on the inventory table.

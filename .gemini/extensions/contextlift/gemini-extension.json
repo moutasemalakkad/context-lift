@@ -1,0 +1,6 @@
+{
+  "name": "contextlift",
+  "version": "0.1.0",
+  "description": "Measure whether written business context makes a data agent more accurate, on questions nobody wrote the context from. Use when someone asks whether their catalog, glossary, semantic layer or prompt rules actually help a text-to-SQL agent, when they want a defensible before-and-after number, or when they have an evaluation set and no idea whether it is any good.",
+  "contextFileName": "GEMINI.md"
+}

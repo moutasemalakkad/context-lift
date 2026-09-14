@@ -1,0 +1,6 @@
+description: One row per item within an order. This is the grain revenue and margin are counted at, not the order.
+columns:
+  status:
+    description: "The state of this line. One of Complete, Cancelled, Returned, Processing, Shipped, capitalised exactly. Revenue and margin exclude Cancelled and Returned."
+  sale_price:
+    description: What the customer paid for this line. Summing it over non-Cancelled, non-Returned lines is revenue.
