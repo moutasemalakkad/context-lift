@@ -1,5 +1,27 @@
 # Methodology
 
+[Documentation](README.md) / Methodology
+
+## On this page
+
+- [1. Execution accuracy, not string match](#1-execution-accuracy-not-string-match)
+- [2. Comparator semantics](#2-comparator-semantics)
+- [2b. Extra columns, as a recorded option](#2b-extra-columns-as-a-recorded-option)
+- [3. Exclusion rules](#3-exclusion-rules)
+- [4. The LLM judge is one-sided — read this before trusting a number](#4-the-llm-judge-is-one-sided--read-this-before-trusting-a-number)
+- [5. The gold-set gate audits the oracle](#5-the-gold-set-gate-audits-the-oracle)
+- [5b. Mining a gold set out of a real query log](#5b-mining-a-gold-set-out-of-a-real-query-log)
+- [6. Routing accuracy scores the table-picking stage on its own](#6-routing-accuracy-scores-the-table-picking-stage-on-its-own)
+- [6b. Attribution: from "broke 3" to "this rule broke it"](#6b-attribution-from-broke-3-to-this-rule-broke-it)
+- [6c. Two numbers per round, and only one of them is a guess](#6c-two-numbers-per-round-and-only-one-of-them-is-a-guess)
+- [6d. `history`: one question across every round](#6d-history-one-question-across-every-round)
+- [7. Statistics: Wilson interval and McNemar's test](#7-statistics-wilson-interval-and-mcnemars-test)
+- [7b. Cost is measured, and estimated from a dated price table](#7b-cost-is-measured-and-estimated-from-a-dated-price-table)
+- [8. Deliberately skipped](#8-deliberately-skipped)
+- [9. Adding a warehouse backend](#9-adding-a-warehouse-backend)
+- [References](#references)
+- [The whole loop, in one diagram](#the-whole-loop-in-one-diagram)
+
 Why this library measures what it measures, the alternatives rejected, and the
 known limitations. The short version lives in the [README](../README.md); this is
 the reference.
@@ -743,3 +765,5 @@ generated, scored and compared by the commands in the middle, each one behind
 the guards below it. Everything a command does lands in the workspace on the
 right, and `next` reads that record to say what to run.
 
+
+[Documentation index](README.md) · Next: [Practices and evidence](PRACTICES.md)

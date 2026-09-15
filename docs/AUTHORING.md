@@ -1,5 +1,7 @@
 # Adding a warehouse or an agent
 
+[Documentation](README.md) / Contribute / Add a warehouse or agent
+
 Two things are pluggable, and both are **structural protocols**: you satisfy
 them by having a method with the right shape. No import, no base class, no
 registration. A class in your own repository qualifies.
@@ -103,3 +105,5 @@ Neither protocol needs a live service to test. The suite drives whole rounds
 with a plain function as the runner and an in-memory SQLite database as the
 executor — see `tests/test_round.py`. If your backend can only be tested
 against a live service, that is worth fixing before it is worth shipping.
+
+[Documentation index](README.md) · Next: [Contributing](../CONTRIBUTING.md)

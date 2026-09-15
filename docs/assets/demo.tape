@@ -1,4 +1,6 @@
 # The README's animated demo. Regenerate with `make demo-gif`.
+# The Makefile crops to the measured result; current next-step commands live
+# in the quickstart rather than in the recorded program's footer.
 #
 # It records `contextlift demo`: the whole loop on a 7-row warehouse, with
 # canned model answers, so it runs with no key, no network and no cloud. The
@@ -7,7 +9,7 @@
 #
 # Needs: brew install vhs ttyd ffmpeg
 
-Output docs/assets/demo.gif
+Output /tmp/contextlift-demo-full.gif
 
 Require contextlift
 
@@ -27,7 +29,7 @@ Enter
 Show
 
 Sleep 600ms
-Type "contextlift demo"
+Type "contextlift --workspace /tmp/contextlift-demo demo"
 Sleep 400ms
 Enter
 Sleep 7s

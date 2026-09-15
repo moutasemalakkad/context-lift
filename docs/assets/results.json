@@ -15,13 +15,11 @@
     "",
     "`show_in_readme` decides what the chart draws. A row set false is still",
     "verified by tests/test_results_chart.py and still lives here -- the",
-    "finding is kept and checked, it just is not on the front page. The",
-    "machine-read BI row is argued in full in docs/CASE_STUDY.md, which is",
-    "where a reader who asks 'can't you just read my BI tool?' should land.",
-    "",
+    "finding is kept and checked. The BI comparison is shown beside the",
+    "gains; docs/CASE_STUDY.md explains its qualifications.",
     "Two rows added 2026-09-13 are ARM-AGAINST-ARM, not context-against-none,",
     "so read their direction from the label and not from the sign. Both are",
-    "hidden: a NOT PROVEN result belongs in the record, not on the front page."
+    "hidden because they compare two context variants rather than context against none."
   ],
   "results": [
     {
@@ -91,7 +89,7 @@
       "verdict": "NOT PROVEN",
       "source": "examples/thelook/lookml-arm/round-2026-09-12.txt",
       "pinned_by": "tests/test_case_study_numbers.py",
-      "show_in_readme": false
+      "show_in_readme": true
     },
     {
       "label": "oracle selection against sending every sentence",

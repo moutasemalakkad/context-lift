@@ -6,7 +6,8 @@ somebody can recompute.**
 
 ## Run the tests first
 
-Everything runs offline. No cloud account, no credentials, no API key.
+Installation downloads dependencies. The test suite then runs offline,
+without a cloud account, credentials, or an API key.
 
 ```
 make install    # creates .venv with uv, installs the package and dev deps
@@ -54,7 +55,7 @@ that overstates its own results cannot be used to check anyone else's.
 ## Adding a warehouse or an agent
 
 Both are structural protocols — you satisfy them by having the right method,
-with no import and no base class. See `docs/AUTHORING.md` for what a new one
+with no import and no base class. See [Authoring](docs/AUTHORING.md) for what a new one
 must do and, more importantly, what it must not.
 
 ## Style
@@ -64,6 +65,27 @@ Match the file you are editing. Comments in this codebase tend to explain
 because those are the things a reader cannot recover from the code.
 
 Line length 88. No formatter is enforced.
+
+## Documentation
+
+- Keep the README focused on what the tool does, one runnable example, and
+  where to go next. Add every reader-facing guide to the [docs index](docs/README.md).
+- A guide has one job: purpose, prerequisites, steps, expected result, and a
+  next-step link. Link to canonical instructions instead of copying them.
+- Keep current instructions in guides and dated experiments in case studies
+  or field notes. Preserve source files, caveats, and reproducibility links.
+- Check command flags against CLI help. Use a workspace, estimate paid calls,
+  bound SQL execution, and keep reserved answers out of curation.
+- Add a contents list to long references. Preserve old heading anchors when
+  moving sections, and update relative links from the new location.
+- Keep images legible in light/dark themes and at narrow widths; provide alt
+  text and text equivalents for important facts. Figures come from committed
+  data. Run `make results-chart` after changing the chart generator, and
+  `make readme-workflow` after changing the workflow generator.
+- The demo is a recording with canned model answers. `make demo-gif` records
+  it again; `make demo-still` extracts the linked still frame with ffmpeg.
+- Validate changed links, commands, visuals, and the existing tests that pin
+  quoted numbers. Do not relax evidence checks to make an editorial edit pass.
 
 ## Licence
 

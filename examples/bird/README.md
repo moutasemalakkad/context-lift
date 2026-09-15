@@ -1,30 +1,33 @@
 # The whole loop, on public data, offline
 
-## Start with the enterprise study
+[Documentation](../../docs/README.md) / [Examples](../README.md) / BIRD
+
+## Start with the small example
+
+```bash
+make example-bird
+```
+
+Run from the repository root with Python 3.10+ and uv installed. Initial
+setup may need network access; the example scores committed predictions
+against local SQLite databases with no API key or cloud calls. It demonstrates
+gate, score, triage, climb, and ablate.
+
+This is the example used by the [Quickstart](../../docs/QUICKSTART.md).
+It has one repetition per arm and no reserved holdout. Its result is a
+reproducible illustration, not a fresh estimate of generalization.
+
+## Explore the enterprise study
 
 ```bash
 make example-bird-enterprise
 ```
 
-That dependency-free receipt tour shows the newer 11-database, three-repetition
-study: a targeted expert-evidence and catalog policy raised fresh-holdout
-accuracy from **37.4% to 56.9%** (**+19.5 points**, paired 95% interval +12.1
-to +26.9). It also prints the 25.4% coverage boundary, three stable
-regressions, and the oracle-routing qualification. The full methodology and
-source-pinned reproduction are in
-[`ENTERPRISE_RUNBOOK.md`](ENTERPRISE_RUNBOOK.md).
-
-The original small walkthrough remains useful when you want to execute five
-framework stages locally rather than inspect a large-run receipt:
-
-```bash
-python examples/bird/run.py      # or: make example-bird
-```
-
-No API key, no network, no cloud. Runs in about a second and prints five of the
-stages a field engineer runs when onboarding a customer: gate, score, triage,
-climb, ablate. Mining and the human review come before them and need a query
-log and a reviewer, so they are not in the offline run.
+This reads the recorded 11-database, three-repetition study. The tour reports
+both question-level and answer-level statistics; do not mix their denominators.
+It includes the 25.4% coverage boundary, stable regressions, and the
+oracle-routing qualification. See the [enterprise runbook](ENTERPRISE_RUNBOOK.md)
+for exact results and fresh-run requirements.
 
 ## Why this dataset
 
@@ -53,6 +56,11 @@ So the enrichment rounds are not invented: **each round adds BIRD's own
 evidence** for one failure shape.
 
 ## What you will see
+
+Against the baseline, the all-rules arm broke **3 questions**:
+`student_club_011`, `student_club_012`, and `superhero_006`.
+These are the `broke` entries in the paired report, alongside 15 fixed questions.
+
 
 ```
 round                     rate   ladder   vs prev   vs base  note

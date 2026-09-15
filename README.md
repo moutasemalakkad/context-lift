@@ -2,32 +2,53 @@
 
 <h1>contextlift</h1>
 
-**Measure whether your written business context makes an AI SQL agent more accurate.**
+**Find out whether your business context makes an AI SQL agent more accurate.**
 
 [![test](https://github.com/moutasemalakkad/context-lift/actions/workflows/test.yml/badge.svg)](https://github.com/moutasemalakkad/context-lift/actions/workflows/test.yml)
 [![license](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
 [![python](https://img.shields.io/badge/python-3.10%2B-blue.svg)](pyproject.toml)
 
-[Try it](#try-it) · [Quickstart](docs/QUICKSTART.md) · [Walkthrough](docs/WALKTHROUGH.md) · [Method](docs/METHODOLOGY.md) · [Results](docs/CASE_STUDY.md)
+[Quickstart](docs/QUICKSTART.md) · [Documentation](docs/README.md) · [Examples](examples/README.md) · [Results](docs/CASE_STUDY.md)
 
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="docs/assets/results-dark.svg">
-  <img alt="Accuracy gain from written business context across four measured runs, with 95% paired intervals. Three runs on context people wrote gain between 9.7 and 30.8 points. The same kind of metadata read out of a BI tool by machine gains 2.0 points and is NOT PROVEN." src="docs/assets/results-light.svg" width="780">
-</picture>
+<img src="docs/assets/demo.gif" alt="Terminal demo comparing SQL answers with and without one business rule." width="720">
 
-<i>Every run this project has measured. Prose a person wrote pays, every time.<br/>
-The same kind of metadata, read out of a BI tool by a machine, does not.</i>
+*A toy warehouse with canned model answers; scoring and the paired test run locally.*
+
+[View a still frame](docs/assets/demo-still.png) · [Run the demo](docs/QUICKSTART.md#try-the-toy-demo)
 
 </div>
 
+<a id="what-that-number-is"></a>
+
+## Why contextlift?
+
+An agent can read a schema and still miss what “revenue” means, which orders to
+exclude, or how your team reports a rate. contextlift measures what those
+written definitions change:
+
+- **Compare answers:** run the same questions with and without context.
+- **See the evidence:** accuracy lift, a paired confidence interval, and the
+  questions context fixed or broke.
+- **Find the next edit:** group failures and investigate the rules behind them.
+
+Bring SQLite data or connect a warehouse and your agent. The
+[full evaluation guide](docs/EVALUATE.md) covers setup, costs, and the review loop.
+
+<a id="install"></a>
+
 ## Try it
 
-No API key. No network. About one second.
+Requires Python 3.10+, [uv](https://docs.astral.sh/uv/getting-started/installation/),
+Git, and Make. Cloning and first-time setup need network access; the example
+uses committed predictions and SQLite databases, with no API key or cloud calls.
 
 ```bash
-git clone https://github.com/moutasemalakkad/context-lift && cd context-lift
+git clone https://github.com/moutasemalakkad/context-lift
+cd context-lift
 make example-bird
 ```
+
+The final comparison includes these results:
 
 <!-- headline:example-bird -->
 ```
@@ -41,186 +62,81 @@ paired ablation on 39 questions (execution accuracy)
   ruling          : REAL GAIN
 ```
 
-## What that number is
+**A gain with regressions:** 15 questions improved and 3 broke. This small
+example uses one repetition per arm and no reserved holdout; it demonstrates
+the workflow, not a new measurement of generalization. See the
+[broken question IDs and qualifications](examples/bird/README.md#what-you-will-see).
 
-Most of the accuracy in an enterprise text-to-SQL system does not come from the
-model. It comes from someone writing down what the business means: the default
-reporting grain, which rows to exclude, how each metric is defined. This tool
-measures whether that writing-down was worth it.
-
-The run above is 39 questions over three [BIRD](https://bird-bench.github.io/)
-databases. Predictions are generated once and committed, so it prints the same
-numbers on your machine as on mine. `tests/test_readme_numbers.py` recomputes
-every figure in that block from those predictions and fails if the two ever
-disagree.
-
-**What made the difference.** BIRD ships one human sentence per question,
-decoding a business phrase into a filter or a formula: *"meetings in 2020 refers
-to type='Meeting' where YEAR(event_date)=2020"*. That sentence is not in the
-schema. It is what a data catalog is supposed to hold, and writing it down
-doubled the accuracy.
-
-**What the verdict word is for.** `REAL GAIN` is printed only when the paired
-test clears 0.05 on questions held back from curation. When a round cannot
-resolve the effect it was looking for, the word is `NOT PROVEN` and the number
-beside it is not a result. Expect to see both on your own data: that is the
-tool working, not failing.
-
-## Everything measured so far
-
-| where the context came from | questions | lift | ruling |
-|---|---|---|---|
-| BIRD evidence sentences, 3 databases — `make example-bird` | 39 | 30.8% → 61.5%, **+30.8** | REAL GAIN, p=0.0075 |
-| BIRD evidence sentences, 11 databases — `make example-bird-enterprise` | 65 | **+18.5** [+6.5, +30.4] | REAL GAIN, p=0.0044 |
-| rules written by hand, 97-table warehouse — [`examples/beaver`](examples/beaver) | 69 | 5.3% → 15.0%, **+9.7** [+2.0, +18.3] | REAL GAIN, p=0.0391 |
-
-Every lift above is **per question**, with its 95% paired interval. Answering
-one question three times gives three answers, not three independent facts, so
-a per-answer figure has a larger denominator and a narrower interval. The two
-levels are not interchangeable, so this table uses one of them throughout.
-
-Each row lives in [`docs/assets/results.json`](docs/assets/results.json) and
-names the committed file its numbers come from, plus the test that pins that
-file. `tests/test_results_chart.py` re-reads every source and fails if a row
-and its source disagree, so the chart cannot drift from the data. Two larger
-rows are described in [docs/CASE_STUDY.md](docs/CASE_STUDY.md) rather than
-drawn here: a 596-question warehouse holdout, the same 11-database study read
-per answer instead of per question, and a round on a BI model whose metrics
-carried no written descriptions.
-
-That last one answers the question every customer asks first — *can't you just
-read my BI tool?* The answer turns on one number, the share of metrics with a
-description, and `contextlift semantic --lookml <repo>` prints it for free
-before anyone spends anything.
+Next: [finish the quickstart](docs/QUICKSTART.md) or follow the
+[annotated walkthrough](docs/WALKTHROUGH.md).
 
 ## How it works
 
-![contextlift demo: the whole loop on a seven-row warehouse, offline](docs/assets/demo.gif)
+<picture>
+  <source media="(max-width: 600px)" srcset="docs/assets/workflow-stacked.svg">
+  <img src="docs/assets/workflow-wide.svg" alt="Prepare questions, establish a baseline, add context, compare answers, then inspect failures." width="860">
+</picture>
 
-Measured on a fresh clone: the **first** run takes about 14 seconds, because
-`uv` builds the virtual environment and caches bytecode. Every run after that
-is about 0.17 seconds. The recording above is a warm run.
+<a id="what-gets-compared"></a>
 
-That is `contextlift demo`: the whole loop on seven rows of data, with no key,
-no cloud and no network. The model answers in it are canned and it says so on
-screen; the warehouse, the SQL execution, the paired test and the verdict are
-the real code. Re-record it with `make demo-gif`.
+An **arm** is the same questions answered under one condition. Compare SQL
+results against a reviewed answer key, then compare the two arms. Different
+SQL that returns the same answer can count as correct.
 
-```mermaid
-flowchart LR
-    C["<b>context</b><br/>catalog · BI model · markdown"]:::src
-    K["<b>answer key</b><br/>mine → gate → split"]:::src
-    A["<b>two arms</b><br/>same questions,<br/>one difference"]:::core
-    G["<b>generate</b><br/>ask the agent, twice"]:::core
-    S["<b>score</b><br/>run both queries,<br/>compare the rows"]:::core
-    B["<b>ablate</b><br/>paired test,<br/>95% interval"]:::core
-    V(["<b>REAL GAIN</b><br/>or <b>NOT PROVEN</b>"]):::out
-    C --> A
-    K --> A
-    A --> G --> S --> B --> V
-    classDef src fill:#ddf4ff,stroke:#0969da,stroke-width:1px,color:#0a3069
-    classDef core fill:#f6f8fa,stroke:#57606a,stroke-width:1px,color:#1f2328
-    classDef out fill:#dafbe1,stroke:#1a7f37,stroke-width:2px,color:#0a3622
-```
+Use three repetitions per arm. Improve context on the working questions and
+reserve a holdout for one final comparison. The
+[methodology](docs/METHODOLOGY.md) explains the statistics and their limits.
 
-An *arm* is the same questions answered under one condition. Two arms differ
-only by the context the model was given, so the gap between them is what the
-context was worth. Eight commands complete one measurement:
-
-| command | what it does |
-|---|---|
-| `doctor` | check the machine can do the run at all |
-| `gate` | audit the answer key for defects, before anything is spent |
-| `split` | set aside questions to be read once, at the end |
-| `lint` | refuse context that cannot help, before paying for a round |
-| `round` | generate, score and compare both arms in one command |
-| `bundle` | write the run and its evidence to a single HTML file |
-| `next` | read the workspace and print the exact command to run next |
-| `demo` | the whole loop on a toy database, offline |
-
-`contextlift --help` lists those eight. `contextlift --help-all` lists all 47.
-
-**Three rules the tool enforces rather than suggests.** *Run every arm more than
-once* — temperature 0 is not reproducible, and on one engagement no single
-repetition reached significance while the pooled three did (p=0.031). *Baseline
-before curation* — it is the only number showing what curation was worth, and it
-cannot be recovered afterwards. *Hold questions out* — scoring on the questions
-that guided your curation measures how well you fitted them, so `climb` warns
-unless you pass `--holdout`.
-
-## What gets compared
-
-Not SQL text. SQL results. The predicted query and the gold query both run
-against a database, and the row sets are compared under SQL semantics:
-column-order independent, multiset unless the gold has `ORDER BY`, float
-tolerant to 4 decimals, NULL-safe. Two queries written differently that return
-the same rows count as a match. This is the Spider/BIRD *execution accuracy*
-metric.
-
-The `gate` runs upstream and is separate: it audits the answer key itself,
-because one broken gold question silently corrupts every score after it.
-
-## Install
+Once you have a workspace, ask for the next step:
 
 ```bash
-make install                  # uv venv + editable install with dev deps, no cloud extras
-source .venv/bin/activate     # the `contextlift` command lives here
-make test                     # fast suite, no cloud, no key
+contextlift --workspace /path/to/evaluation next
 ```
 
-`make test` runs green from a fresh clone with no credentials. That is checked
-by `tests/test_fresh_clone.py`, not just claimed.
+<a id="everything-measured-so-far"></a>
 
-Every `make` target runs through `uv run` and works without activating. The
-bare `contextlift` command does not — without that `activate` line, the first
-command in either guide fails with *command not found*.
+## Measured results
 
-The core is Python standard library over SQLite. Cloud backends are optional:
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/assets/results-dark.svg">
+  <img src="docs/assets/results-light.svg" alt="Per-question accuracy lift: BIRD 3 databases +30.8 points, BIRD 11 databases +18.5, BEAVER +9.7; a BI model with no written descriptions +2.0, not proven. Intervals and qualifications follow in the results record." width="520">
+</picture>
 
-```bash
-uv pip install --python .venv/bin/python -e ".[bigquery]"   # --db bq://PROJECT/DATASET
-uv pip install --python .venv/bin/python -e ".[gemini]"     # the LLM judge
-uv pip install --python .venv/bin/python -e ".[catalog]"    # Google Knowledge Catalog
-```
+These studies measured gains from written context; the BI model without
+written descriptions did not establish a gain. They use different question
+sets and conditions, so their lift values are not a ranking of approaches.
 
-`--python .venv/bin/python` pins the interpreter. A `VIRTUAL_ENV` left over from
-another checkout otherwise wins, and the extra lands there.
+[Full results, limitations, and reproduction commands](docs/CASE_STUDY.md) ·
+[Chart data and sources](docs/assets/results.json)
+
+<a id="repo-layout"></a>
 
 ## Documentation
 
-| read | when |
+| I want to… | Start here |
 |---|---|
-| [QUICKSTART](docs/QUICKSTART.md) | you want it running in three steps, the first one second long |
-| [WALKTHROUGH](docs/WALKTHROUGH.md) | one real loop end to end, every command and its output |
-| [ONBOARDING](docs/ONBOARDING.md) | you have a warehouse, an afternoon, and a blank file |
-| [PRACTICES](docs/PRACTICES.md) | thirteen practices, each printed beside the measurement that earned it |
-| [METHODOLOGY](docs/METHODOLOGY.md) | why each number is computed this way, with citations and known limits |
-| [CASE_STUDY](docs/CASE_STUDY.md) | every measured result, with the command that produced it |
-| [ATTRIBUTION](docs/ATTRIBUTION.md) | how one written line gets credited or blamed for one question |
-| [CONTEXT-SOURCES](docs/CONTEXT-SOURCES.md) | where each piece of knowledge belongs in a catalog, then the field notes from a live estate |
-| [SECURITY-AND-DATA](docs/SECURITY-AND-DATA.md) | what leaves your estate and what does not |
-| [COLD-RUN](docs/COLD-RUN.md) | proving the loop on a dataset nobody here has seen |
-| [AUTHORING](docs/AUTHORING.md) | adding a warehouse or an agent: two protocols, and what a new one must not do |
-| [ROADMAP](docs/ROADMAP.md) | what is wanted, and what is deliberately not planned, with the reasons |
+| Try a local example | [Quickstart](docs/QUICKSTART.md) |
+| Evaluate my own data | [Evaluation guide](docs/EVALUATE.md) |
+| Write useful business context | [Context-writing guide](docs/ONBOARDING.md) |
+| Understand a verdict | [Methodology](docs/METHODOLOGY.md) |
+| Browse all guides and research | [Documentation index](docs/README.md) |
 
-`contextlift <verb> --help` is the reference for every verb and flag. It is
-generated from the code, so it cannot disagree with the code.
+For flags, use `contextlift --help` and `contextlift <command> --help`.
+`contextlift --help-all` includes specialist commands.
 
-Contributing: [CONTRIBUTING.md](CONTRIBUTING.md). Reporting a vulnerability:
-[SECURITY.md](SECURITY.md). Everything runs offline, so `make install &&
-make test` is the whole setup.
+## Contributing
 
-## Repo layout
-
+```bash
+make install
+make test
 ```
-src/context_lift/   the package: 48 commands, one per stage of the loop
-tests/              the fast suite — no cloud, no key, no network
-examples/           bird, beaver, thelook: each with its own README and runbook
-docs/               methodology, results, security, and the two guides
-scripts/            stage runners that are not verbs yet (LookML reader, convention miner)
-docs/assets/        the README's chart and demo, and the script that draws them
-deploy/             a Cloud Run job, for a round that outlives a laptop
-```
+
+After dependencies are installed, `make test` runs offline from a fresh clone
+without credentials. See [Contributing](CONTRIBUTING.md) for development and
+[Authoring](docs/AUTHORING.md) for adding a warehouse or agent.
+
+Data handling: [Security and data](docs/SECURITY-AND-DATA.md).
+Report vulnerabilities through [Security](SECURITY.md).
 
 ## License
 

@@ -1,5 +1,30 @@
 # What to do before you measure written context
 
+[Documentation](README.md) / Research / Practices
+
+This is a research record. For current setup and commands, start with
+[Evaluate your data](EVALUATE.md). Costs and timings below belong to the cited runs.
+
+## On this page
+
+- [1. Name the datasets. Do not let the tool choose them.](#1-name-the-datasets-do-not-let-the-tool-choose-them)
+- [2. Mine the data somebody has already written about.](#2-mine-the-data-somebody-has-already-written-about)
+- [3. Check the set can resolve the effect before paying for the round.](#3-check-the-set-can-resolve-the-effect-before-paying-for-the-round)
+- [4. Report three separate facts, and never dress one as another.](#4-report-three-separate-facts-and-never-dress-one-as-another)
+- [5. Write rules with a subject.](#5-write-rules-with-a-subject)
+- [6. Say which table a rule applies to.](#6-say-which-table-a-rule-applies-to)
+- [7. A convention counted from query history is evidence, not a definition.](#7-a-convention-counted-from-query-history-is-evidence-not-a-definition)
+- [8. Do not write a rule about a question whose hard part is a value.](#8-do-not-write-a-rule-about-a-question-whose-hard-part-is-a-value)
+- [9. Have somebody confirm the answer keys.](#9-have-somebody-confirm-the-answer-keys)
+- [10. Do not swap the model hoping it will fix the floor.](#10-do-not-swap-the-model-hoping-it-will-fix-the-floor)
+- [11. The question drafter is probably your biggest loss. Count it.](#11-the-question-drafter-is-probably-your-biggest-loss-count-it)
+- [12. Read the ledger, not the cost sheets](#12-read-the-ledger-not-the-cost-sheets)
+- [13. An example handed to the wrong question is a distractor, measured](#13-an-example-handed-to-the-wrong-question-is-a-distractor-measured)
+- [What is still unproven, stated plainly](#what-is-still-unproven-stated-plainly)
+- [14. A semantic layer is not written business context. Measure its description share before trusting it.](#14-a-semantic-layer-is-not-written-business-context-measure-its-description-share-before-trusting-it)
+- [15. Do not narrow reference text to the one line you think applies](#15-do-not-narrow-reference-text-to-the-one-line-you-think-applies)
+- [16. A per-question snippet can never be cached. A shared block can.](#16-a-per-question-snippet-can-never-be-cached-a-shared-block-can)
+
 Every practice here has a measurement behind it and a command that checks it.
 A practice without its measurement is an opinion, and this file is not for
 opinions.
@@ -599,3 +624,5 @@ warming the first one raises the share, and how high it can go, is not
 measured. Nor is the size of the discount itself: the reference says savings
 are passed on and gives no multiplier, so this project bills cached tokens at
 the full rate and treats any saving as unmodelled upside.
+
+[Documentation index](README.md) · Next: [Case studies](CASE_STUDY.md)

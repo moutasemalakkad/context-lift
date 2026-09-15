@@ -137,7 +137,17 @@ results-chart:  ## redraw the README's results chart from docs/assets/results.js
 demo-gif:  ## re-record the README's terminal demo (needs: brew install vhs ttyd ffmpeg)
 	@command -v vhs >/dev/null || { echo "vhs not found: brew install vhs ttyd ffmpeg"; exit 1; }
 	@PATH="$(PWD)/.venv/bin:$$PATH" vhs docs/assets/demo.tape
+	@ffmpeg -hide_banner -loglevel error -y -i /tmp/contextlift-demo-full.gif -filter_complex 'crop=960:505:0:0,split[a][b];[a]palettegen[p];[b][p]paletteuse' -loop 0 docs/assets/demo.gif
+	@$(MAKE) demo-still
 	@ls -lh docs/assets/demo.gif | awk '{print "wrote docs/assets/demo.gif ("$$5")"}'
 
 clean: ## remove venv, caches, and scratch example DBs
 	rm -rf .venv .pytest_cache **/__pycache__ *.egg-info examples/*.db
+
+.PHONY: demo-still
+demo-still: ## extract a still frame from the README recording (needs ffmpeg)
+	ffmpeg -hide_banner -loglevel error -y -ss 8 -i docs/assets/demo.gif -frames:v 1 docs/assets/demo-still.png
+
+.PHONY: readme-workflow
+readme-workflow: ## redraw the responsive README workflow SVGs
+	python3 scripts/make_readme_workflow.py

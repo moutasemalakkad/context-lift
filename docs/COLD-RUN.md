@@ -1,5 +1,10 @@
 # Cold run: prove the loop as an analyst, not as a model
 
+[Documentation](README.md) / Research / Cold-run protocol
+
+This is a research record. For current setup and commands, start with
+[Evaluate your data](EVALUATE.md). Costs and timings below belong to the cited runs.
+
 Instructions for an agent doing a cold run. A cold run answers one question:
 can an ordinary analyst, using only the commands in this repository, find
 out whether business context makes a data agent more accurate?
@@ -145,3 +150,5 @@ you ran and its output.
 The measure of success is not a large lift. It is that an analyst got from
 a warehouse to a defensible number without anyone helping them, and that
 every stop on the way is written down so it can be fixed.
+
+[Documentation index](README.md) · Next: [Evaluate your data](EVALUATE.md)

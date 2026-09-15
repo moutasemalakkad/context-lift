@@ -1,390 +1,213 @@
-# What to write, per dataset, before you measure anything
+# Write business context
 
-A data team asked what to document first. This is the answer, and it is not an
-opinion: on one enterprise BigQuery estate we ran **two different kinds of
-written context past the same agent, on the same day**, and they went in
-opposite directions.
+[Documentation](README.md) / Write business context
 
-| | context A | context B |
-|---|---|---|
-| what it was | the team's own published data-product docs | conventions a model mined from the query log |
-| size | 49 KB | 3 KB |
-| **fully-qualified table names** | **181** | **0** |
-| tables with a business definition | 47 | 0 |
-| bare column names, no table named | 0 | 9 |
-| **result** | **+6.5 points, 4 fixed, 0 broke** | **−6.9 points, 1 fixed, 3 broke** |
+Write down the definitions an agent cannot infer from a schema. Each rule
+should identify the business concept, the table it applies to, and the exact
+condition or calculation. Measure whether it helps before adopting it.
 
-**Where these numbers come from, and what you can and cannot re-run.** Both
-rounds were `contextlift round`; the context counts are
-`scripts/doc_coverage.py` and a grep over each spec's `rules/`. The estate is
-not named here and nothing below identifies it — which also means **its
-artifacts are not in this repository, so no test can recompute these two
-columns.** Take them as reported.
+**Prerequisites:** an agreed dataset scope, a data owner who can verify the
+rules, and a scored baseline over the working questions. Use
+[Evaluate your data](EVALUATE.md) for those steps.
 
-Everything sourced to `docs/CASE_STUDY.md` or to `examples/thelook/` below
-*is* re-runnable, free and offline:
+## On this page
 
-```
-make example-thelook     # recomputes a held-out verdict from committed rows
-make example-beaver       # reads the committed enterprise receipt
-```
+- [Choose what to document](#1-choose-what-to-document)
+- [Use the dataset template](#2-use-the-dataset-template)
+- [Review the draft](#3-review-the-draft)
+- [Install and measure](#4-install-and-measure)
+- [Evidence and field notes](#evidence-and-field-notes)
 
-**The single difference that matters:** the context that helped **names
-tables**. The context that hurt named columns with no table attached, and 8 of
-its 10 bare column names were on no table the agent could see at all.
+## 1. Choose what to document
 
-So the template below is short, and every line in it earns its place.
+Start with the agreed scope and the baseline's working-set failures. Read a
+few failing question/SQL pairs together. A group of rate questions returning
+extra columns may need one reporting convention rather than many examples.
 
----
+Use [query demand](EVALUATE.md#bigquery) or an owner-provided dataset list to
+choose scope. Confirm that the schema shown to the agent includes the tables
+needed by the questions. Scope cannot be inferred from dataset names.
 
-## If you only have one hour
+If you have a LookML project, inspect the descriptions already present:
 
-You will not fill six sections for 27 datasets, and you should not try. This
-is the order, and it is ranked by what was measured rather than by what feels
-thorough.
-
-### First: pick the datasets. Do not guess this.
-
-On the estate above, **12 of 27 documented data products had no analytical
-query in 180 days**, while the five most-queried had no documentation at all.
-A team had been writing, carefully, about data nobody asked about.
-
-Twenty minutes, and it decides everything after it:
-
-```
-contextlift log --db bq://YOUR_PROJECT --days 180 --limit 2000 \
-    --min-tables 2 --require-analytical --out query_log.csv
+```bash
+contextlift --workspace /path/to/evaluation semantic --lookml /path/to/lookml
 ```
 
-Then rank the datasets by how many distinct people ran queries against them.
-Write about the top five. Ignore the rest until those five are done.
+Definitions, join paths, and written descriptions are different inputs. The
+[BI-model case study](CASE_STUDY.md#measure-the-description-share-before-counting-on-a-bi-model-0-of-9-20-points)
+shows why measuring the descriptions matters.
 
-### Before any of it: "we already have Looker, can't you just read that?"
+## 2. Use the dataset template
 
-Ask this first, because it is the first thing said in every meeting, and the
-answer is measured rather than argued. **One free command answers it for your
-project:**
+Start from the [dataset template](../examples/onboarding/TEMPLATE.md).
+See the [completed theLook example](../examples/onboarding/EXAMPLE-thelook.md)
+for the intended level of detail. Use one page per dataset and fill in:
 
-```
-contextlift semantic --lookml /path/to/your-looker-repo
-```
+| Section | What to write |
+|---|---|
+| Purpose | The business process and the questions this dataset answers |
+| Tables | Fully qualified names and what one row represents |
+| Sources | Where the data comes from and which source is authoritative |
+| Business terms | Map each term to a column or condition, naming its table |
+| Exclusions | Rows the metric excludes, with the business reason |
+| Worked questions | Reviewed examples drawn only from the permitted example pool |
 
-Read one line of the output — how many metrics carry a written description.
+### Make each rule specific
 
-```
-  9 metrics, 0 with a written description (0%)      <- Looker's own public project
-```
-
-On a project like that, a full round measured **+2.0 points, NOT PROVEN
-(p = 0.6875), and safety MIXED** — it broke two questions that were right
-without it. Against **+12.2 points** for the hand-written rules in row 4
-below. The extraction is worth the join paths and little else.
-
-The reason is structural, not a Looker complaint. A LookML measure carries a
-`type` and an expression, so it can tell an agent `SUM(sale_price)`. It has
-nowhere to say *which rows count*. "Revenue is the sale price of items that
-are neither Cancelled nor Returned" has no field in LookML except
-`description`, and the description is what nobody fills in.
-
-So: if your description share is near zero, do not spend the afternoon on a
-connector. Do the table below. If your share is high — a project analysts
-have maintained for years may well be — that changes the answer, and the
-command above is how you find out for nothing.
-
-Published benchmarks are not in conflict with this. Cube measured +17 to +23
-points from a semantic layer, and dbt Labs +8 — from **hand-written prose
-about business conventions**, which is the same thing the table below asks you
-to write. "We have a semantic layer" and "we have written business context"
-are treated as one sentence in the industry. They are two.
-
-### Then, per dataset, in this order
-
-| do this | minutes | why, measured |
-|---|---|---|
-| **1. Name the tables, fully qualified, and say what one row is** | 10 | 181 of these in the context that gained +6.5; **zero** in the context that lost 6.9 |
-| **2. Write down exact spellings of status and code values** | 5 | on a public set, `'shipped'` in lower case returns zero rows and looks like an answer. One line, and it was the most load-bearing in the file |
-| **3. Rows people do not want** | 10 | never written down anywhere, and an agent will confidently return a wrong total without them |
-| **4. Business word to column mapping, and the rules** | 15 | **+12.2 points** measured directly: removing the rules class took a public set from 42% to 30%, 11 questions broken against 2 fixed |
-| **5. What the dataset is for, 2-4 sentences** | 5 | present in 17 of 17 documents that gained; it is how an agent chooses between two plausible tables |
-| **6. Worked questions with their SQL — only if you can route them** | 15 | **see the correction below.** Shipped to every question, a 22-example bank measured **-24.3 points** |
-
-**About 60 minutes per dataset, and the order is the point.**
-
-### Corrected 2026-09-12, and the correction is the finding
-
-An earlier version of this table put worked examples third and the glossary
-last, citing +6.9 and +1.9 from a different benchmark. **A direct
-leave-one-class-out ablation on `examples/thelook` says the opposite.** Same
-74 questions, one class removed per arm, 370 model calls:
-
-```
-  examples              -24.3 points [-34.8, -13.9]   66% without it vs 42% with
-                                                       19 fixed, 1 broke
-                                                       BETTER WITHOUT IT
-  rules                 +12.2 points [+3.0, +21.3]     30% without vs 42% with
-                                                       2 fixed, 11 broke
-                                                       CARRIES ITS WEIGHT
-  terms                  +1.4 points [-5.6, +8.4]      not shown either way
-  authored descriptions  -0.0 points [-6.5, +6.5]      not shown either way
+```text
+On `project.sales.orders`, net revenue is SUM(order_total - refund_total).
+Exclude rows where order_type = 'TEST'.
+Report one row per calendar month using the order_date column.
 ```
 
-Command: `contextlift classes --spec examples/thelook/spec --golds
-examples/thelook/golds.csv --run`. The full arm scored 42% against 39.2% on
-the committed run two days earlier, so this reproduces rather than drifts.
+This is an illustrative format, not a rule to copy into your warehouse.
+Check the real names, literals, grain, and metric definition with the owner.
+Avoid a formula such as “sum(a) - sum(b)” without naming what it measures.
 
-**Why examples hurt here, and it is not that examples are bad.** The bank is
-22 items and 9,063 bytes, and it travels with every question:
+### Treat examples as a separate choice
 
-```
-  matched an example        about 1 question in 3
-  carried it anyway         the other 2 in 3
-```
+An example needs to be relevant to the question receiving it. A bank sent to
+every question can distract the agent; a matched example can help. Keep the
+example pool disjoint from scored questions and respect the template-twin
+checks. A question must never be its own example.
 
-So two thirds of questions were handed 9 KB of SQL answering a different
-question. Irrelevant context is measurably worse than none
-(https://arxiv.org/pdf/2408.07702), and this is that effect at full size.
+For curation-set iteration, split the working set again if needed to build a
+disjoint example pool. Do not read holdout answers to choose examples. See
+[the worked-example findings](PRACTICES.md#13-an-example-handed-to-the-wrong-question-is-a-distractor-measured).
 
-**So the rule is about routing, not about examples.** An example handed to
-the question it matches is the strongest lever this project has measured
-(+6.9 on a 596-question benchmark). The same example handed to every question
-is a distractor. If you cannot route examples per question, do not ship them
-— write rows 1 to 5 instead and stop.
+## 3. Review the draft
 
-Two independent experiments now point the same way: this ablation, and a
-customer round where every break landed on a question the rules did not apply
-to.
+Before installing context, have a person check:
 
-### What to tell somebody who has 15 minutes
+- Does every rule have a subject and a table scope?
+- Are metric definitions, status values, and exclusions verified?
+- Is the reporting grain explicit where it matters?
+- Does a rule express reusable business knowledge rather than an answer to
+  one evaluation question?
+- Are examples relevant, permitted, and separate from the questions scored?
+- Are the sources and any unresolved ambiguities recorded?
 
-Rows 1 and 2 only. Fully-qualified table names, what one row is, and the exact
-spelling of every status value. That is it. It is the difference between the
-two contexts in the table at the top of this page.
+`draft-rules` and `draft-context` produce drafts. Estimate paid drafting first,
+then use an approved budget. A draft is not ready merely because it parses;
+a person must review it before `context-write` installs it.
 
----
+## 4. Install and measure
 
-## Why "add some business rules" fails as an instruction
+Use the workspace containing the baseline. After reviewing the draft:
 
-It is the request customers are usually given and it is unanswerable, for
-three reasons we can now name:
-
-- **It does not say what a rule is attached to.** Five of the ten rule lines
-  in the failing context had no subject at all: *"Compute it as
-  `sum(a) - sum(b)`"*. Compute **what**?
-- **It does not say which part.** "Business rules" means a glossary to most
-  people, and a glossary is two different things: the word-to-column mapping
-  (+1.4, not shown either way) and the conventions that decide how to answer
-  (+12.2, the largest measured effect). Asking for "rules" gets the first.
-- **It gives no stopping condition.** A dataset can absorb unlimited writing.
-  The table above stops at 60 minutes and says what you get for each block of
-  it.
-
-Replace it with: *"For your five most-queried datasets, name every table in
-full, say what one row is, and give us two real questions with the SQL."*
-That is a request somebody can finish.
-
----
-
-## The template: one page per dataset
-
-Copy `examples/onboarding/TEMPLATE.md`. One file per dataset, not per table.
-About an hour each, and the order matters more than the total -- see above.
-
-```
-# <Dataset display name>   (`<dataset_id>`)
-
-## What this is for
-<2-4 sentences. What business process does this data describe? Who uses it
-and to answer what? Write it for somebody who has never opened the tables.>
-
-## The tables
-- `project.dataset.table`: <what one row is, and what the table is for.>
-- `project.dataset.table`: <same. fully qualified, every time.>
-
-## Where the data comes from
-<Source systems, in your words. "Orders from S4 via HANA; product master
-from MDM." An agent cannot guess this and a schema does not say it.>
-
-## Words we use that the columns do not
-- "<business word>" means <column or condition>, on `project.dataset.table`.
-
-## Rows people usually do not want
-- <filter>, on `project.dataset.table`, because <reason>.
-
-## Two questions and their SQL
-<The highest-value section, and the one people skip. See below.>
+```bash
+contextlift --workspace /path/to/evaluation context-write \
+  --source-file /path/to/evaluation/context/rules_draft.md \
+  --to /path/to/evaluation/context/rules.md
+contextlift --workspace /path/to/evaluation leak \
+  --predictions /path/to/evaluation/holdout.csv \
+  --context /path/to/evaluation/context/rules.md
+contextlift --workspace /path/to/evaluation next
 ```
 
----
+Follow the [comparison steps](EVALUATE.md#5-write-and-compare-context): answer
+the same working questions with context, score each repetition once, and
+compare with the baseline reports. Later `context-write` calls replace the
+working file unless you use `--add`; the workspace retains its history.
 
-## Why each section is there
+**Expected result:** a versioned context file, a leak check, and a measured
+working-set comparison. Report both gains and broken questions. Use attribution
+to investigate a rule, then confirm it with an arm that removes that rule.
 
-### "What this is for" — 2 to 4 sentences
+For a catalog arm, read [Context sources and catalogs](CONTEXT-SOURCES.md).
+A catalog may serve fewer context channels than a file-based arm, so inspect
+what is read back before comparing the conditions.
 
-Every one of the 17 documents that produced +6.5 points had one. It is what
-lets an agent pick between two tables that both look plausible by name.
+## Evidence and field notes
 
-### "The tables" — fully qualified, every time
+The original guide mixed the writing checklist with dated experiments and
+operational incidents. Those observations, including the worked-example
+correction and service-account deployment record, are preserved in
+[Field notes](FIELD-NOTES.md#context-writing-observations).
 
-This is the section with the evidence behind it. 181 fully-qualified names in
-the context that worked, 0 in the context that failed.
+Use [Case studies](CASE_STUDY.md) for source-backed benchmark results and
+[Practices](PRACTICES.md) for the evidence behind the recommendations.
 
-**Fully qualified means `project.dataset.table`, not `table`.** On that estate
-two projects held copies of the same data, and an answer key that read one
-copy while the agent read the other scored wrong for a reason that had nothing
-to do with anybody's understanding. A bare table name cannot tell them apart.
+[Documentation index](README.md) · Next: [Compare your context](EVALUATE.md#5-write-and-compare-context)
 
-Say what **one row is**. "One row is one purchase-order line per delivery
-milestone" is worth more than three sentences about the business process.
+<details>
+<summary>Links to the former sections</summary>
 
-### "Where the data comes from"
+<a id="if-you-only-have-one-hour"></a>
 
-17 of 17 working documents had this. It sounds like background and it is not:
-*"shipments from Infor Nexus, purchase orders from S4"* tells an agent which
-table is authoritative when two of them disagree, which is a question the
-schema cannot answer.
+[If you only have one hour](FIELD-NOTES.md#if-you-only-have-one-hour)
 
-### "Words we use that the columns do not" — and name the table
+<a id="first-pick-the-datasets-do-not-guess-this"></a>
 
-Write the mapping, and **name the table it applies to**:
+[First: pick the datasets. Do not guess this.](FIELD-NOTES.md#first-pick-the-datasets-do-not-guess-this)
 
-```
-  GOOD  "North America" means cluster = 'USCA', on `proj.ds.dim_location`.
-  BAD   `cluster` holds USCA for North America.
-```
+<a id="before-any-of-it-we-already-have-looker-cant-you-just-read-that"></a>
 
-The bad version is what the failing context looked like. On that estate the
-same concept was filtered on two different columns in two different tables,
-so an unscoped rule was true and unhelpful at the same time.
+[Before any of it: "we already have Looker, can't you just read that?"](FIELD-NOTES.md#before-any-of-it-we-already-have-looker-cant-you-just-read-that)
 
-### "Rows people usually do not want"
+<a id="then-per-dataset-in-this-order"></a>
 
-Exclusions are the highest-value thing a data team knows and the least likely
-to be written down. *"Test orders have `order_type = 'ZTST'`; nobody wants
-them in a sales number."* An agent will never guess it and will confidently
-return a wrong total.
+[Then, per dataset, in this order](FIELD-NOTES.md#then-per-dataset-in-this-order)
 
-Name the table here too.
+<a id="corrected-2026-09-12-and-the-correction-is-the-finding"></a>
 
-### "Two questions and their SQL" — do not skip this
+[Corrected 2026-09-12, and the correction is the finding](FIELD-NOTES.md#corrected-2026-09-12-and-the-correction-is-the-finding)
 
-The best-measured lever in this framework is not prose. On a public
-enterprise benchmark, a leak-checked bank of worked examples was worth
-**+6.9 points** where an iterated glossary was worth **+1.9**
-(`docs/CASE_STUDY.md`). Two real questions with the SQL your team would
-actually write beats another page of description.
+<a id="what-to-tell-somebody-who-has-15-minutes"></a>
 
-Two rules for them:
+[What to tell somebody who has 15 minutes](FIELD-NOTES.md#what-to-tell-somebody-who-has-15-minutes)
 
-1. **Real questions, not toy ones.** Take them from what somebody asked last
-   week.
-2. **Not a question you plan to test on.** An example that answers a scored
-   question makes the score meaningless. `contextlift leak` refuses those, and
-   it caught 25 on one build.
+<a id="why-add-some-business-rules-fails-as-an-instruction"></a>
 
----
+[Why "add some business rules" fails as an instruction](FIELD-NOTES.md#why-add-some-business-rules-fails-as-an-instruction)
 
-## What NOT to write, each one measured
+<a id="the-template-one-page-per-dataset"></a>
 
-**A formula with no subject.** Five of the ten rule lines in the failing
-context read like this:
+[The template: one page per dataset](FIELD-NOTES.md#the-template-one-page-per-dataset)
 
-```
-  Compute it as `sum(count_of_eligible_days) - sum(count_of_oos_days)`.
-```
+<a id="why-each-section-is-there"></a>
 
-Compute **what**? The file that generated them admitted it: naming the metric
-*"is a person's job"*. An instruction an agent cannot attach to anything is
-not context.
+[Why each section is there](FIELD-NOTES.md#why-each-section-is-there)
 
-**A column name with no table.** 8 of 10 bare column names in the failing
-context were on no table the agent could see.
+<a id="what-this-is-for--2-to-4-sentences"></a>
 
-**A rule about a value the question already gives.** If the question says
-"in March 2026", writing down the date range teaches nothing. Worse, a rule
-that spells out a value the question *omits on purpose* hands the answer to
-the arm that has no documentation, and then the measurement says nothing.
+["What this is for" — 2 to 4 sentences](FIELD-NOTES.md#what-this-is-for--2-to-4-sentences)
 
-**A page about data nobody queries.** On that estate, 12 of 27 documented data
-products had **no analytical query in 180 days**, while the five most-queried
-had no documentation at all. Check before you write:
+<a id="the-tables--fully-qualified-every-time"></a>
 
-```
-uv run python scripts/doc_coverage.py CANDIDATES.csv GOLDS.csv
-```
+["The tables" — fully qualified, every time](FIELD-NOTES.md#the-tables--fully-qualified-every-time)
 
-**Anything you are guessing.** A wrong rule is worse than a missing one. It
-moved one question off a table that already had the column it needed, cost
-30 GB of extra scan, and broke an answer that had been right.
+<a id="where-the-data-comes-from"></a>
 
----
+["Where the data comes from"](FIELD-NOTES.md#where-the-data-comes-from)
 
-## Getting it into the agent
+<a id="words-we-use-that-the-columns-do-not--and-name-the-table"></a>
 
-```
-  your pages          a reader            a spec         Knowledge Catalog
-  (markdown)     ->   read_catalog_docs -> spec/rules/ -> spec-push --provenance
-                      (deterministic,                          |
-                       no model, so it                         v
-                       cannot paraphrase                  arms --served
-                       your words)                        (what lookupContext
-                                                           actually hands back)
-```
+["Words we use that the columns do not" — and name the table](FIELD-NOTES.md#words-we-use-that-the-columns-do-not--and-name-the-table)
 
-The reader is deliberately dumb — regular expressions, no model. Two reasons,
-both learned the hard way. A regex fails loudly and a model fails politely:
-an early version of that reader silently carried 8 table names out of 34
-files and the output still read fine. And if a model rewrites your
-documentation, the thing being measured is no longer **your** documentation.
+<a id="rows-people-usually-do-not-want"></a>
 
-## Then measure, and check the set can answer before you pay
+["Rows people usually do not want"](FIELD-NOTES.md#rows-people-usually-do-not-want)
 
-```
-uv run python scripts/estate_shape.py GOLDS.csv     # free
-uv run python scripts/resolvable_lift.py            # free
-```
+<a id="two-questions-and-their-sql--do-not-skip-this"></a>
 
-A round is scored only on questions where the two arms **disagree**. Six
-disagreements all pointing the same way is the cheapest significant result
-that exists. If your set is expected to move fewer than six, no amount of
-good writing will produce a verdict — and `contextlift round` now refuses to
-spend, and says so.
+["Two questions and their SQL" — do not skip this](FIELD-NOTES.md#two-questions-and-their-sql--do-not-skip-this)
 
----
+<a id="what-not-to-write-each-one-measured"></a>
 
-## Running it without a person's credential
+[What NOT to write, each one measured](FIELD-NOTES.md#what-not-to-write-each-one-measured)
 
-A framework that runs only from one laptop, with one human's login, cannot be
-handed to anybody. It also cannot survive a corp policy: on 2026-09-12 a
-Google corp account was refused by the Conversational Analytics API with
-`access_denied: Account restricted`, raised while *minting the token*, so no
-project or permission change reached it. Five routes were tried:
+<a id="getting-it-into-the-agent"></a>
 
-```
-  the account directly              Account restricted
-  a second project                  Account restricted  (account, not project)
-  service-account impersonation     Account restricted  (the corp identity is
-                                    still what asks for the token)
-  a gcert refresh                   Account restricted  (OAuth, not LOAS)
-  a downloaded service-account key  org policy: enforced: true
-```
+[Getting it into the agent](FIELD-NOTES.md#getting-it-into-the-agent)
 
-`deploy/cloud_run_job.sh` is the sixth, and it is not a workaround. On Cloud
-Run the machine **is** the service account: its metadata server hands the
-process a token with no login, no key on disk and no human in the chain.
+<a id="then-measure-and-check-the-set-can-answer-before-you-pay"></a>
 
-```
-  export CONTEXTLIFT_RUN_PROJECT=your-project
-  export CONTEXTLIFT_RUN_SA=runner@your-project.iam.gserviceaccount.com
-  deploy/cloud_run_job.sh build
-  deploy/cloud_run_job.sh run round --golds golds.csv --spec spec/ ...
-  deploy/cloud_run_job.sh logs
-```
+[Then measure, and check the set can answer before you pay](FIELD-NOTES.md#then-measure-and-check-the-set-can-answer-before-you-pay)
 
-Verified end to end the same day: the image built on Cloud Build in 56
-seconds, `contextlift demo` ran inside the job, and a `classes --run` probe
-answered 13 real chat calls as the service account against the API that
-refuses the human account.
+<a id="running-it-without-a-persons-credential"></a>
 
-Two reasons to prefer it even where a laptop works. A round takes an hour and
-a laptop sleeps. And `.dockerignore` excludes `_personal/`, so customer data
-cannot be built into an image by accident.
+[Running it without a person's credential](FIELD-NOTES.md#running-it-without-a-persons-credential)
+
+</details>

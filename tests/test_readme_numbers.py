@@ -208,7 +208,7 @@ def test_the_readme_points_at_both_guides_and_apologises_for_neither():
     assert "was deleted on" not in text
 
 
-def test_the_quickstart_says_how_many_defect_classes_the_gate_has():
+def test_the_evaluation_guide_says_how_many_defect_classes_the_gate_has():
     """It said 12 for a while after the count reached 15, which is the kind of
     number a reader checks by counting the table and then distrusts the rest
     of the document."""
@@ -219,23 +219,35 @@ def test_the_quickstart_says_how_many_defect_classes_the_gate_has():
     warnings = {"MISSING_LITERAL", "MISSING_ORDER", "MISSING_PROJECTION",
                 "LITERAL_ON_WRONG_COLUMN"}
     defects = [n for n in names if n not in warnings]
-    text = (REPO / "docs" / "QUICKSTART.md").read_text()
+    text = (REPO / "docs" / "EVALUATE.md").read_text()
     assert f"{len(defects)} defect classes" in text, \
-        f"the gate has {len(defects)} defect classes; QUICKSTART says otherwise"
+        f"the gate has {len(defects)} defect classes; EVALUATE says otherwise"
     assert f"{len(warnings)} warnings" in text
 
 
-def test_every_command_the_quickstart_tells_you_to_run_exists():
-    """A first-impression problem of its own: a stranger's first paste
-    failing with "invalid choice" is the last command they run."""
-    import re
+def test_getting_started_commands_parse_with_the_real_cli():
+    """Validate the first commands readers paste, including global flag order.
+
+    The former quickstart put --workspace after the verb and accepted it in
+    this test because only verb names were checked. Parse flags too, without
+    executing a query or contacting any backend.
+    """
+    import shlex
 
     from context_lift.cli import _build_parser
-    verbs = set(_build_parser()._subparsers._group_actions[0].choices)
-    text = (REPO / "docs" / "QUICKSTART.md").read_text()
-    told = set(re.findall(r"contextlift ([a-z][a-z-]*)", text))
-    unknown = sorted(told - verbs)
-    assert not unknown, f"QUICKSTART names commands that do not exist: {unknown}"
-    # and the flags on the log line, which is the step the document argues for
+
+    parser = _build_parser()
+    checked = []
+    for name in ("README.md", "docs/QUICKSTART.md", "docs/EVALUATE.md",
+                 "docs/ONBOARDING.md"):
+        text = (REPO / name).read_text()
+        for block in re.findall(r"```bash\n(.*?)```", text, re.S):
+            for command in block.replace("\\\n", " ").splitlines():
+                if not command.startswith("contextlift "):
+                    continue
+                parser.parse_args(shlex.split(command)[1:])
+                checked.append(command)
+    assert len(checked) >= 15, "the runnable examples were not checked"
+    guide = (REPO / "docs/EVALUATE.md").read_text()
     for flag in ("--min-tables", "--require-analytical", "--max-bytes"):
-        assert flag in text, f"QUICKSTART's log step lost {flag}"
+        assert flag in guide, f"EVALUATE's log step lost {flag}"

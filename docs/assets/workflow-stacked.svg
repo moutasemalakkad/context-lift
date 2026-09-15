@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="360" height="386" viewBox="0 0 360 386" role="img" aria-labelledby="title" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Arial, sans-serif">
+<title id="title">Prepare questions, establish baseline, add context, compare answers, then inspect failures.</title>
+<rect x="30" y="8" width="300" height="58" rx="8" fill="#f6f8fa" stroke="#8c959f"/>
+<circle cx="58" cy="37" r="15" fill="#0969da"/>
+<text x="58" y="43" text-anchor="middle" font-size="16" fill="#fff">1</text>
+<text x="84" y="43" font-size="17" fill="#1f2328">Prepare questions</text>
+<path d="M180 69 v13 m-4 -4 l4 4 4 -4" fill="none" stroke="#6e7781" stroke-width="1.5" stroke-linecap="round"/>
+<rect x="30" y="86" width="300" height="58" rx="8" fill="#f6f8fa" stroke="#8c959f"/>
+<circle cx="58" cy="115" r="15" fill="#0969da"/>
+<text x="58" y="121" text-anchor="middle" font-size="16" fill="#fff">2</text>
+<text x="84" y="121" font-size="17" fill="#1f2328">Establish baseline</text>
+<path d="M180 147 v13 m-4 -4 l4 4 4 -4" fill="none" stroke="#6e7781" stroke-width="1.5" stroke-linecap="round"/>
+<rect x="30" y="164" width="300" height="58" rx="8" fill="#f6f8fa" stroke="#8c959f"/>
+<circle cx="58" cy="193" r="15" fill="#0969da"/>
+<text x="58" y="199" text-anchor="middle" font-size="16" fill="#fff">3</text>
+<text x="84" y="199" font-size="17" fill="#1f2328">Add context</text>
+<path d="M180 225 v13 m-4 -4 l4 4 4 -4" fill="none" stroke="#6e7781" stroke-width="1.5" stroke-linecap="round"/>
+<rect x="30" y="242" width="300" height="58" rx="8" fill="#f6f8fa" stroke="#8c959f"/>
+<circle cx="58" cy="271" r="15" fill="#0969da"/>
+<text x="58" y="277" text-anchor="middle" font-size="16" fill="#fff">4</text>
+<text x="84" y="277" font-size="17" fill="#1f2328">Compare answers</text>
+<path d="M180 303 v13 m-4 -4 l4 4 4 -4" fill="none" stroke="#6e7781" stroke-width="1.5" stroke-linecap="round"/>
+<rect x="30" y="320" width="300" height="58" rx="8" fill="#f6f8fa" stroke="#8c959f"/>
+<circle cx="58" cy="349" r="15" fill="#0969da"/>
+<text x="58" y="355" text-anchor="middle" font-size="16" fill="#fff">5</text>
+<text x="84" y="355" font-size="17" fill="#1f2328">Inspect failures</text>
+</svg>

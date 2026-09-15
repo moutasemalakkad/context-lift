@@ -1,5 +1,19 @@
 # Security and data handling
 
+[Documentation](README.md) / Security and data
+
+## On this page
+
+- [The short answer](#the-short-answer)
+- [Three channels, and nothing else](#three-channels-and-nothing-else)
+- [Credentials](#credentials)
+- [What an AI assistant driving this can and cannot do](#what-an-ai-assistant-driving-this-can-and-cannot-do)
+- [What is written into Knowledge Catalog](#what-is-written-into-knowledge-catalog)
+- [The workspace is sensitive. Keep it out of git.](#the-workspace-is-sensitive-keep-it-out-of-git)
+- [`contextlift share` — the only export, and how it is built](#contextlift-share--the-only-export-and-how-it-is-built)
+- [Limits. What this does not do](#limits-what-this-does-not-do)
+- [IAM, per command](#iam-per-command)
+
 Written for a security reviewer who has not read the source. Every claim names
 the function or constant that implements it, so each one can be checked rather
 than taken on trust. `tests/test_security_doc.py` fails if a symbol named here
@@ -273,3 +287,5 @@ A separate note, learned the hard way: a **VPC Service Controls** perimeter (a
 boundary controlling where requests may come from) blocks calls that IAM
 allows. The refusal names the perimeter, not the role, and no amount of
 role-granting fixes it. `contextlift doctor --explain` says so when it sees one.
+
+[Documentation index](README.md) · Next: [Evaluate your data](EVALUATE.md)

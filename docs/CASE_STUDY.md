@@ -1,5 +1,29 @@
 # Case study: a three-day campaign on four public benchmarks
 
+[Documentation](README.md) / Research / Case studies
+
+This is a research record. For current setup and commands, start with
+[Evaluate your data](EVALUATE.md). Costs and timings below belong to the cited runs.
+
+## On this page
+
+- [One harness, four benchmarks, 36 databases](#one-harness-four-benchmarks-36-databases)
+- [Does curated context help? Both answers, measured](#does-curated-context-help-both-answers-measured)
+- [The guards, observed working](#the-guards-observed-working)
+- [Reproduce the shape of it](#reproduce-the-shape-of-it)
+- [thelook, on BigQuery, 2026-09-03](#thelook-on-bigquery-2026-09-03)
+- [thelook, the loop closing, 2026-09-10](#thelook-the-loop-closing-2026-09-10)
+- [How stable is a run? Two identical rounds, 2026-09-09](#how-stable-is-a-run-two-identical-rounds-2026-09-09)
+- [The answer key, gated for the first time, 2026-09-09](#the-answer-key-gated-for-the-first-time-2026-09-09)
+- [Measure the description share before counting on a BI model: 0 of 9, +2.0 points](#measure-the-description-share-before-counting-on-a-bi-model-0-of-9-20-points)
+- [Sending everything beats perfect selection, 2026-09-13](#sending-everything-beats-perfect-selection-2026-09-13)
+- [Why the winning arm wins: over-salience, directional and unproven](#why-the-winning-arm-wins-over-salience-directional-and-unproven)
+- [Self-Route: the escape hatch nobody takes](#self-route-the-escape-hatch-nobody-takes)
+- [Why the cheap arm cannot be made cheaper, 2026-09-13](#why-the-cheap-arm-cannot-be-made-cheaper-2026-09-13)
+- [The typo that was not the explanation, 2026-09-13](#the-typo-that-was-not-the-explanation-2026-09-13)
+- [What each kind of bad context costs, 2026-09-13](#what-each-kind-of-bad-context-costs-2026-09-13)
+- [The 22 worked examples were costing 27 points, 2026-09-14](#the-22-worked-examples-were-costing-27-points-2026-09-14)
+
 This is the record of the framework's first extended use on data it was not
 built against, run 2026-08-30 through 2026-09-01. Every number below was
 printed by a framework command; the full logs and prediction files are kept
@@ -702,3 +726,5 @@ handed to the wrong question costs 24.3 points, which is a reason a *bank* of
 dataset, one repetition per arm. The dollar figures are warehouse query bill
 only; model calls are billed separately on the run's own `spent:` line, and
 neither line is the whole bill.
+
+[Documentation index](README.md) · Next: [Reproduce an example](../examples/README.md)

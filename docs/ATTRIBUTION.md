@@ -1,4 +1,18 @@
-# What this tool says about itself
+# Run identity and job labels
+
+[Documentation](README.md) / Run identity and job labels
+
+This page covers service-call identification. For crediting or blaming a
+context rule, see [Rule attribution](METHODOLOGY.md#6b-attribution-from-broke-3-to-this-rule-broke-it).
+
+## On this page
+
+- [The two things answer two different questions](#the-two-things-answer-two-different-questions)
+- [The user agent](#the-user-agent)
+- [Who started the run](#who-started-the-run)
+- [What each service gives you, which is not the same everywhere](#what-each-service-gives-you-which-is-not-the-same-everywhere)
+- [The BigQuery job labels](#the-bigquery-job-labels)
+- [Turning it off](#turning-it-off)
 
 Every request this tool sends to Google carries two pieces of text it did not
 have to: a **user agent** naming the tool, and **job labels** on each BigQuery
@@ -177,3 +191,5 @@ This is said plainly because it is true and because pretending otherwise would
 be worse: anyone who forks this can remove the string in one line, and then
 their usage is not counted. That is the nature of attribution. It is a count
 of people who did not mind being counted.
+
+[Documentation index](README.md) · Next: [Security and data](SECURITY-AND-DATA.md)

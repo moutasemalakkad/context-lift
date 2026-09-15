@@ -1,5 +1,7 @@
 # Roadmap
 
+[Documentation](README.md) / Contribute / Roadmap
+
 Two lists. The second one is the useful one: a contributor should not spend a
 weekend on something that will be turned down, and the reasons are written out
 so the refusal is arguable rather than arbitrary.
@@ -78,3 +80,5 @@ These need something that does not exist yet rather than a decision:
 
 Open an issue before writing the code, especially for anything on the second
 list. A rejected pull request costs you more than a rejected issue.
+
+[Documentation index](README.md) · Next: [Contributing](../CONTRIBUTING.md)
