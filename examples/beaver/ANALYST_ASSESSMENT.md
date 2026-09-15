@@ -131,7 +131,7 @@ here. Downloading and building the warehouse is free; generating new model
 arms costs money.
 
 For the current 1,200-question experiment, follow
-[`LATEST_RUNBOOK.md`](LATEST_RUNBOOK.md). Its stdlib-only preparation command
+[the benchmark README](README.md#full-reproduction). Its stdlib-only preparation command
 downloads the gated query rows, reproduces the seed-77 sample, and leaves every
 gate, split, generation, score and comparison as a separately recorded
 contextlift command.
@@ -146,7 +146,7 @@ python3 add_indexes.py dw_join_keys.json scratch/beaver_dw.sqlite
 python3 make_csvs.py scratch/
 ```
 
-After setup, follow `RUNBOOK.md`. In accordance with the contextlift workflow,
+Follow the consolidated reproduction in `README.md`. In accordance with the contextlift workflow,
 estimate each paid generation before approving a budget, use three repetitions
 per arm, and reserve the holdout until the final comparison.
 

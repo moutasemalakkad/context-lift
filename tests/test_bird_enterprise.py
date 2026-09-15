@@ -165,7 +165,7 @@ def test_the_bird_result_quotes_the_paired_per_question_interval():
     [12.1, 26.9] over 195 answers, a half-width of 7.4 points. The paired
     (McNemar) interval over the 65 questions is [6.5, 30.4], half-width 12.0.
     Both are kept so the gap is visible; the per-question one is quoted.
-    docs/METHODOLOGY.md: where the two disagree, that gap is the result.
+    docs/REFERENCE.md: where the two disagree, that gap is the result.
     """
     import json
     import math

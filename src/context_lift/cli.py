@@ -1268,7 +1268,7 @@ def _cmd_mine(args: argparse.Namespace) -> int:
     # reserved half only 60% reachable, so three rounds in a row reported
     # +0.0 about the SPLIT while reading as a result about the context. The
     # same log pulled deep on two named datasets gave 4.78 per table and
-    # 100% reachable. `docs/PRACTICES.md` practice 1.
+    # 100% reachable. `docs/research/README.md` practice 1.
     #
     # And the scope decides what the run can ever measure. On the same estate
     # the two datasets chosen by traffic had no written documentation at all,
@@ -1288,7 +1288,7 @@ def _cmd_mine(args: argparse.Namespace) -> int:
               "      questions per table, and how much of the reserved half a\n"
               "      rule could reach. Under 2.00 per table or under 50%\n"
               "      reachable, no context can show through.\n\n"
-              "docs/PRACTICES.md, practices 1 and 2. Measured on one estate:\n"
+              "docs/research/README.md, practices 1 and 2. Measured on one estate:\n"
               "spread over 26 datasets gave 0.61 questions per table and 60%\n"
               "reachable; two named datasets gave 4.78 and 100%.",
               file=sys.stderr)
@@ -1302,7 +1302,7 @@ def _cmd_mine(args: argparse.Namespace) -> int:
             print(f"note: mining {named} datasets with the round-robin spread "
                   "on. That default surveys an estate; it does not build a set "
                   "that proves anything. Pass --no-spread to stack questions "
-                  "on the busiest tables (docs/PRACTICES.md practice 1).",
+                  "on the busiest tables (docs/research/README.md practice 1).",
                   file=sys.stderr)
 
     # Before anything else: `mine` gates every candidate it keeps, and the
@@ -6332,7 +6332,7 @@ def _build_parser(show_all: bool = False) -> argparse.ArgumentParser:
              "refuses, because a scope chosen by traffic alone produced three "
              "rounds that measured the split instead of the context and one "
              "gold set where 6 of 43 questions touched a dataset anybody had "
-             "written about (docs/PRACTICES.md practices 1 and 2)")
+             "written about (docs/research/README.md practices 1 and 2)")
     # the estimate is measured once the shapes are ranked, right before
     # gating; --budget and --estimate-only apply at that moment
     mine_p.add_argument(
@@ -6578,7 +6578,7 @@ def _build_parser(show_all: bool = False) -> argparse.ArgumentParser:
              "unanimous disagreements is the cheapest significant result "
              "that exists. Default 6.9, the largest deployable "
              "written-context effect this tool has measured on an "
-             "enterprise warehouse (docs/CASE_STUDY.md). Declare a bigger "
+             "enterprise warehouse (docs/research/README.md). Declare a bigger "
              "number only if you really expect a bigger effect")
     round_p.add_argument("--golds", required=True, help="the gold set CSV")
     round_p.add_argument("--spec", default=None,

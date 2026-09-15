@@ -2,7 +2,7 @@
 # SPDX-FileCopyrightText: 2026 Moutasem Akkad <moutasemalakkad@gmail.com>
 """The "where does each piece of knowledge go" guide, against its evidence.
 
-That section of docs/CONTEXT-SOURCES.md quotes a live catalog run and a live
+That section of docs/REFERENCE.md quotes a live catalog run and a live
 API probe. Both outputs are committed beside it, so the quotes can be checked
 rather than trusted. Without this, the section is a page of confident
 sentences about a service, which is the kind of document that is wrong for a
@@ -20,7 +20,7 @@ import pathlib
 import pytest
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
-DOC = ROOT / "docs" / "CONTEXT-SOURCES.md"
+DOC = ROOT / "docs" / "REFERENCE.md"
 ROUNDTRIP = ROOT / "docs" / "evidence" / "kc-roundtrip.txt"
 PROBE = ROOT / "docs" / "evidence" / "glossary-tiers.json"
 
@@ -122,11 +122,11 @@ def test_every_practice_the_decision_table_cites_actually_exists(doc):
     a practice number that does not exist reads as evidence and is not."""
     import re
 
-    practices = (ROOT / "docs" / "PRACTICES.md").read_text()
+    practices = (ROOT / "docs" / "research" / "README.md").read_text()
     numbers = {int(n) for n in re.findall(r"^## (\d+)\.", practices, re.M)}
     assert numbers, "no numbered practices found to cite"
 
-    table = doc[doc.index("| what you have |"):]
+    table = doc[doc.index("| What you have |"):]
     table = table[:table.index("\n\n")]
     cited = {int(n) for n in re.findall(r"practices? (\d+)(?: and (\d+))?",
                                         table) for n in n if n}
@@ -139,7 +139,7 @@ def test_the_table_says_which_rows_are_unmeasured(doc):
     """A dash in the last column is the honest marker for a mechanism that
     works but has never been priced. If every row claimed a practice, the
     column would be decoration."""
-    table = doc[doc.index("| what you have |"):]
+    table = doc[doc.index("| What you have |"):]
     table = table[:table.index("\n\n")]
     rows = [r for r in table.splitlines() if r.startswith("| ") and "---" not in r]
     dashes = [r for r in rows if r.rstrip().endswith("— |")]

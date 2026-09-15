@@ -5,7 +5,7 @@
 The context a person reviewed lives in files: one page per table, a rules
 draft, a worked-example bank. This is the logic of `catalog-push`, the stage
 that puts those into Knowledge Catalog, where a text-to-SQL agent reads them
-at question time. One rule shapes all of it (docs/CONTEXT-SOURCES.md): a
+at question time. One rule shapes all of it (docs/REFERENCE.md): a
 catalog that accepts bytes and keeps fewer of them looks exactly like one that
 worked. So nothing here counts as written until a read shows it, and a read
 that comes back shorter than what went in is reported with its cause.

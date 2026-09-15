@@ -209,7 +209,7 @@ def expected_disagreements(n: int, points: float,
 
 
 # The effect a round is assumed to be paying to see, unless it says otherwise.
-# From `docs/CASE_STUDY.md`: the leak-checked worked-example bank moved an
+# From `docs/research/README.md`: the leak-checked worked-example bank moved an
 # enterprise warehouse 13.3% to 20.2% on a 596-question reserved half. It is
 # the largest DEPLOYABLE written-context effect this framework has measured --
 # the oracle-hint rung above it is per-question and undeployable by design --

@@ -331,7 +331,7 @@ def resolvable_lift(n_holdout: int, target_points: float = DEFAULT_TARGET_POINTS
     `target_points` is the effect the operator is paying to see. Its default
     is the largest deployable written-context effect this framework has
     measured on an enterprise warehouse: the worked-example rung of
-    `docs/CASE_STUDY.md`. Declaring a bigger target is a commitment, not a
+    `docs/research/README.md`. Declaring a bigger target is a commitment, not a
     loophole -- a round that declares 50 points and finds 6 was wrong about
     its context, not about its set.
     """

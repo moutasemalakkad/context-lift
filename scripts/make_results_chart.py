@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: Apache-2.0
 # SPDX-FileCopyrightText: 2026 Moutasem Akkad <moutasemalakkad@gmail.com>
-"""Render the README's source-pinned results as readable light/dark SVGs.
+"""Render the research archive's source-pinned results as readable light/dark SVGs.
 
 Run `python scripts/make_results_chart.py` or `make results-chart`.
 Labels sit above their intervals so neither overlaps the plotted evidence.
@@ -100,7 +100,7 @@ def draw(results: list[dict], theme: str) -> str:
                    f'text-anchor="middle" fill="{c["dim"]}" font-size="13">'
                    f'{tick:+d}</text>')
     text(PAD, height - 33, "Lines: 95% paired intervals. Dots: measured lift.", 14, c["dim"])
-    text(PAD, height - 12, "Sources and study limits: docs/CASE_STUDY.md", 13, c["dim"])
+    text(PAD, height - 12, "Sources and study limits: docs/research/README.md", 13, c["dim"])
     out.append('</svg>')
     return "\n".join(out) + "\n"
 

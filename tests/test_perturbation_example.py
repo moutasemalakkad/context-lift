@@ -123,7 +123,7 @@ def test_the_case_study_and_the_example_agree():
     this checks both: the current numbers, and the withdrawn one kept for
     comparison.
     """
-    case_study = (ROOT / "docs" / "CASE_STUDY.md").read_text()
+    case_study = (ROOT / "docs" / "research" / "README.md").read_text()
     flat = " ".join(case_study.replace("−", "-").split())
 
     assert "-17.0" in flat, "the case study lost the 3-rep control"

@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: Apache-2.0
 # SPDX-FileCopyrightText: 2026 Moutasem Akkad <moutasemalakkad@gmail.com>
-"""The cost table in docs/FIELD-NOTES.md, recomputed from committed data.
+"""The cost table in docs/research/README.md, recomputed from committed data.
 
 The walkthrough tells a reader that a handful of huge queries are most of a
 mine's bill, and prints four numbers to prove it. Those numbers came from one
@@ -21,7 +21,7 @@ from context_lift.executor import bigquery_usd
 
 HERE = pathlib.Path(__file__).parent
 FIXTURE = HERE / "fixtures" / "mine_cost_bands.json"
-WALKTHROUGH = HERE.parent / "docs" / "FIELD-NOTES.md"
+WALKTHROUGH = HERE.parent / "docs" / "research" / "README.md"
 
 GB = 10 ** 9
 

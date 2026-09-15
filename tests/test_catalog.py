@@ -48,7 +48,7 @@ class FakeCatalog:
                               many characters, HTTP 200, no warning and no
                               truncation flag; the whole bundle once the
                               budget passes it. The read serves a page whole
-                              or not at all (docs/CONTEXT-SOURCES.md): 572
+                              or not at all (docs/REFERENCE.md): 572
                               characters of a 71,690-character entry at
                               budget 60,000, 78,854 at 80,000
     `queries_unsupported`     write_queries raises WriteUnsupported

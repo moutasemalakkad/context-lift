@@ -7,7 +7,7 @@ project uses [semantic versioning][semver].
 work before that release happened in a private repository, and a changelog
 written backwards from commits nobody outside could read would be fiction —
 invented entries, invented dates, invented reasons. What came before is in the
-git history and in `docs/CASE_STUDY.md`, which records the measurements
+git history and in `docs/research/README.md`, which records the measurements
 themselves rather than a story about them.
 
 ## [Unreleased]

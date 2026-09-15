@@ -109,7 +109,7 @@ WHY THIS MATTERS
    blanket context was not the win. Contextlift found the context shapes that paid,
    withheld a second fresh set, and kept {result['question_broke']} stable regressions in the verdict.
 
-Receipt check: passed. Full method: examples/bird/ENTERPRISE_RUNBOOK.md
+Receipt check: passed. Full method: examples/bird/README.md
 """
 
 

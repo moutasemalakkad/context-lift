@@ -28,8 +28,9 @@ REQUIRED = [
     "CITATION.cff",
     ".github/pull_request_template.md",
     ".github/ISSUE_TEMPLATE/bug_report.yml",
-    "docs/AUTHORING.md",
-    "docs/ROADMAP.md",
+    "docs/README.md",
+    "docs/REFERENCE.md",
+    "docs/research/README.md",
 ]
 
 
@@ -102,7 +103,7 @@ def test_the_authoring_guide_quotes_the_protocols_as_they_are():
     """Both protocols are structural, so their method names are the whole
     contract. A guide quoting a stale signature sends somebody to write a
     class that does not fit."""
-    guide = (ROOT / "docs" / "AUTHORING.md").read_text()
+    guide = (ROOT / "CONTRIBUTING.md").read_text()
     executor = (ROOT / "src" / "context_lift" / "executor.py").read_text()
     runners = (ROOT / "src" / "context_lift" / "runners" / "__init__.py").read_text()
 
@@ -120,7 +121,7 @@ def test_the_roadmap_rejections_match_the_code():
     or the CLI, so a reversal cannot happen quietly in a document."""
     from context_lift.cli import _build_parser
 
-    roadmap = (ROOT / "docs" / "ROADMAP.md").read_text()
+    roadmap = (ROOT / "CONTRIBUTING.md").read_text()
     verbs = set(_build_parser()._subparsers._group_actions[0].choices)
 
     assert "An `architect` verb" in roadmap

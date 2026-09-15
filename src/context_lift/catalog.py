@@ -26,7 +26,7 @@ by anyone who was not there. Live retrieval answers a different question - "did
 my retrieval pipeline help", with the retriever's own failures inside the
 measurement - and that is the rarer one.
 
-See docs/CONTEXT-SOURCES.md for how much each behaviour below is trusted: two
+See docs/REFERENCE.md for how much each behaviour below is trusted: two
 were probed a second time against a live store, the rest were observed once.
 """
 from __future__ import annotations
@@ -280,7 +280,7 @@ class ScopeCheckFailed(RuntimeError):
     table), and no search permission on the --project (needs
     roles/dataplex.catalogViewer there). A quota project on the credentials
     is not a cause; that diagnosis was re-tested and retracted
-    (docs/CONTEXT-SOURCES.md). Every adapter has to prove its scoping works
+    (docs/REFERENCE.md). Every adapter has to prove its scoping works
     against a query it knows should match, or it will report a clean empty
     catalog forever.
     """
@@ -476,7 +476,7 @@ class KnowledgeCatalogStore:
                 "mode or drop the prefix), and no search permission on --project (needs "
                 "roles/dataplex.catalogViewer there). A quota project on the credentials is "
                 "not a cause; that diagnosis was re-tested and retracted "
-                "(docs/CONTEXT-SOURCES.md).")
+                "(docs/REFERENCE.md).")
 
     def _term(self, table: str) -> str:
         dataset, _, name = table.rpartition(".")

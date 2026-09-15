@@ -64,5 +64,5 @@
 <text x="334.0" y="525" text-anchor="middle" fill="#59636e" font-size="13">+40</text>
 <text x="410.0" y="525" text-anchor="middle" fill="#59636e" font-size="13">+50</text>
 <text x="18" y="563" fill="#59636e" font-size="14" font-weight="400">Lines: 95% paired intervals. Dots: measured lift.</text>
-<text x="18" y="584" fill="#59636e" font-size="13" font-weight="400">Sources and study limits: docs/CASE_STUDY.md</text>
+<text x="18" y="584" fill="#59636e" font-size="13" font-weight="400">Sources and study limits: docs/research/README.md</text>
 </svg>

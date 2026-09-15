@@ -33,7 +33,7 @@ def test_the_acme_round_could_not_have_reached_a_verdict():
 def test_twenty_nine_questions_cannot_see_the_effect_we_already_measured():
     """The worked-example rung on BEAVER DW was +6.9 points.
 
-    `docs/CASE_STUDY.md`: 13.3% to 20.2% on a 596-question holdout,
+    `docs/research/README.md`: 13.3% to 20.2% on a 596-question holdout,
     p < 0.0001. On 29 reserved questions the same effect has almost no
     chance of reading as significant, which is why the Acme round's
     NOT PROVEN carries no information about the context.

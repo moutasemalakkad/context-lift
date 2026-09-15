@@ -54,9 +54,57 @@ that overstates its own results cannot be used to check anyone else's.
 
 ## Adding a warehouse or an agent
 
-Both are structural protocols — you satisfy them by having the right method,
-with no import and no base class. See [Authoring](docs/AUTHORING.md) for what a new one
-must do and, more importantly, what it must not.
+Implement the structural protocol: a class with the right methods needs no
+base class or registration. The definitions live in
+[executor.py](src/context_lift/executor.py) and
+[runners](src/context_lift/runners/__init__.py).
+
+```python
+class Executor(Protocol):
+    def execute(self, sql: str) -> ExecResult: ...
+
+class Runner(Protocol):
+    name: str
+    def cost_sheet(self, n_questions: int, n_arms: int, k: int) -> CostSheet: ...
+    def answer(self, question_id: str, question: str, arm: Arm) -> Prediction: ...
+```
+
+An executor returns rows, columns, and an error when execution fails. Preserve
+empty results, errors, timeouts, and row-cap exclusions as distinct outcomes.
+Reuse the read-only guard, prevent engine/filesystem escapes, and never silently
+truncate or turn an error into an empty answer. Report billed bytes when known.
+SQLite ships in the standard library; DuckDB and BigQuery use optional extras.
+
+A runner receives the whole `Arm`, never gold SQL. Return no SQL plus an
+`error_class` for a refusal; do not invent a prediction. Expose retries, job
+identity, and matched-example metadata when available. Estimate model costs
+honestly and state unknown query costs separately. The prompt, CA, and CSV
+runners show the available paths. A command-runner integration is described in
+[the reference](docs/REFERENCE.md#agent-backends).
+
+Google clients use `client_info=identity.client_info()`. Fail with the relevant
+question ID. Test the contract offline with an in-memory executor and a fake
+runner; [test_round.py](tests/test_round.py) provides examples.
+
+## Project scope and roadmap
+
+The project measures one intervention: whether business context improves a
+text-to-SQL agent. Useful contributions include more warehouses and agents,
+better checks for invalid comparisons, and reproducible sources for every
+reported number. PostgreSQL and additional cloud warehouses need suitable
+backend tests. Larger independent corpora and production feedback need real
+source data and a serving integration to evaluate.
+
+These proposals remain closed unless new evidence changes the decision:
+
+- **A general benchmark or observability platform**, including framework
+  adapters with no measured need, would broaden the project beyond its purpose.
+- **A `knowledge.yaml` schema** duplicates the file conventions and their lint
+  checks; maintain one representation.
+- **An `architect` verb** duplicates `spec-push` and its dry-run plan/drift view.
+- **An `ask` verb** needs demonstrated demand for another interaction surface.
+
+Open an issue with a concrete use case before implementing a scope expansion.
 
 ## Style
 
@@ -68,24 +116,33 @@ Line length 88. No formatter is enforced.
 
 ## Documentation
 
-- Keep the README focused on what the tool does, one runnable example, and
-  where to go next. Add every reader-facing guide to the [docs index](docs/README.md).
-- A guide has one job: purpose, prerequisites, steps, expected result, and a
-  next-step link. Link to canonical instructions instead of copying them.
-- Keep current instructions in guides and dated experiments in case studies
-  or field notes. Preserve source files, caveats, and reproducibility links.
-- Check command flags against CLI help. Use a workspace, estimate paid calls,
-  bound SQL execution, and keep reserved answers out of curation.
-- Add a contents list to long references. Preserve old heading anchors when
-  moving sections, and update relative links from the new location.
-- Keep images legible in light/dark themes and at narrow widths; provide alt
-  text and text equivalents for important facts. Figures come from committed
-  data. Run `make results-chart` after changing the chart generator, and
-  `make readme-workflow` after changing the workflow generator.
-- The demo is a recording with canned model answers. `make demo-gif` records
-  it again; `make demo-still` extracts the linked still frame with ffmpeg.
-- Validate changed links, commands, visuals, and the existing tests that pin
-  quoted numbers. Do not relax evidence checks to make an editorial edit pass.
+Maintain three reader-facing pages rather than adding another guide:
+
+- [The guide](docs/README.md): the continuous eight-stage workflow. Every stage
+  uses Purpose, Inputs, Commands, Expected output, Best practices, Ready to
+  continue, and Next stage. Keep SQLite on the main path and alternatives in
+  adjacent expandable sections.
+- [The reference](docs/REFERENCE.md): technical behavior, flags, integrations,
+  and data handling. Link from the relevant stage; do not duplicate its steps.
+- [The research archive](docs/research/README.md): dated measurements,
+  source artifacts, qualifications, and corrections. Preserve unsuccessful
+  results and evidence when trimming narrative.
+
+The root README introduces the tool and points to the guide. Each benchmark
+has one README entry point; keep reproduction details with its artifacts.
+Dataset templates and evaluated context files are resources, not extra guides.
+
+Check flags against CLI help and use one workspace through an example. Estimate
+paid calls, bound SQL, and keep reserved questions out of curation. When moving
+content, update repository links and tests to its canonical location; remove
+superseded pages rather than adding navigation stubs.
+
+Keep visuals legible in light/dark themes and at narrow widths, with alt text
+and text equivalents. Figures use committed sources. `make results-chart`
+regenerates the research chart; `make readme-workflow` regenerates the overview.
+`make demo-gif` records the toy demo and `make demo-still` extracts its poster.
+Validate links, commands, and rendered pages, including expanded alternatives.
+Keep numerical evidence checks intact when relocating a claim.
 
 ## Licence
 

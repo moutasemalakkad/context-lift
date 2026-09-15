@@ -440,7 +440,7 @@ def test_the_question_prompt_asks_for_the_filter_values_and_a_reply_keeps_them()
 
 
 def test_the_prompt_carries_the_four_rules_and_names_the_two_that_conflict():
-    """docs/PRACTICES.md practice 11. 140 of 372 candidates on one estate were
+    """docs/research/README.md practice 11. 140 of 372 candidates on one estate were
     rejected because the English did not ask what the SQL answers, so the four
     rules a question has to satisfy at once are in the prompt, and so is the
     one test that separates the two which pull against each other.
@@ -1386,7 +1386,7 @@ def test_it_never_throws_away_a_real_question():
 # --------------------------------------------------------------------------
 # `mine` refuses to guess its scope. Both settings that turned an unprovable
 # gold set into a provable one were opt-in and neither was prompted, and the
-# cost of that is measured in docs/PRACTICES.md practices 1 and 2.
+# cost of that is measured in docs/research/README.md practices 1 and 2.
 # --------------------------------------------------------------------------
 
 def _empty_log(tmp_path):

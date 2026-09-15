@@ -91,9 +91,9 @@ def test_the_group_titles_say_what_the_family_is_for():
 
 
 # ---------------------------------------------------------------------------
-# the README's own count of them
+# the technical reference's count of them
 
-def test_the_readme_verb_count_is_recomputed_not_typed():
+def test_the_reference_verb_count_is_recomputed_not_typed():
     """The README said 47 while the parser built 48.
 
     Nobody mistyped it: a verb was added and the prose was not. That is the
@@ -104,14 +104,14 @@ def test_the_readme_verb_count_is_recomputed_not_typed():
     import pathlib
     import re
 
-    readme = (pathlib.Path(__file__).resolve().parent.parent
-              / "README.md").read_text()
-    found = re.search(r"the package: (\d+) commands", readme)
-    assert found, "the README no longer states a command count in that shape"
+    reference = (pathlib.Path(__file__).resolve().parent.parent
+                 / "docs" / "REFERENCE.md").read_text()
+    found = re.search(r"The CLI has (\d+) commands", reference)
+    assert found, "the technical reference no longer states the command count"
 
     parser = _build_parser()
     sub = next(a for a in parser._actions if hasattr(a, "choices") and a.choices)
 
     assert int(found.group(1)) == len(sub.choices), (
-        f"README.md says {found.group(1)} commands, the parser builds "
+        f"REFERENCE.md says {found.group(1)} commands, the parser builds "
         f"{len(sub.choices)}")

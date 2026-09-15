@@ -1,41 +1,26 @@
 # Examples
 
-[Documentation](../docs/README.md) / Examples
+Start with **BIRD small**, the example in [guide stage 1](../docs/README.md#1-install-and-try-the-example).
+Run the commands below from the repository root. Cloning and initial setup
+need network access; replaying these committed results makes no model calls.
 
-**Start with BIRD:** `make example-bird` runs the small SQLite example used in
-the [Quickstart](../docs/QUICKSTART.md). It uses committed model predictions;
-replaying a result does not generate a fresh measurement.
+| Benchmark | Local command | What is verified |
+|---|---|---|
+| [BIRD](bird/README.md) | `make example-bird` | Executes committed SQLite queries and compares two arms |
+| [BIRD enterprise](bird/README.md#enterprise-study) | `make example-bird-enterprise` | Checks the larger study's recorded summary |
+| [BEAVER](beaver/README.md) | `make example-beaver` | Checks the recorded enterprise-study summary |
+| [theLook](thelook/README.md) | `make example-thelook` | Recomputes a verdict from recorded answer-level outcomes |
+| [KaggleDBQA](kaggledbqa/README.md) | `make example-kaggledbqa` | Executes a small public-data comparison |
 
-## Choose an example
+Each benchmark README is its entry point for results, limitations, and full
+reproduction. Replaying a receipt does not independently validate its SQL;
+new generation may need data downloads, credentials, and a budget.
 
-Run these commands from the repository root. Initial cloning and environment
-setup need network access; the local tours below do not call models or clouds.
+The [research archive](../docs/research/README.md) compares the findings.
+To evaluate your own workload, continue the [guide](../docs/README.md#2-choose-a-workload).
 
-| Example | Local command | What it shows | To generate fresh predictions |
-|---|---|---|---|
-| [BIRD, small](bird/README.md) | `make example-bird` | Gate, baseline, triage, context comparison; one repetition and no reserved holdout | See the BIRD README |
-| [BIRD, enterprise](bird/ENTERPRISE_RUNBOOK.md) | `make example-bird-enterprise` | A recorded 11-database study, coverage limits, and regressions | Model key and benchmark download |
-| [theLook](../docs/WALKTHROUGH.md) | `make example-thelook` | An annotated comparison on a public warehouse | BigQuery access and model backend |
-| [BEAVER](beaver/QUICKSTART.md) | `make example-beaver` | A recorded enterprise-warehouse result and its guardrails | Gated data download and model key |
-| [KaggleDBQA](kaggledbqa/README.md) | `make example-kaggledbqa` | Context effects on two small databases | See the dataset README |
+## Supporting resources
 
-## Reproduce a larger study
-
-- BIRD: [enterprise runbook](bird/ENTERPRISE_RUNBOOK.md).
-- BEAVER: [latest runbook](beaver/LATEST_RUNBOOK.md); the older
-  [runbook](beaver/RUNBOOK.md) records an earlier campaign.
-- theLook: [assessment](thelook/ANALYST_ASSESSMENT.md) and
-  [context spec](thelook/spec/README.md).
-
-## Templates and supporting experiments
-
-- [Dataset documentation template](onboarding/TEMPLATE.md) and
-  [completed example](onboarding/EXAMPLE-thelook.md).
-- [Context research](CONTEXT_RESEARCH.md): cross-benchmark findings, including
-  negative and inconclusive results.
-- [BIRD perturbations](bird/perturbation/README.md): effects of changing context.
-- [LookML arm](thelook/lookml-arm/README.md): extracting a semantic model.
-- `examples/demo/`: tiny fixtures used by `make example` and
-  `make example-routing` to show report formats.
-
-[Documentation index](../docs/README.md) · Next: [Evaluate your data](../docs/EVALUATE.md)
+- [Dataset template](onboarding/TEMPLATE.md) and [completed example](onboarding/EXAMPLE-thelook.md), used in guide stage 6.
+- [BIRD perturbation artifacts](bird/perturbation/README.md), for the archived defect experiment.
+- `examples/demo/`: tiny fixtures used by `make example` and `make example-routing`.

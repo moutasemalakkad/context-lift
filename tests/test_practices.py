@@ -2,7 +2,7 @@
 # SPDX-FileCopyrightText: 2026 Moutasem Akkad <moutasemalakkad@gmail.com>
 """Every practice is earned by a measurement, or listed as unproven.
 
-`docs/PRACTICES.md` opens by promising that each practice is printed beside
+`docs/research/README.md` opens by promising that each practice is printed beside
 the measurement that earned it. Until this file existed, that promise was
 enforced by nobody: `git grep PRACTICES -- tests/` found two incidental
 mentions in test_mine.py and no check.
@@ -24,7 +24,7 @@ import re
 import pytest
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
-DOC = ROOT / "docs" / "PRACTICES.md"
+DOC = ROOT / "docs" / "research" / "README.md"
 
 # A measurement is a number with a unit a reader can check. Prose like
 # "usually helps" matches none of these on purpose.
@@ -42,7 +42,7 @@ MEASUREMENT = re.compile(
     r"|\b\d[\d,]*\s+[a-z]{3,}"                   # 43 golds, 2,686 rows, 74 questions
 )
 
-# The objects that actually exist, from docs/CONTEXT-SOURCES.md and push.py.
+# The objects that actually exist, from docs/REFERENCE.md and push.py.
 # A practice naming something else is naming something nobody can create.
 CATALOG_OBJECTS = (
     "overview", "queries aspect", "glossary term", "category",
@@ -132,7 +132,7 @@ def test_no_project_or_customer_name_is_in_the_practices():
     from leakcheck import leaks_in
 
     found = leaks_in(DOC.read_text())
-    assert not found, f"docs/PRACTICES.md names {found}"
+    assert not found, f"docs/research/README.md names {found}"
 
 
 def test_practice_15_token_counts_are_arithmetic_on_the_committed_run():
@@ -167,7 +167,7 @@ def test_practice_15_does_not_claim_over_salience_is_proven():
     assert "Fisher exact p = 0.0839" in body
     for withdrawn in ("selection  37 runs", "over-projects on 29%"):
         assert withdrawn not in body, (
-            f"the withdrawn hand count {withdrawn!r} is back in PRACTICES.md")
+            f"the withdrawn hand count {withdrawn!r} is back in the research archive")
 
 
 def test_the_refuted_alternatives_stay_in_the_document():

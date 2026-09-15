@@ -51,7 +51,7 @@ def test_the_four_classes_still_split_the_same_179_errors():
 def test_the_methodology_table_says_what_the_fixture_computes():
     """The document and the data cannot drift apart, which is the only way a
     number in a document stays true six months later."""
-    text = (REPO / "docs" / "METHODOLOGY.md").read_text()
+    text = (REPO / "docs" / "research" / "README.md").read_text()
     # the table is written as `| description | N | who fixes it |`
     rows = dict(re.findall(r"\|\s*([^|]+?)\s*\|\s*(\d+)\s*\|\s*[^|]+\|", text))
     by_number = {int(n) for n in rows.values()}

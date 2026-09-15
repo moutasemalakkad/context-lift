@@ -347,7 +347,7 @@ class QuestionWriter:
         ...
 
 
-# The four rules below are docs/PRACTICES.md practice 11, in the order that
+# The four rules below are docs/research/README.md practice 11, in the order that
 # practice lists them. They were written after counting what this prompt costs:
 # on two independent pulls from one estate, reviewed by the model that did NOT
 # write the questions, 140 of 372 candidates (38%) were rejected because the

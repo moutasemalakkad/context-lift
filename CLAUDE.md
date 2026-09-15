@@ -104,7 +104,7 @@ Design constraints to preserve:
 - A judge backend is just `Callable[[str], str]` (`backends.py`). Tests use
   `echo_backend`; no network in the fast path, ever.
 - The judge is one-sided: it only reviews comparator MISMATCHes, so it can
-  only raise a score, never lower it. Documented in `docs/METHODOLOGY.md`.
+  only raise a score, never lower it. Documented in `docs/REFERENCE.md`.
 - The comparator ignores column order by default (Spider/BIRD comparability).
   `column_order_matters=True` exists for business reporting. Do not "fix"
   this asymmetry; a past bug came from sorting cells within each row —

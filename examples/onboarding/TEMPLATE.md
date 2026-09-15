@@ -9,7 +9,7 @@ Every section that names data must name it as project.dataset.table. A bare
 table name cannot tell two copies of the same data apart, and on one estate
 that alone made two answer keys unscoreable.
 
-Read docs/ONBOARDING.md for why each section is here and what it measured.
+Read docs/README.md for why each section is here and what it measured.
 -->
 
 ## What this is for

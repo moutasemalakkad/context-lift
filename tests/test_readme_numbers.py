@@ -74,7 +74,7 @@ def test_the_readme_headline_is_what_the_example_computes():
 def test_the_thelook_case_study_numbers_are_recomputed_from_the_committed_run():
     """A figure in a document is a claim until a script recomputes it.
 
-    `CASE_STUDY.md` prints the first round through the framework. This reads
+    The research archive prints the first round through the framework. This reads
     the committed run of that round, recomputes the verdict from the recorded
     answers, and fails if the document and the data ever disagree. No
     warehouse, no model, no network.
@@ -90,7 +90,7 @@ def test_the_thelook_case_study_numbers_are_recomputed_from_the_committed_run():
     holdout = report_for(rows, "holdout")
     result = verdict(holdout, curate, target_pp=10.0)
 
-    text = (REPO / "docs" / "CASE_STUDY.md").read_text()
+    text = (REPO / "docs" / "research" / "README.md").read_text()
     assert "## thelook, the loop closing, 2026-09-10" in text
 
     assert result.word == "REAL GAIN"
@@ -129,7 +129,7 @@ def test_the_case_study_keeps_the_refusal_beside_the_win():
     # Whitespace flattened, because a sentence that wraps across two lines is
     # the same sentence and an assertion that breaks on a reflow teaches
     # people to reflow around the test rather than to keep the claim true.
-    text = " ".join((REPO / "docs" / "CASE_STUDY.md").read_text().split())
+    text = " ".join((REPO / "docs" / "research" / "README.md").read_text().split())
 
     assert holdout.mcnemar.p_value < 0.05, "round 2 is the provable one"
     assert "held out: 30 questions, +13.3 points, 5 fixed, 1 broke" in text, (
@@ -153,7 +153,7 @@ def test_the_walkthrough_numbers_are_recomputed_from_the_committed_run():
     holdout = report_for(rows, "holdout")
     result = verdict(holdout, curate, target_pp=10.0)
 
-    text = " ".join((REPO / "docs" / "WALKTHROUGH.md").read_text().split())
+    text = " ".join((REPO / "docs" / "research" / "README.md").read_text().split())
 
     assert result.word == "REAL GAIN"
     assert f"verdict: {result.word}" in text
@@ -177,35 +177,36 @@ def test_the_walkthrough_shows_the_refusal_before_it_shows_the_win():
     """A walkthrough that only shows the win is an advertisement. This one
     opens on a round that refused to claim anything, because that refusal is
     what makes the second number worth reading."""
-    text = " ".join((REPO / "docs" / "WALKTHROUGH.md").read_text().split())
+    text = " ".join((REPO / "docs" / "research" / "README.md").read_text().split())
 
     assert "verdict: UNDERPOWERED" in text
     assert text.index("UNDERPOWERED") < text.index("REAL GAIN"), (
         "the refusal has to come first, or the document is a sales page")
-    assert "Most tools would print +13.3 and stop" in text
+    assert "Reporting +13.3 without the refusal would overstate the result" in text
 
 
 def test_the_walkthrough_states_what_it_does_not_claim():
     """Two limits, both real: the conventions resolve ambiguity in questions
     the author wrote, and the author wrote the questions too."""
-    text = " ".join((REPO / "docs" / "WALKTHROUGH.md").read_text().split())
+    text = " ".join((REPO / "docs" / "research" / "README.md").read_text().split())
 
     assert "not \"the agent learned the business\"" in text
     assert "same person wrote the questions and the context" in text
     assert "Expect UNDERPOWERED on your first round" in text
 
 
-def test_the_readme_points_at_both_guides_and_apologises_for_neither():
-    """Two outside reviews of this repository independently named the same
-    first-impression problem: the README told a stranger that the guides had
-    been deleted. Deleting a stale guide was right; shipping the apology was
-    not. A visitor reads "the docs are gone" and leaves."""
+def test_the_readme_points_to_one_continuous_guide():
+    """A visitor should follow one workflow, with the same cues at each stage."""
     text = " ".join((REPO / "README.md").read_text().split())
 
-    assert "docs/QUICKSTART.md" in text
-    assert "docs/WALKTHROUGH.md" in text
-    assert "were deleted on" not in text
-    assert "was deleted on" not in text
+    assert "[Start the guide →](docs/README.md)" in text
+    guide = (REPO / "docs" / "README.md").read_text()
+    stages = re.split(r"^## \d+\. ", guide, flags=re.M)[1:]
+    assert len(stages) == 8
+    for stage in stages:
+        for cue in ("Purpose", "Inputs", "Commands", "Expected output",
+                    "Best practices", "Ready to continue", "Next stage"):
+            assert f"**{cue}" in stage
 
 
 def test_the_evaluation_guide_says_how_many_defect_classes_the_gate_has():
@@ -219,9 +220,9 @@ def test_the_evaluation_guide_says_how_many_defect_classes_the_gate_has():
     warnings = {"MISSING_LITERAL", "MISSING_ORDER", "MISSING_PROJECTION",
                 "LITERAL_ON_WRONG_COLUMN"}
     defects = [n for n in names if n not in warnings]
-    text = (REPO / "docs" / "EVALUATE.md").read_text()
+    text = (REPO / "docs" / "README.md").read_text()
     assert f"{len(defects)} defect classes" in text, \
-        f"the gate has {len(defects)} defect classes; EVALUATE says otherwise"
+        f"the gate has {len(defects)} defect classes; the guide says otherwise"
     assert f"{len(warnings)} warnings" in text
 
 
@@ -238,16 +239,16 @@ def test_getting_started_commands_parse_with_the_real_cli():
 
     parser = _build_parser()
     checked = []
-    for name in ("README.md", "docs/QUICKSTART.md", "docs/EVALUATE.md",
-                 "docs/ONBOARDING.md"):
+    for name in ("README.md", "docs/README.md", "docs/REFERENCE.md"):
         text = (REPO / name).read_text()
         for block in re.findall(r"```bash\n(.*?)```", text, re.S):
             for command in block.replace("\\\n", " ").splitlines():
+                command = command.strip()
                 if not command.startswith("contextlift "):
                     continue
                 parser.parse_args(shlex.split(command)[1:])
                 checked.append(command)
     assert len(checked) >= 15, "the runnable examples were not checked"
-    guide = (REPO / "docs/EVALUATE.md").read_text()
+    guide = (REPO / "docs/README.md").read_text()
     for flag in ("--min-tables", "--require-analytical", "--max-bytes"):
-        assert flag in guide, f"EVALUATE's log step lost {flag}"
+        assert flag in guide, f"the guide's log step lost {flag}"

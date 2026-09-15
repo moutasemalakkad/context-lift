@@ -6,7 +6,7 @@ A mermaid block that GitHub cannot parse does not degrade -- it renders as a
 red error box where the diagram should be, and nothing in a test suite or a
 review catches it, because the markdown around it is fine.
 
-That shipped. `docs/WALKTHROUGH.md` carried a node label written
+That shipped. `docs/research/README.md` carried a node label written
 `K[gap +10.8 [-8.3, +29.8]...]`. An unquoted `[` inside a `[...]` label ends
 the label early, so the whole diagram failed with `Parse error on line 11`
 and the first picture in the walkthrough was an error box.
@@ -79,7 +79,7 @@ def test_every_class_a_node_uses_is_defined():
     assert not bad, "\n  ".join([""] + bad)
 
 
-# The line exactly as it shipped in docs/WALKTHROUGH.md, which GitHub rejected
+# The line exactly as it shipped in docs/research/README.md, which GitHub rejected
 # with: Parse error on line 11 ... Expecting 'SQE', ... got 'SQS'
 SHIPPED_BROKEN = ("    J --> K[gap +10.8 [-8.3, +29.8]<br/>includes zero: "
                   "the rules were not<br/>fitted to the questions they came from]")

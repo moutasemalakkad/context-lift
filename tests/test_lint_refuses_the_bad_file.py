@@ -15,7 +15,7 @@ column no answer key touches.
 
 That substitution is a real weakening and it is worth saying plainly: this
 proves the checks fire on the shape, not that they fired on that file. What
-the original file produced is recorded in `docs/PRACTICES.md` and in the
+the original file produced is recorded in `docs/research/README.md` and in the
 round's own numbers -- 49 rule lines, a reserved lift of minus 6.9 points, and
 three faults visible for free beforehand.
 

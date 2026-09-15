@@ -46,10 +46,10 @@ SETS = [
     ("Acme reserved, 2026-09-12", 29),
     ("Acme, all deep golds", 43),
     ("thelook", 104),
-    ("BEAVER DW holdout (CASE_STUDY.md)", 596),
+    ("BEAVER DW holdout (research archive)", 596),
 ]
 
-# The rungs this framework has actually measured, from docs/CASE_STUDY.md.
+# The rungs this framework has actually measured, from docs/research/README.md.
 LADDER = [
     ("iterated glossary", 3.8, 5.7),
     ("stronger model", 5.7, 8.1),
@@ -82,7 +82,7 @@ def main() -> None:
     print()
 
     print("CAN 29 RESERVED QUESTIONS SEE THE EFFECTS THIS TOOL ALREADY")
-    print("MEASURED ON AN ENTERPRISE WAREHOUSE? (docs/CASE_STUDY.md)")
+    print("MEASURED ON AN ENTERPRISE WAREHOUSE? (docs/research/README.md)")
     n = 29
     for name, before, after in LADDER:
         points = after - before

@@ -4,7 +4,7 @@
 
 This is source preparation, not an evaluation runner.  Every gate, split,
 generation, score, and comparison remains an explicit recorded contextlift CLI
-command in ENTERPRISE_RUNBOOK.md.
+command in README.md under Enterprise study.
 """
 from __future__ import annotations
 

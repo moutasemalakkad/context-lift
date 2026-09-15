@@ -5,7 +5,7 @@
 This project's rule is that a shipped figure must be computable from
 something committed. A paid round cannot be recomputed for free, so the next
 best thing is committed instead: the round's own output, beside the arm it
-scored. These tests fail if `docs/CASE_STUDY.md` ever stops matching it.
+scored. These tests fail if `docs/research/README.md` ever stops matching it.
 
 The mistake that made this necessary is worth recording. The round was run
 WITHOUT `--save-report`, so for about an hour the only copy of the result was
@@ -22,7 +22,7 @@ import pytest
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 EVIDENCE = ROOT / "examples" / "thelook" / "lookml-arm" / "round-2026-09-12.txt"
-CASE_STUDY = ROOT / "docs" / "CASE_STUDY.md"
+CASE_STUDY = ROOT / "docs" / "research" / "README.md"
 
 
 @pytest.fixture(scope="module")
@@ -235,7 +235,7 @@ def test_the_oracle_framing_is_not_softened(case_study):
 
 
 def test_the_two_cache_probes_are_both_reported(case_study):
-    """One probe was quoted in PRACTICES.md with no committed run behind it.
+    """One probe was quoted in the practice record with no committed run behind it.
     Re-running gave 19% where the first gave 11% on byte-identical input, so
     the honest claim is the instability, not either number. Reporting only one
     would re-create the defect that prompted the re-run."""

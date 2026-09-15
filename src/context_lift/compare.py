@@ -39,7 +39,7 @@ What this deliberately does NOT do:
   9.0% max over 21 Spider dev submissions, and reports no false-negative rate
   at all. So this comparator's only published error rate says it scores too
   high, and the optional LLM judge cannot fix that because it only ever raises
-  a score. docs/METHODOLOGY.md section 4 carries the quotes.
+  a score. docs/research/README.md records the correction and source.
 """
 from __future__ import annotations
 

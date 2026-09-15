@@ -69,7 +69,7 @@ WHAT contextlift CHANGED
 
 This was a paid recorded run (~${r['model_spend_usd']:.2f}); this receipt reader is free.
 Audit offline: make example-thelook
-Reproduce BEAVER: examples/beaver/LATEST_RUNBOOK.md
+Reproduce BEAVER: examples/beaver/README.md
 Run your estate: contextlift --workspace /absolute/path/to/workspace next"""
 
 

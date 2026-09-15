@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: Apache-2.0
 # SPDX-FileCopyrightText: 2026 Moutasem Akkad <moutasemalakkad@gmail.com>
-"""docs/SECURITY-AND-DATA.md cites code by name. The names must still exist.
+"""docs/REFERENCE.md cites code by name. The names must still exist.
 
 A security document is read by someone who will not read the source, so every
 claim in it names the function or constant that implements it. That only helps
@@ -20,7 +20,7 @@ import re
 import pytest
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
-DOC = ROOT / "docs" / "SECURITY-AND-DATA.md"
+DOC = ROOT / "docs" / "REFERENCE.md"
 
 
 def flat(text: str) -> str:
