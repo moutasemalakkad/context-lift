@@ -138,7 +138,7 @@ context was worth. Eight commands complete one measurement:
 | `next` | read the workspace and print the exact command to run next |
 | `demo` | the whole loop on a toy database, offline |
 
-`contextlift --help` lists those eight. `contextlift --help-all` lists all 47.
+`contextlift --help` lists those eight. `contextlift --help-all` lists all 48.
 
 **Three rules the tool enforces rather than suggests.** *Run every arm more than
 once* — temperature 0 is not reproducible, and on one engagement no single
@@ -193,6 +193,7 @@ another checkout otherwise wins, and the extra lands there.
 | [QUICKSTART](docs/QUICKSTART.md) | you want it running in three steps, the first one second long |
 | [WALKTHROUGH](docs/WALKTHROUGH.md) | one real loop end to end, every command and its output |
 | [ONBOARDING](docs/ONBOARDING.md) | you have a warehouse, an afternoon, and a blank file |
+| [FORMATS](docs/FORMATS.md) | every CSV, JSON, `--spec` directory, and `--workspace` layout in one table |
 | [PRACTICES](docs/PRACTICES.md) | thirteen practices, each printed beside the measurement that earned it |
 | [METHODOLOGY](docs/METHODOLOGY.md) | why each number is computed this way, with citations and known limits |
 | [CASE_STUDY](docs/CASE_STUDY.md) | every measured result, with the command that produced it |

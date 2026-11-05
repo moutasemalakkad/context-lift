@@ -239,3 +239,39 @@ def test_every_command_the_quickstart_tells_you_to_run_exists():
     # and the flags on the log line, which is the step the document argues for
     for flag in ("--min-tables", "--require-analytical", "--max-bytes"):
         assert flag in text, f"QUICKSTART's log step lost {flag}"
+
+
+def test_the_readme_verb_counts_match_the_cli():
+    """README states the verb count in two places (under the core table and in
+    the repo layout). When one said 47 and the other said 48, a reader had to
+    guess which half of the page was stale."""
+    from context_lift.cli import CORE_VERBS, _build_parser
+
+    total = len(_build_parser(show_all=True)._subparsers._group_actions[0].choices)
+    text = (REPO / "README.md").read_text()
+
+    assert len(CORE_VERBS) == 8
+    assert "lists those eight." in text
+    assert f"lists all {total}." in text
+    assert f"{total} commands" in text
+
+
+def test_formats_doc_is_linked_and_matches_schema_constants():
+    """The file-and-directory reference only helps if a newcomer can find it
+    from the README and its column lists and verdict codes stay pinned to the
+    modules that read and write them."""
+    from context_lift import harness, review, workspace
+    from context_lift.backends_db import DEMAND_COLUMNS, QUERY_LOG_COLUMNS
+    from context_lift.mine import CANDIDATE_COLUMNS
+
+    readme = (REPO / "README.md").read_text()
+    assert "docs/FORMATS.md" in readme
+
+    formats = (REPO / "docs" / "FORMATS.md").read_text()
+    for column in (*DEMAND_COLUMNS, *QUERY_LOG_COLUMNS, *CANDIDATE_COLUMNS,
+                   *review.COLUMN_ORDER):
+        assert f"`{column}`" in formats, f"FORMATS.md is missing column {column!r}"
+    for code in harness.VERDICT_MEANINGS:
+        assert f"`{code}`" in formats, f"FORMATS.md is missing verdict {code!r}"
+    assert f"schema_version: {workspace.SCHEMA_VERSION}" in formats
+

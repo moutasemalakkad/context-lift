@@ -59,9 +59,13 @@ the difference between understanding the tool and being buried by it:
 
 ```
 # ten queries, only the ones YOU ran, so you recognise every row
-contextlift log  --db bq://YOUR_PROJECT --days 30 --limit 10               --only-accounts you@your-company.com               --min-tables 2 --require-analytical --max-bytes 10GB               --out my_queries.csv
+contextlift log  --db bq://YOUR_PROJECT --days 30 --limit 10 \
+              --only-accounts you@your-company.com \
+              --min-tables 2 --require-analytical --max-bytes 10GB \
+              --out my_queries.csv
 
-contextlift mine --db bq://YOUR_PROJECT --queries my_queries.csv --limit 10               --write-questions --budget 1 --out my_candidates.csv
+contextlift mine --db bq://YOUR_PROJECT --queries my_queries.csv --limit 10 \
+              --write-questions --budget 1 --out my_candidates.csv
 
 contextlift review --candidates my_candidates.csv --out .
 ```
