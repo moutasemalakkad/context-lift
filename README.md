@@ -60,6 +60,11 @@ model. It comes from someone writing down what the business means: the default
 reporting grain, which rows to exclude, how each metric is defined. This tool
 measures whether that writing-down was worth it.
 
+**What it is not.** Not a text-to-SQL agent and not a semantic layer. It does
+not answer questions and it does not write your context. It measures the agent
+and the context you already have, and says whether the difference between them
+is real or noise.
+
 The run above is 39 questions over three [BIRD](https://bird-bench.github.io/)
 databases. Predictions are generated once and committed, so it prints the same
 numbers on your machine as on mine. `tests/test_readme_numbers.py` recomputes
