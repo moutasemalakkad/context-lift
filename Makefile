@@ -1,4 +1,4 @@
-.PHONY: help install test test-integration scan example example-routing example-kaggledbqa example-thelook example-thelook-seed example-beaver example-bird example-bird-enterprise clean
+.PHONY: help install test test-integration scan check-wheel example example-routing example-kaggledbqa example-thelook example-thelook-seed example-beaver example-bird example-bird-enterprise clean
 
 # Force public PyPI. The default environment here routes pip/uv through a
 # private corp index (Airlock, us-python.pkg.dev) that 401s for this project
@@ -138,6 +138,19 @@ demo-gif:  ## re-record the README's terminal demo (needs: brew install vhs ttyd
 	@command -v vhs >/dev/null || { echo "vhs not found: brew install vhs ttyd ffmpeg"; exit 1; }
 	@PATH="$(PWD)/.venv/bin:$$PATH" vhs docs/assets/demo.tape
 	@ls -lh docs/assets/demo.gif | awk '{print "wrote docs/assets/demo.gif ("$$5")"}'
+
+check-wheel:  ## build the wheel and prove `uvx contextlift demo` works with nothing else installed
+	@rm -rf dist
+	@UV_INDEX_URL=$(INDEX) uv build
+	@WORK=$$(mktemp -d); \
+	 env -u VIRTUAL_ENV uv venv -q "$$WORK/.venv"; \
+	 env -u VIRTUAL_ENV uv pip install -q --python "$$WORK/.venv/bin/python" \
+	   --index-url $(INDEX) dist/*.whl; \
+	 cd "$$WORK" && ./.venv/bin/contextlift demo > "$$WORK/demo.log" 2>&1; \
+	 grep -q "safety SAFE" "$$WORK/demo.log" || { \
+	   tail -20 "$$WORK/demo.log"; \
+	   echo "FAIL: the wheel does not run standalone; see $$WORK/demo.log"; exit 1; }; \
+	 echo "OK: the wheel alone runs \`contextlift demo\` from $$WORK, outside the repo"
 
 clean: ## remove venv, caches, and scratch example DBs
 	rm -rf .venv .pytest_cache **/__pycache__ *.egg-info examples/*.db
