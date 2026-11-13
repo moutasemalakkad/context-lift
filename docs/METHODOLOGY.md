@@ -648,8 +648,51 @@ table in section 7b: a number the code prints must say where it came from.
 No Spanner backend ships here. An untested backend in the package is worse than
 a documented recipe: it looks supported and nothing proves it works.
 
+## Related measurements, and what this one adds
+
+Two public measurements in 2026 report that written context moves text-to-SQL
+accuracy more than the choice of model. This project agrees with both. What it
+adds is the instrument, not another result.
+
+**dbt Labs, 7 April 2026.** Ganz and Perigaud scored the dbt Semantic Layer
+against text-to-SQL on the ACME Insurance suite: 11 questions, 20 runs each,
+four models. With modelled data, claude-sonnet-4-6 read 90.0% on text-to-SQL
+and 98.2% through the Semantic Layer; gpt-5.3-codex read 84.1% and 100.0%. The
+post states its own limit in those words: "to make text-to-SQL work, we loaded
+the entire schema as context, which isn't practical for larger datasets."
+Eleven questions cannot carry a confidence interval, and the post reports none.
+
+**Ye, 6 September 2026 (arXiv 2609.22259).** A four-arm ablation on DABStep,
+176 tasks, four models, separating the written content of a context layer from
+the retrieval machinery around it. Written content alone moved hard-task
+accuracy from 13.9% to 55.1%. Scaffolding without content added 0 to 5 points
+on small models and 14 to 15 on frontier ones. Its conclusion, "content
+dominates", is this project's thesis reached independently, on a different
+benchmark, by a different method.
+
+**What neither measures.** Both compare a context arm against a bare-schema arm
+on a fixed public benchmark whose answer key is already trusted. Neither audits
+its own answer key, holds questions back from the curation that follows, nor
+reports what the measurement failed to resolve. This project exists for the
+other case: a team wants the number for its own warehouse and its own glossary,
+the answer key is homemade and probably defective, and the honest outcome is
+often NOT PROVEN. Sections 2, 4 and 6 are written for that case and not for a
+leaderboard.
+
+One result here has no counterpart in the published work: the arm built from
+metadata a machine read out of a BI model, scored beside arms built from prose
+a person wrote. The figures and the file each came from are in
+`docs/assets/results.json`, pinned by `tests/test_results_chart.py`.
+
 ## References
 
+- Ganz, J. and Perigaud, B. Semantic Layer vs. Text-to-SQL: 2026 Benchmark
+  Update. dbt Developer Blog, 7 April 2026.
+  https://docs.getdbt.com/blog/semantic-layer-vs-text-to-sql-2026
+  (benchmark code: https://github.com/dbt-labs/dbt-llm-sl-bench)
+- Ye, Q. Which Part of the Context Layer Does the Work? Separating Semantic
+  Content from Retrieval Scaffolding in Text-to-SQL Agents. arXiv, 6 September
+  2026. https://arxiv.org/abs/2609.22259
 - Yu et al. Spider: A Large-Scale Human-Labeled Dataset for Complex and
   Cross-Domain Semantic Parsing and Text-to-SQL Task. EMNLP 2018.
 - Li et al. Can LLM Already Serve as a Database Interface? A Big Bench for
