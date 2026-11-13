@@ -5,6 +5,7 @@
 **Measure whether your written business context makes an AI SQL agent more accurate.**
 
 [![test](https://github.com/moutasemalakkad/context-lift/actions/workflows/test.yml/badge.svg)](https://github.com/moutasemalakkad/context-lift/actions/workflows/test.yml)
+[![pypi](https://img.shields.io/pypi/v/contextlift.svg)](https://pypi.org/project/contextlift/)
 [![license](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
 [![python](https://img.shields.io/badge/python-3.10%2B-blue.svg)](pyproject.toml)
 

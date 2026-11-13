@@ -12,6 +12,12 @@ themselves rather than a story about them.
 
 ## [Unreleased]
 
+Nothing yet.
+
+## [0.1.0] - 2026-11-13
+
+First release on PyPI: <https://pypi.org/project/contextlift/>
+
 ### Added
 
 - Published to PyPI, so `uvx contextlift demo` runs the whole loop with
@@ -21,7 +27,8 @@ themselves rather than a story about them.
 - `project.urls` and trove classifiers in `pyproject.toml`, so the PyPI page
   links back to the repo, the quickstart, the changelog and the issue tracker.
 
-Nothing is tagged yet. These entries become `0.1.0` when `v0.1.0` is pushed.
+Published by `.github/workflows/release.yml` from tag `v0.1.0`, through PyPI
+Trusted Publishing, so no API token exists for this project.
 
 [kac]: https://keepachangelog.com/en/1.1.0/
 [semver]: https://semver.org/spec/v2.0.0.html
