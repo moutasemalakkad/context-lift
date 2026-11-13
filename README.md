@@ -22,7 +22,18 @@ The same kind of metadata, read out of a BI tool by a machine, does not.</i>
 
 ## Try it
 
-No API key. No network. About one second.
+Nothing installed, no API key, no network:
+
+```bash
+uvx contextlift demo
+```
+
+That builds a seven-row warehouse in a temporary directory, answers six
+questions twice, and prints the verdict. The model answers in it are canned and
+it says so on screen.
+
+For the headline measurement on public [BIRD](https://bird-bench.github.io/)
+data, clone and run one target. About one second.
 
 ```bash
 git clone https://github.com/moutasemalakkad/context-lift && cd context-lift
@@ -161,6 +172,15 @@ The `gate` runs upstream and is separate: it audits the answer key itself,
 because one broken gold question silently corrupts every score after it.
 
 ## Install
+
+To run it on your own data:
+
+```bash
+uv tool install contextlift   # or: pipx install contextlift
+contextlift demo              # check it works
+```
+
+To develop on it, from a clone:
 
 ```bash
 make install                  # uv venv + editable install with dev deps, no cloud extras

@@ -12,7 +12,16 @@ themselves rather than a story about them.
 
 ## [Unreleased]
 
-Nothing released yet. The first tagged version will be the first entry here.
+### Added
+
+- Published to PyPI, so `uvx contextlift demo` runs the whole loop with
+  nothing installed and no clone. `make check-wheel` builds the wheel and runs
+  that demo from a clean virtual environment outside the checkout, which is
+  what the release workflow checks before it publishes anything.
+- `project.urls` and trove classifiers in `pyproject.toml`, so the PyPI page
+  links back to the repo, the quickstart, the changelog and the issue tracker.
+
+Nothing is tagged yet. These entries become `0.1.0` when `v0.1.0` is pushed.
 
 [kac]: https://keepachangelog.com/en/1.1.0/
 [semver]: https://semver.org/spec/v2.0.0.html

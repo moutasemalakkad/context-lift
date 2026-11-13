@@ -11,13 +11,41 @@ requires-python = ">=3.10"
 license = { text = "Apache-2.0" }
 authors = [{ name = "Moutasem Akkad", email = "moutasemalakkad@gmail.com" }]
 maintainers = [{ name = "Moutasem Akkad", email = "moutasemalakkad@gmail.com" }]
-keywords = ["text-to-sql", "evaluation", "execution-accuracy", "spider", "bird"]
+keywords = ["text-to-sql", "evaluation", "execution-accuracy", "spider", "bird",
+            "llm-evaluation", "data-catalog", "semantic-layer", "bigquery"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: Apache Software License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Database",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Software Development :: Testing",
+]
 # Core is pure stdlib on purpose: the SQLite backend, the comparator, the
 # metrics, and the gate run from a fresh clone with no third-party deps.
 dependencies = []
 
 [project.scripts]
 contextlift = "context_lift.cli:main"
+
+# PyPI renders these as the project page sidebar. Without them the page has no
+# route back to the repo, the docs, or the issue tracker. Keep this table and
+# every other [project.*] sub-table BELOW the plain keys above: a TOML table
+# absorbs every key that follows it, and putting this one higher silently moved
+# `dependencies` into it ("URL `dependencies` must be a string" from hatchling).
+[project.urls]
+Homepage = "https://github.com/moutasemalakkad/context-lift"
+Documentation = "https://github.com/moutasemalakkad/context-lift/blob/main/docs/QUICKSTART.md"
+Repository = "https://github.com/moutasemalakkad/context-lift"
+Changelog = "https://github.com/moutasemalakkad/context-lift/blob/main/CHANGELOG.md"
+Issues = "https://github.com/moutasemalakkad/context-lift/issues"
 
 [project.optional-dependencies]
 # Cloud / LLM backends live behind extras so the fast path stays stdlib-only.

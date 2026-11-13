@@ -1,0 +1,54 @@
+name: release
+
+# Publishing runs on a version tag only, never on a branch push. A PyPI
+# version number can be used exactly once and cannot be reused after a
+# delete, so an accidental publish of 0.1.0 costs that number forever.
+on:
+  push:
+    tags: ["v*"]
+  # Dry run: builds and checks the wheel, then stops before publishing.
+  workflow_dispatch:
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    # Attach a protection rule to this environment in repo settings to require
+    # a manual approval before anything reaches PyPI.
+    environment: pypi
+    permissions:
+      # Trusted Publishing: PyPI accepts a short-lived OIDC token from this
+      # workflow instead of a stored API token. Nothing secret lives here.
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v5
+
+      # A tag of v0.2.0 on a pyproject still saying 0.1.0 publishes 0.1.0 and
+      # the tag then points at a version that was never released.
+      - name: the tag and pyproject.toml must agree
+        if: startsWith(github.ref, 'refs/tags/')
+        run: |
+          tagged="${GITHUB_REF#refs/tags/v}"
+          declared=$(grep -m1 '^version = ' pyproject.toml | cut -d'"' -f2)
+          echo "tag says $tagged, pyproject.toml says $declared"
+          test "$tagged" = "$declared" || {
+            echo "FAIL: bump version in pyproject.toml, or retag"
+            exit 1
+          }
+
+      - name: install
+        run: make install
+
+      - name: test
+        run: make test
+
+      # Builds the wheel and runs `contextlift demo` from it in a clean venv
+      # outside the checkout. This is the `uvx contextlift demo` path from the
+      # README, so a wheel that cannot do it must not be published.
+      - name: the wheel alone must run the demo
+        run: make check-wheel
+
+      - name: publish to PyPI
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: pypa/gh-action-pypi-publish@release/v1
