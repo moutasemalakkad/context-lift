@@ -38,16 +38,48 @@ jobs:
           REPO: ${{ github.repository }}
         run: |
           set -euo pipefail
+
+          # Read one endpoint, or stop the run. The first green run of this
+          # workflow recorded `{"message":"Resource not accessible by
+          # integration","status":"403"}` in place of every traffic figure and
+          # still reported success: the traffic endpoints refuse the default
+          # GITHUB_TOKEN, gh printed the error body, and jq embedded it as
+          # data. A monitor that logs nulls during a launch is worse than no
+          # monitor, so the shape is checked and a bad answer fails the job.
+          read_api () {
+            local path="$1" shape="$2" body
+            if ! body=$(gh api "$path" 2>&1); then
+              echo "::error::GET $path failed: $body" >&2
+              exit 1
+            fi
+            if ! printf '%s' "$body" | jq -e "$shape" >/dev/null 2>&1; then
+              echo "::error::GET $path answered the wrong shape ($shape): $body" >&2
+              echo "::error::If this is a 403, the traffic endpoints need a PAT." >&2
+              echo "::error::Create a fine-grained token with Administration:" >&2
+              echo "::error::read-only on this repo and save it as TRAFFIC_TOKEN." >&2
+              exit 1
+            fi
+            printf '%s' "$body"
+          }
+
+          views=$(read_api "repos/$REPO/traffic/views" '.count | type == "number"')
+          clones=$(read_api "repos/$REPO/traffic/clones" '.count | type == "number"')
+          # Referrers and paths are legitimately `[]` on a quiet day, so the
+          # only thing worth asserting is that they are arrays at all.
+          referrers=$(read_api "repos/$REPO/traffic/popular/referrers" 'type == "array"')
+          paths=$(read_api "repos/$REPO/traffic/popular/paths" 'type == "array"')
+          repo=$(read_api "repos/$REPO" '.stargazers_count | type == "number"')
+
           # -c keeps it one line, which is what makes the file appendable.
           # Referrers are the diagnostic that matters: they say which channel
           # sent people, and so whether a flat day is a traffic problem or a
           # conversion problem.
           jq -nc \
-            --argjson views    "$(gh api "repos/$REPO/traffic/views")" \
-            --argjson clones   "$(gh api "repos/$REPO/traffic/clones")" \
-            --argjson referrers "$(gh api "repos/$REPO/traffic/popular/referrers")" \
-            --argjson paths    "$(gh api "repos/$REPO/traffic/popular/paths")" \
-            --argjson repo     "$(gh api "repos/$REPO")" \
+            --argjson views "$views" \
+            --argjson clones "$clones" \
+            --argjson referrers "$referrers" \
+            --argjson paths "$paths" \
+            --argjson repo "$repo" \
             '{asof: (now | todate),
               stars: $repo.stargazers_count,
               forks: $repo.forks_count,
@@ -57,6 +89,8 @@ jobs:
               views_daily: $views.views,
               referrers: $referrers,
               paths: $paths}' >> metrics.jsonl
+
+          echo "appended: $(tail -1 metrics.jsonl | jq -c '{asof, stars, views_14d}')"
 
       - name: commit
         run: |
