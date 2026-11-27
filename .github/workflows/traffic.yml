@@ -16,11 +16,13 @@ on:
   workflow_dispatch:
 
 permissions:
+  # `administration: read` is not a key a workflow may set, whatever the REST
+  # docs for the traffic endpoints say about the permission they want: the
+  # dispatch is rejected with "Unexpected value 'administration'". The traffic
+  # endpoints want push access, which contents: write already carries for the
+  # workflow's own repository. Set a TRAFFIC_TOKEN secret if that stops being
+  # true; the step below prefers it when present.
   contents: write
-  # The traffic endpoints need more than read access to the repository. The
-  # default GITHUB_TOKEN carries it for its own repo; TRAFFIC_TOKEN is the
-  # escape hatch if a future permission change takes that away.
-  administration: read
 
 jobs:
   snapshot:
