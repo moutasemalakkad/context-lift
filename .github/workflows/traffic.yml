@@ -1,0 +1,68 @@
+name: traffic
+
+# GitHub keeps repository traffic for 14 days and then deletes it. Launch week
+# is the only week whose funnel matters and it cannot be reconstructed after
+# the fact, so a daily snapshot is appended to `metrics.jsonl` on the `metrics`
+# branch. One JSON object per line, never rewritten.
+#
+# The data lives on its own branch so that a daily commit never touches main's
+# history. Read it with:
+#   git fetch origin metrics && git show origin/metrics:metrics.jsonl
+on:
+  schedule:
+    # 06:17 UTC. Off the hour because the hour is when every cron on GitHub
+    # fires at once and the queue runs late.
+    - cron: "17 6 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  # The traffic endpoints need more than read access to the repository. The
+  # default GITHUB_TOKEN carries it for its own repo; TRAFFIC_TOKEN is the
+  # escape hatch if a future permission change takes that away.
+  administration: read
+
+jobs:
+  snapshot:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: metrics
+
+      - name: append today's row
+        env:
+          GH_TOKEN: ${{ secrets.TRAFFIC_TOKEN || secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          # -c keeps it one line, which is what makes the file appendable.
+          # Referrers are the diagnostic that matters: they say which channel
+          # sent people, and so whether a flat day is a traffic problem or a
+          # conversion problem.
+          jq -nc \
+            --argjson views    "$(gh api "repos/$REPO/traffic/views")" \
+            --argjson clones   "$(gh api "repos/$REPO/traffic/clones")" \
+            --argjson referrers "$(gh api "repos/$REPO/traffic/popular/referrers")" \
+            --argjson paths    "$(gh api "repos/$REPO/traffic/popular/paths")" \
+            --argjson repo     "$(gh api "repos/$REPO")" \
+            '{asof: (now | todate),
+              stars: $repo.stargazers_count,
+              forks: $repo.forks_count,
+              open_issues: $repo.open_issues_count,
+              views_14d: {count: $views.count, uniques: $views.uniques},
+              clones_14d: {count: $clones.count, uniques: $clones.uniques},
+              views_daily: $views.views,
+              referrers: $referrers,
+              paths: $paths}' >> metrics.jsonl
+
+      - name: commit
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add metrics.jsonl
+          # Nothing to commit means the API returned the same bytes twice in a
+          # day, which is a re-run and not a failure.
+          git diff --staged --quiet || git commit -m "traffic $(date -u +%F)"
+          git push

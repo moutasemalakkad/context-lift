@@ -275,3 +275,57 @@ def test_formats_doc_is_linked_and_matches_schema_constants():
         assert f"`{code}`" in formats, f"FORMATS.md is missing verdict {code!r}"
     assert f"schema_version: {workspace.SCHEMA_VERSION}" in formats
 
+
+# Each row of the README's "Four results that changed what we build" table, as
+# the figures the README prints and the strings that must still be in the run
+# output it links to. These four are the rows a reader is most likely to quote
+# somewhere this project cannot correct, so a reflow or a re-run that moves a
+# number has to break a test here rather than ship.
+SURPRISE_ROWS = (
+    ("docs/evidence/classes-thelook-cost.txt",
+     ["-27.0 points [-37.8, -16.2]",
+      "66% without it against 39% with, 21 fixed 1 broke"],
+     ["-27.0 points", "[-37.8, -16.2]", "66% without them against 39% with",
+      "fixed 21 questions and broke 1"]),
+    ("docs/evidence/blob-vs-selection.txt",
+     ["-7.7%", "[-15.7%, -1.6%]", "0.0290", "REAL LOSS"],
+     ["-7.7 points", "[-15.7, -1.6]", "0.0290", "REAL LOSS"]),
+    ("examples/thelook/lookml-arm/round-2026-09-12.txt",
+     ["held out: 102 questions, +2.0 points", "0.6875", "NOT PROVEN"],
+     ["+2.0 points", "0.6875", "NOT PROVEN"]),
+    ("docs/evidence/self-route.txt",
+     ["2 of 139 escalated", "1.4%"],
+     ["2 of 139 questions escalated, 1.4%"]),
+)
+
+
+def test_the_readme_surprises_still_match_the_runs_they_link_to():
+    """The four counter-intuitive rows are the ones worth quoting, so they are
+    the ones worth pinning. Each row names a run output; this asserts the
+    figure is in the README AND still in that file. No warehouse, no model."""
+    # Flattened, because a table cell that rewraps is the same claim and an
+    # assertion that breaks on a reflow teaches people to reflow around the
+    # test instead of keeping the claim true.
+    readme = " ".join((REPO / "README.md").read_text().split())
+    assert "Four results that changed what we build" in readme
+
+    for path, in_evidence, in_readme in SURPRISE_ROWS:
+        evidence = (REPO / path).read_text()
+        assert path in readme, f"README stopped linking {path}"
+        for figure in in_evidence:
+            assert figure in evidence, f"{path} no longer contains {figure!r}"
+        for figure in in_readme:
+            assert figure in readme, f"README no longer prints {figure!r} for {path}"
+
+
+def test_the_readme_says_what_the_examples_result_does_not_claim():
+    """-27 points is the most quotable number this project has produced, and
+    the case study is explicit that it is about those 22 examples on that one
+    schema. If the README carries the number it has to carry the limit, or the
+    README becomes the overclaiming version of the case study."""
+    readme = " ".join((REPO / "README.md").read_text().split())
+
+    assert "-27.0 points" in readme
+    assert "not a finding about worked examples" in readme
+    assert "one schema, one model, one run" in readme
+
