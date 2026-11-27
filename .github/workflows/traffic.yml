@@ -35,9 +35,20 @@ jobs:
       - name: append today's row
         env:
           GH_TOKEN: ${{ secrets.TRAFFIC_TOKEN || secrets.GITHUB_TOKEN }}
+          # Which token the line above picked. An unset or empty secret is
+          # falsy, so it falls through silently, and the 403 that follows looks
+          # identical either way: a fine-grained PAT is an integration to
+          # GitHub, so one missing Administration:read answers "Resource not
+          # accessible by integration" exactly as the Actions token does.
+          # Printing which one was used is the difference between a two-minute
+          # fix and an afternoon. The value is never printed, only whether the
+          # secret has one.
+          HAVE_PAT: ${{ secrets.TRAFFIC_TOKEN != '' }}
           REPO: ${{ github.repository }}
         run: |
           set -euo pipefail
+          echo "TRAFFIC_TOKEN set: $HAVE_PAT (false means the Actions token is"
+          echo "in use, which cannot read traffic at all)"
 
           # Read one endpoint, or stop the run. The first green run of this
           # workflow recorded `{"message":"Resource not accessible by
