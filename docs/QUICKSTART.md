@@ -273,12 +273,19 @@ Every command that spends money prints a cost sheet and waits for you to type
 
 ### What to expect on your first round
 
-**UNDERPOWERED**, most likely. A customer estate usually yields 50 to 90
-questions, and 24 held-out questions can only prove a lift above about 20
-points. That is not a failure and not a bug: it is the tool telling you what
+Two lines print, and the one you can act on today is not the verdict.
+
+Expect the verdict to read **UNDERPOWERED**. A customer estate usually yields
+50 to 90 questions, and 24 held-out questions can only prove a lift above about
+20 points. That is not a failure and not a bug: it is the tool telling you what
 your evidence can carry, and printing how many questions would settle it.
 
-If you want a number on the first day, the thing to grow is the question set.
+The safety line beside it needs no sample size. It names every question the
+context broke, and a context that breaks working answers is worth knowing about
+on day one whatever the verdict says.
+
+If you want a provable lift on the first day, the thing to grow is the question
+set.
 
 **Read the safety line, not only the verdict word.** Two numbers print, and
 only one of them is a guess:

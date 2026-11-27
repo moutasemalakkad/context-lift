@@ -110,6 +110,25 @@ read my BI tool?* The answer turns on one number, the share of metrics with a
 description, and `contextlift semantic --lookml <repo>` prints it for free
 before anyone spends anything.
 
+## Four results that changed what we build
+
+The table above is the tool agreeing with the plan. These four did not, and
+each one redirected a round. Every row links the committed run output it was
+read from.
+
+| measured | result |
+|---|---|
+| 22 worked examples, one class removed at a time — [run output](docs/evidence/classes-thelook-cost.txt) | **-27.0 points** [-37.8, -16.2]. 66% without them against 39% with. Deleting them fixed 21 questions and broke 1 |
+| oracle retrieval against sending the whole 22 KB blob, 450 BIRD questions × 3 reps — [run output](docs/evidence/blob-vs-selection.txt) | the blob won. -1.6 overall, NOT PROVEN. On Toxicology alone **-7.7 points** [-15.7, -1.6], p = 0.0290, **REAL LOSS**. 19 questions broken by receiving only their own evidence sentence |
+| a BI model's metric definitions, read out by machine — [run output](examples/thelook/lookml-arm/round-2026-09-12.txt) | 0 of 9 metrics carried a written description. **+2.0 points**, p=0.6875, NOT PROVEN, and 2 questions that were right without it came back wrong |
+| Self-Route: send less and let the model ask for more — [run output](docs/evidence/self-route.txt) | **2 of 139 questions escalated, 1.4%**. A firmer instruction did not raise the rate, so there is no escalation to price |
+
+Each row is one schema, one model, one run. The first is not a finding about
+worked examples; it is a finding about those 22 on that seven-table schema, and
+a well-matched example measured the other way. Every section in
+[docs/CASE_STUDY.md](docs/CASE_STUDY.md) ends by stating what it does not
+establish.
+
 ## How it works
 
 ![contextlift demo: the whole loop on a seven-row warehouse, offline](docs/assets/demo.gif)

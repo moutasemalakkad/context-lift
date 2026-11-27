@@ -32,11 +32,14 @@ template for it.
 ## Deliberately not planned
 
 **Agent-framework adapters: LangChain, LlamaIndex, MLflow, Weights & Biases,
-agent-observability integrations.** Refused outright, and written here so they
-are not proposed a third time. Each one turns this into a general evaluation
-platform, and the sharp thing about this tool is that it answers one question
-well. This is a rejection of breadth as an adoption strategy: it trades the
-only distinctive thing for a longer feature list.
+agent-observability integrations.** Not planned. Each one turns this into a
+general evaluation platform, and the sharp thing about this tool is that it
+answers one question well. A longer feature list would cost the only
+distinctive thing it has.
+
+If you want these numbers inside a tool you already run, open an issue naming
+the output you want to read. Reading a file out is a much smaller change than
+an adapter, and that request is welcome.
 
 **A `knowledge.yaml` schema.** Proposed and closed. The convention already IS
 the schema — rules files are concatenated in filename order and the more
