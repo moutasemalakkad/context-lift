@@ -9,6 +9,10 @@ INDEX := https://pypi.org/simple/
 # every target runs against it: `make example` died with "No module named
 # contextlift" naming a python in an unrelated repo. Found in the field.
 export VIRTUAL_ENV := $(CURDIR)/.venv
+# Chrome rasterises the link-preview card. GitHub refuses SVG for a social
+# preview, and this is the one rasteriser already on a Mac that ships no
+# dependency with it. Override on Linux: make social-card CHROME=$(which chromium)
+CHROME ?= /Applications/Google Chrome.app/Contents/MacOS/Google Chrome
 
 help: ## show available targets
 	@grep -E '^[a-zA-Z_-]+:.*## ' $(MAKEFILE_LIST) \
@@ -133,6 +137,14 @@ check-board:  ## check the planning board against the code (needs CHECKLIST=path
 
 results-chart:  ## redraw the README's results chart from docs/assets/results.json
 	@uv run python scripts/make_results_chart.py
+
+social-card:  ## re-render the 1280x640 link preview (needs Google Chrome)
+	@test -x "$(CHROME)" || { echo "Chrome not found at $(CHROME); set CHROME=/path/to/chrome"; exit 1; }
+	@"$(CHROME)" --headless --disable-gpu --hide-scrollbars \
+		--screenshot=docs/assets/social-card.png --window-size=1280,640 \
+		"file://$(CURDIR)/docs/assets/social-card.html" 2>/dev/null
+	@ls -lh docs/assets/social-card.png | awk '{print "wrote docs/assets/social-card.png ("$$5")"}'
+	@echo "upload it at https://github.com/moutasemalakkad/context-lift/settings -> Social preview"
 
 demo-gif:  ## re-record the README's terminal demo (needs: brew install vhs ttyd ffmpeg)
 	@command -v vhs >/dev/null || { echo "vhs not found: brew install vhs ttyd ffmpeg"; exit 1; }

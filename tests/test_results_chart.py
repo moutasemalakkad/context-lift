@@ -269,3 +269,33 @@ def test_a_row_quoting_a_two_denominator_evidence_file_quotes_the_question_half(
     assert checked >= 2, (
         f"only {checked} row(s) were actually checked against a two-level "
         f"source, so this test is close to vacuous")
+
+
+def test_the_social_card_is_the_size_github_accepts_and_draws_the_real_chart():
+    """The link preview is the first thing anyone sees on X, LinkedIn or Slack,
+    and it is the one artifact in this repository that no reader can check
+    against a source. So two things are pinned: it is 1280x640, the size
+    GitHub crops anything else to, and it draws the committed chart rather
+    than carrying numbers typed into the card by hand."""
+    import struct
+
+    card = ROOT / "docs" / "assets" / "social-card.png"
+    page = (ROOT / "docs" / "assets" / "social-card.html").read_text()
+
+    assert "results-dark.svg" in page, (
+        "the card stopped drawing the generated chart, which means its figures "
+        "are no longer pinned to results.json by anything")
+    assert not re.search(r"\+\d+\.\d", page), (
+        "a figure was typed into the card; it has to come from the chart, "
+        "because no test reads a PNG and a stale number here is invisible")
+
+    # PNG header: 8-byte signature, then the IHDR length and tag, then the
+    # dimensions as two big-endian uint32. Cheaper than a image library for
+    # the one fact that matters.
+    header = card.read_bytes()[:24]
+    assert header[:8] == b"\x89PNG\r\n\x1a\n", "social-card.png is not a PNG"
+    width, height = struct.unpack(">II", header[16:24])
+    assert (width, height) == (1280, 640), (
+        f"GitHub's social preview is 1280x640 and this is {width}x{height}; "
+        f"re-run `make social-card`")
+    assert card.stat().st_size < 1_000_000, "GitHub rejects a preview over 1 MB"

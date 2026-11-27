@@ -1,0 +1,60 @@
+<!doctype html>
+<!--
+  The 1280x640 OpenGraph card. This is what X, LinkedIn, Slack and Discord
+  show when someone pastes the repository link, and GitHub only accepts a
+  raster image for it, so `make social-card` screenshots this page.
+
+  It carries no number of its own. The figures come from results-dark.svg,
+  which make_results_chart.py draws from docs/assets/results.json and
+  tests/test_results_chart.py pins to its sources. A card with typed-in
+  numbers is a figure nobody can recompute, and it goes stale silently
+  because no test reads a PNG.
+-->
+<html lang="en">
+<meta charset="utf-8">
+<style>
+  /* GitHub's dark palette, same as results-dark.svg, so the chart sits on the
+     card instead of floating in a lighter box. */
+  html, body { margin: 0; padding: 0; background: #0d1117; }
+  body {
+    width: 1280px; height: 640px;
+    box-sizing: border-box;
+    padding: 56px 64px;
+    display: flex; flex-direction: column;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    color: #f0f6fc;
+    overflow: hidden;
+  }
+  .name { font-size: 34px; font-weight: 700; letter-spacing: -0.4px; }
+  .name span { color: #3fb950; }
+  h1 {
+    margin: 18px 0 0;
+    font-size: 52px; line-height: 1.12; font-weight: 700;
+    letter-spacing: -1.2px;
+    max-width: 20ch;
+  }
+  .chart { margin-top: auto; }
+  .chart img { width: 1030px; display: block; }
+  footer {
+    margin-top: 22px;
+    font-size: 21px; color: #9198a1;
+  }
+  footer b { color: #f0f6fc; font-weight: 600; }
+</style>
+
+<div class="name">context<span>lift</span></div>
+
+<h1>Does your written business context actually help?</h1>
+
+<div class="chart">
+  <img src="results-dark.svg" alt="">
+</div>
+
+<!-- The chart draws only the rows results.json marks show_in_readme, which are
+     the three that cleared 0.05. So the footer must not promise a NOT PROVEN
+     bar the picture does not contain; it points at where those rows live. -->
+<footer>
+  Paired test, 95% intervals, questions held back from curation.
+  The runs that <b>did not</b> clear the bar are in the repo too.
+</footer>
+</html>
